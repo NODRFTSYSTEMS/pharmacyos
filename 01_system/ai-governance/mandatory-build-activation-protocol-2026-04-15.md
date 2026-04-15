@@ -1,6 +1,6 @@
 # Mandatory Build Activation Protocol
 
-Status: proposed canonical governance  
+Status: canonical governance  
 Date: 2026-04-15  
 Owners: Founder, ARE, PRGA, QAS  
 Confidentiality: proprietary internal framework; no external publishing approved  
@@ -37,7 +37,7 @@ This protocol applies to:
 - agent capability assessment before execution
 - minimum build cell before work starts
 - mandatory planning phase
-- explicit handoff path to relevant and capable agents
+- explicit agent assessment and handoff routing gate before packet approval
 - separate reviewer assignment before review begins
 - evidence package before merge or release
 - structured completion reporting
@@ -168,6 +168,49 @@ Required actions:
 - define the likely handoff path if work crosses domains
 - assign the reviewer path
 
+#### Gate 0A: Agent Assessment & Handoff Routing
+
+Before the build packet is approved, `MOA`, `PMA`, and `RCA` must complete an explicit agent-assessment and produce a bounded handoff plan.
+
+**Assessment steps:**
+
+1. **Surface mapping** — List every technical surface affected by the build (frontend, backend, API, database, infrastructure, third-party integration, agent-system wiring, performance path, security boundary).
+2. **Role-to-surface matching** — Map each affected surface to the smallest set of relevant and capable agents from the 55-agent approved registry:
+   - Architecture / boundary-setting → `SAA`
+   - Repository context / pattern inventory → `RCA`
+   - Frontend UI / component implementation → `FIS`
+   - Backend API / business logic → `BLS`
+   - Third-party integration / debugging → `IDS`
+   - Database schema / migrations → `DSS`
+   - Infrastructure / deployment / CI → `PIS`
+   - Performance optimization → `POS`
+   - Agent-system integration / orchestration → `ASIS`
+   - UI design fidelity → `DAA`
+   - Accessibility compliance → `AAA`
+   - Security / compliance review → `SCA`
+   - Deployment readiness → `DRA`
+   - Test design / verification evidence → `TVA`
+3. **Capability check** — For each proposed agent, confirm:
+   - The agent's skill pack exists and is loadable.
+   - The agent's bounded scope covers the specific task surface.
+   - The agent has the required inputs available (specs, contracts, context, test baseline).
+   - No cheaper or more focused agent can own the same surface with equal or better precision.
+4. **Overlap elimination** — If two agents could claim the same surface, assign a primary owner and define the other as consult-only or reviewer.
+5. **Handoff routing plan** — Document the expected execution sequence:
+   - Which agent starts the work.
+   - Under what condition the work hands off to the next agent.
+   - The exact bounded surface being transferred at each handoff.
+   - The evidence package that must accompany each handoff.
+   - The fallback agent if the primary agent stalls or hits a confidence-floor breach.
+
+**Output:** A signed-off `agent-routing-note` attached to the build packet containing:
+- assigned cell list with justification per role
+- handoff sequence and trigger conditions
+- evidence requirements between handoffs
+- any capability gaps and how they will be closed before execution
+
+If the agent assessment cannot produce a clean routing plan, the build does not activate.
+
 #### Gate 1: Build Packet Approval
 
 `PMA` must produce a build packet containing:
@@ -180,6 +223,7 @@ Required actions:
 - risk level
 - required evidence
 - release sensitivity
+- **agent routing note (from Gate 0A)**
 
 If the build packet is weak, the build does not activate.
 
@@ -337,11 +381,11 @@ Route escalation through `HHC` to Founder when:
 This protocol is working only when:
 
 - no governed build starts without classification and a complete build packet
-- every governed build assesses which agents are relevant and capable before execution
+- every governed build completes Gate 0A agent assessment and handoff routing before the build packet is approved
 - every governed build has `RCA`, one implementation lead, `TVA`, and a separate reviewer path
 - every governed build uses an approved root contract and scoped prompt stack
 - specialist activation matches actual build risk
-- handoffs are explicit, bounded, and routed to the correct capable role
+- handoffs are explicit, bounded, and routed to the correct capable role per the agent-routing-note
 - evidence exists before independent review
 - structured completion reporting exists before release advancement
 - release-sensitive work cannot reach production without `DRA`, `QAS`, and human gate completion
