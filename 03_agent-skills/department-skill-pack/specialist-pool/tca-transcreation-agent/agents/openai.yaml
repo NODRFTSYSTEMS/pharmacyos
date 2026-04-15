@@ -1,0 +1,3 @@
+display_name: TCA - Transcreation Agent
+short_description: Produce Spanish versions that preserve tone, conversion strength, and cultural appropriateness.
+default_prompt: Use TCA to spanish transcreation within NoDrftSystems rules and escalate when authority or confidence limits are reached.

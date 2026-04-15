@@ -1,0 +1,3 @@
+display_name: PEA - Proposal Engine Agent
+short_description: Produces accurate proposal drafts using approved NoDrftSystems packages and pricing with mandatory scope-gap and pricing-safety checks.
+default_prompt: Use PEA to generate proposal drafts within NoDrftSystems approved pricing and scope rules and escalate when authority or confidence limits are reached.

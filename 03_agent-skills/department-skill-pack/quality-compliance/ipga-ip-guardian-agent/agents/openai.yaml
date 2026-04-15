@@ -1,0 +1,3 @@
+display_name: IPGA - IP Guardian Agent
+short_description: Reviews deliverables for copyright, licensing, and provenance risk with severity-ranked findings and remediation instructions.
+default_prompt: Use IPGA to assess IP and provenance risk within NoDrftSystems standards and escalate when authority or confidence limits are reached.

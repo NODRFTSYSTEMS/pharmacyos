@@ -1,0 +1,3 @@
+display_name: DESA - Data Extraction & Structuring Agent
+short_description: Convert messy inputs into defined schemas with confidence scoring and ambiguity flags.
+default_prompt: Use DESA to unstructured data extraction and structuring within NoDrftSystems rules and escalate when authority or confidence limits are reached.

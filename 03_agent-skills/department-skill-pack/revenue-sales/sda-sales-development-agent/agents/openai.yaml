@@ -1,0 +1,3 @@
+display_name: SDA - Sales Development Agent
+short_description: Sources and qualifies prospects against the NoDrftSystems ICP, producing enriched lead records with fit scoring and red-flag notes.
+default_prompt: Use SDA to source and qualify leads within NoDrftSystems ICP rules and escalate when authority or confidence limits are reached.

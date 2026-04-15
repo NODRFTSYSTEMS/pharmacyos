@@ -1,0 +1,3 @@
+display_name: DCPA - Discovery Call Prep Agent
+short_description: Prepares discovery briefing packets with gap lists, risk notes, and structured agendas so human-led discovery calls produce commercially bounded outcomes.
+default_prompt: Use DCPA to prepare discovery briefing packets within NoDrftSystems rules and escalate when authority or confidence limits are reached.

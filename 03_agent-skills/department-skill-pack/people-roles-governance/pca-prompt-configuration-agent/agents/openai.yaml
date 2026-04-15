@@ -1,0 +1,3 @@
+display_name: PCA - Prompt Configuration Agent
+short_description: Maintains the NoDrftSystems prompt library with versioning, change logs, diff notes, and rollback references for all active prompts.
+default_prompt: Use PCA to version and track prompt changes within NoDrftSystems governance rules and escalate when authority or confidence limits are reached.

@@ -246,6 +246,60 @@ Minimum repository-side records after acceptance or formal review:
 - route only after a baseline exists
 - do not use a retainer to replace basic scoping discipline
 
+## Manual Record Protocol
+
+Until a live operations database is active, the following steps are mandatory for every accepted or materially reviewed opportunity.
+
+### Steps
+
+1. Download the intake packet JSON from the intake form.
+2. Create a client workspace folder under `02_client-system/` using the naming convention `CLIENTNAME_project-slug`.
+3. Copy the workspace template from `02_client-system/templates/client-workspace-template/` into the new client folder.
+4. Store the intake packet JSON in `01_intake/intake-packet.json`.
+5. Complete `01_intake/intake-summary.txt` from the intake submission.
+6. Complete `01_intake/qualification-decision.md` using the scoring criteria below.
+7. Complete `00_admin/client-control-sheet.md` with authority, risk, and phase controls.
+8. Log the intake date, project slug, and routing decision in a running operations note until a database is live.
+
+### Do not proceed to discovery or proposal without steps 1–7 complete.
+
+If the intake packet was not generated from the form (e.g., a referral or direct conversation), recreate it manually using the intake summary template before assigning to a workspace.
+
+## Scoring Criteria
+
+Qualification scoring uses these dimensions. Total must reach the band threshold before routing advances.
+
+| Dimension | Max Points | Guidance |
+| --- | --- | --- |
+| Budget clarity | 20 | 20 = specific stated budget; 10 = range stated; 0 = unknown or vague |
+| Timeline realism | 15 | 15 = feasible timeline with buffer; 8 = tight but achievable; 0 = unrealistic or unstated |
+| Decision-maker access | 15 | 15 = decision-maker is the contact; 8 = contact has access to DM; 0 = DM unknown |
+| ICP alignment | 20 | 20 = strong ICP match on all signals; 10 = partial match; 0 = weak or misfit |
+| Scope clarity | 15 | 15 = clear and bounded; 8 = partially defined; 0 = vague or undefined |
+| Red flag reduction | 15 | 15 = zero red flags; 8 = 1–2 manageable flags; 0 = 3+ red flags or a blocker present |
+
+### Band thresholds
+
+- `85–100`: proposal-ready — proceed to PEA with approved package recommendation
+- `70–84`: discovery required — route to Discovery Sprint before any pricing conversation
+- `50–69`: gaps must close first — return to lead with specific missing-data request; do not schedule discovery without resolution
+- `0–49`: decline or Founder Review — do not advance without Founder input
+
+### Red flag trigger list
+
+Any single item below triggers an automatic flag regardless of total score:
+
+- budget authority is unconfirmed
+- timeline is fixed and scope is completely undefined
+- more than 3 required approvers are identified
+- compliance or legal risk is significant and unresolved
+- prior delivery friction was disclosed but not explained
+- scope requires capabilities not in the approved service catalog
+
+### Override rule
+
+A scoring band does not override policy. If policy requires Discovery Sprint or Founder Review, those gates apply regardless of score.
+
 ## Acceptance Criteria
 
 The intake system is operational when:
@@ -256,6 +310,7 @@ The intake system is operational when:
 - every accepted lead can be instantiated into the workspace template
 - every client workspace follows the same stage-based structure
 - discovery is triggered automatically when scope is still unclear
+- manual record steps are completed before any opportunity advances past intake
 
 ## Recommended Next Build Order
 

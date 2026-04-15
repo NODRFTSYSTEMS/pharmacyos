@@ -1,0 +1,1674 @@
+version: 1
+generated_at: 2026-04-14
+source_priority:
+  approved_registry: 01_system/registry/final-approved-department-and-agent-registry.md
+  skill_library: 90_source-documents/ai-architecture/NoDrftSystems_Skills_Library_v1.md
+  skill_creator: C:/Users/nkwtr/.codex/skills/.system/skill-creator/SKILL.md
+pack_root: 03_agent-skills/department-skill-pack
+authority_routing:
+  founder: HR-FOUNDER
+  are: HR-ARE
+  growth_lead: HR-GROWTH
+
+skills:
+
+  # --- SUPERVISOR LAYER ---
+
+  - skill_id: moa-master-orchestrator-agent
+    agent_code: MOA
+    canonical_name: Master Orchestrator Agent
+    caribbean_name: Zayne
+    department: supervisor-layer
+    path: 03_agent-skills/department-skill-pack/supervisor-layer/moa-master-orchestrator-agent
+    activation_status: always-on
+    load_priority: core
+    trigger_terms:
+      - route work
+      - orchestrate tasks
+      - assign agents
+      - dependency map
+      - workflow stall
+      - task assignment
+    workflow_tags:
+      - orchestration
+      - routing
+      - dependency-management
+    required_inputs:
+      - task brief
+      - project registry
+      - agent availability
+      - SOP reference
+      - context package
+    outputs:
+      - task assignments
+      - dependency maps
+      - routing logs
+      - workflow status summaries
+    confidence_floor: 85
+    escalates_to_ai:
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: qas-quality-assurance-supervisor
+    agent_code: QAS
+    canonical_name: Quality Assurance Supervisor
+    caribbean_name: Imani
+    department: supervisor-layer
+    path: 03_agent-skills/department-skill-pack/supervisor-layer/qas-quality-assurance-supervisor
+    activation_status: always-on
+    load_priority: core
+    trigger_terms:
+      - quality gate
+      - QA review
+      - defect classification
+      - release recommendation
+      - pass fail decision
+    workflow_tags:
+      - quality-assurance
+      - gate-enforcement
+      - defect-management
+    required_inputs:
+      - completed deliverable
+      - original scope
+      - QA checklists
+      - prior QA reports
+      - supporting evidence
+    outputs:
+      - QA review reports
+      - defect logs
+      - release recommendations
+      - remediation assignments
+    confidence_floor: 90
+    escalates_to_ai:
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: csm-context-state-manager
+    agent_code: CSM
+    canonical_name: Context State Manager
+    caribbean_name: Josette
+    department: supervisor-layer
+    path: 03_agent-skills/department-skill-pack/supervisor-layer/csm-context-state-manager
+    activation_status: always-on
+    load_priority: core
+    trigger_terms:
+      - project state
+      - context package
+      - state conflict
+      - prior decisions
+      - project memory
+    workflow_tags:
+      - state-management
+      - context-continuity
+      - archive
+    required_inputs:
+      - project briefs
+      - client profile
+      - prior deliverables
+      - change records
+      - human decisions
+    outputs:
+      - context packages
+      - state logs
+      - conflict flags
+      - archive records
+    confidence_floor: 100
+    escalates_to_ai:
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: hhc-human-handoff-coordinator
+    agent_code: HHC
+    canonical_name: Human Handoff Coordinator
+    caribbean_name: Desmond
+    department: supervisor-layer
+    path: 03_agent-skills/department-skill-pack/supervisor-layer/hhc-human-handoff-coordinator
+    activation_status: always-on
+    load_priority: core
+    trigger_terms:
+      - escalation
+      - human routing
+      - decision brief
+      - urgency classification
+      - escalation log
+    workflow_tags:
+      - escalation-management
+      - human-routing
+      - decision-brief
+    required_inputs:
+      - escalation signals from agents
+      - routing matrix
+      - SLA rules
+      - decision context
+    outputs:
+      - escalation decision briefs
+      - routing records
+      - resolution logs
+      - weekly escalation summaries
+    confidence_floor: 95
+    escalates_to_ai: []
+    escalates_to_human:
+      - HR-FOUNDER
+      - HR-ARE
+      - HR-GROWTH
+    source_status: approved
+
+  # --- REVENUE & SALES ---
+
+  - skill_id: sda-sales-development-agent
+    agent_code: SDA
+    canonical_name: Sales Development Agent
+    caribbean_name: Marlon
+    department: revenue-sales
+    path: 03_agent-skills/department-skill-pack/revenue-sales/sda-sales-development-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - lead sourcing
+      - prospect research
+      - ICP fit
+      - lead qualification
+      - red flag review
+    workflow_tags:
+      - lead-generation
+      - qualification
+      - prospecting
+    required_inputs:
+      - ICP definition
+      - market targets
+      - source lists
+      - lead criteria
+      - scorecard logic
+    outputs:
+      - qualified lead records
+      - fit notes
+      - red-flag notes
+      - sourcing reports
+    confidence_floor: 80
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: ooa-outreach-orchestration-agent
+    agent_code: OOA
+    canonical_name: Outreach Orchestration Agent
+    caribbean_name: Althea
+    department: revenue-sales
+    path: 03_agent-skills/department-skill-pack/revenue-sales/ooa-outreach-orchestration-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - outreach draft
+      - sequence creation
+      - reply classification
+      - follow-up task
+      - messaging cadence
+    workflow_tags:
+      - outreach
+      - sequencing
+      - reply-management
+    required_inputs:
+      - lead records
+      - approved messaging
+      - outreach rules
+      - prior reply history
+    outputs:
+      - outreach drafts
+      - reply classifications
+      - follow-up tasks
+      - sequence reports
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: crma-crm-operations-agent
+    agent_code: CRMA
+    canonical_name: CRM Operations Agent
+    caribbean_name: Daren
+    department: revenue-sales
+    path: 03_agent-skills/department-skill-pack/revenue-sales/crma-crm-operations-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - pipeline update
+      - CRM stage
+      - stall alert
+      - pipeline report
+      - deal tracking
+    workflow_tags:
+      - pipeline-management
+      - crm
+      - deal-tracking
+    required_inputs:
+      - lead record
+      - communication log
+      - human call outcomes
+      - proposal status
+    outputs:
+      - pipeline updates
+      - task assignments
+      - stall alerts
+      - weekly pipeline reports
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: pea-proposal-engine-agent
+    agent_code: PEA
+    canonical_name: Proposal Engine Agent
+    caribbean_name: Giselle
+    department: revenue-sales
+    path: 03_agent-skills/department-skill-pack/revenue-sales/pea-proposal-engine-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - proposal generation
+      - scope pricing
+      - package fit
+      - scope gap
+      - pricing safety
+    workflow_tags:
+      - proposal
+      - pricing
+      - commercial
+    required_inputs:
+      - questionnaire
+      - recommended package
+      - approved pricing
+      - scope notes
+      - scorecard
+    outputs:
+      - proposal drafts
+      - pricing safety result
+      - scope-gap list
+      - recommendation notes
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: dcpa-discovery-call-prep-agent
+    agent_code: DCPA
+    canonical_name: Discovery Call Prep Agent
+    caribbean_name: Vaughn
+    department: revenue-sales
+    path: 03_agent-skills/department-skill-pack/revenue-sales/dcpa-discovery-call-prep-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - discovery prep
+      - briefing packet
+      - call agenda
+      - risk surfacing
+      - decision questions
+    workflow_tags:
+      - discovery
+      - call-preparation
+      - briefing
+    required_inputs:
+      - questionnaire
+      - lead notes
+      - prior communications
+      - target package hypotheses
+    outputs:
+      - discovery briefing packet
+      - risk list
+      - decision agenda
+      - open-question list
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  # --- MARKETING & CONTENT ---
+
+  - skill_id: cea-content-engine-agent
+    agent_code: CEA
+    canonical_name: Content Engine Agent
+    caribbean_name: Kalila
+    department: marketing-content
+    path: 03_agent-skills/department-skill-pack/marketing-content/cea-content-engine-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - content draft
+      - post production
+      - article writing
+      - case study draft
+      - content structure
+    workflow_tags:
+      - content-production
+      - drafting
+      - channel-content
+    required_inputs:
+      - content brief
+      - audience
+      - offer
+      - approved claims
+      - source materials
+    outputs:
+      - draft content
+      - content outlines
+      - repurposing variants
+      - content logs
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: bca-brand-consistency-agent
+    agent_code: BCA
+    canonical_name: Brand Consistency Agent
+    caribbean_name: Nadine
+    department: marketing-content
+    path: 03_agent-skills/department-skill-pack/marketing-content/bca-brand-consistency-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - brand review
+      - voice check
+      - tone consistency
+      - positioning review
+      - off-brand flag
+    workflow_tags:
+      - brand
+      - consistency-review
+      - messaging
+    required_inputs:
+      - draft content
+      - brand rules
+      - approved vocabulary
+      - audience posture
+    outputs:
+      - brand review notes
+      - pass-fail decisions
+      - revision instructions
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: staa-seo-technical-audit-agent
+    agent_code: STAA
+    canonical_name: SEO Technical Audit Agent
+    caribbean_name: Jermaine
+    department: marketing-content
+    path: 03_agent-skills/department-skill-pack/marketing-content/staa-seo-technical-audit-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - SEO audit
+      - crawl structure
+      - metadata review
+      - indexability
+      - search readiness
+    workflow_tags:
+      - seo
+      - technical-audit
+      - search
+    required_inputs:
+      - site pages
+      - page metadata
+      - content inventory
+      - technical access reports
+    outputs:
+      - SEO audit reports
+      - issue lists
+      - remediation priorities
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: dsa-distribution-scheduling-agent
+    agent_code: DSA
+    canonical_name: Distribution Scheduling Agent
+    caribbean_name: Soraya
+    department: marketing-content
+    path: 03_agent-skills/department-skill-pack/marketing-content/dsa-distribution-scheduling-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - distribution schedule
+      - content calendar
+      - channel queue
+      - publication plan
+      - posting cadence
+    workflow_tags:
+      - distribution
+      - scheduling
+      - calendar
+    required_inputs:
+      - approved content
+      - channel rules
+      - posting calendar
+      - campaign priorities
+    outputs:
+      - distribution schedules
+      - queue lists
+      - channel plans
+      - publication checklists
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: cpa-campaign-performance-agent
+    agent_code: CPA
+    canonical_name: Campaign Performance Agent
+    caribbean_name: Dwayne
+    department: marketing-content
+    path: 03_agent-skills/department-skill-pack/marketing-content/cpa-campaign-performance-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - campaign performance
+      - KPI tracking
+      - channel analysis
+      - underperformance flag
+      - campaign report
+    workflow_tags:
+      - campaign-analysis
+      - performance
+      - reporting
+    required_inputs:
+      - campaign data
+      - analytics reports
+      - goals
+      - historical benchmarks
+    outputs:
+      - performance summaries
+      - KPI dashboards
+      - recommendation notes
+    confidence_floor: 80
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  # --- DELIVERY & BUILD ---
+
+  - skill_id: pma-product-manager-agent
+    agent_code: PMA
+    canonical_name: Product Manager Agent
+    caribbean_name: Keon
+    department: delivery-build
+    path: 03_agent-skills/department-skill-pack/delivery-build/pma-product-manager-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - execution plan
+      - task decomposition
+      - milestone mapping
+      - blocker tracking
+      - delivery planning
+    workflow_tags:
+      - delivery-planning
+      - task-management
+      - milestone-tracking
+    required_inputs:
+      - approved scope
+      - SOW
+      - architecture decisions
+      - context package
+      - timeline assumptions
+    outputs:
+      - execution plans
+      - task packets
+      - milestone maps
+      - blocker logs
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: sea-software-engineer-agent
+    agent_code: SEA
+    canonical_name: Software Engineer Agent
+    caribbean_name: Malik
+    department: delivery-build
+    path: 03_agent-skills/department-skill-pack/delivery-build/sea-software-engineer-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - implementation
+      - code build
+      - defect fix
+      - technical artifact
+      - feature development
+    workflow_tags:
+      - implementation
+      - code
+      - build
+    required_inputs:
+      - task packet
+      - architecture notes
+      - design guidance
+      - repo context
+      - acceptance criteria
+    outputs:
+      - code changes
+      - implementation notes
+      - test artifacts
+      - handoff packages
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: daa-design-assistance-agent
+    agent_code: DAA
+    canonical_name: Design Assistance Agent
+    caribbean_name: Anika
+    department: delivery-build
+    path: 03_agent-skills/department-skill-pack/delivery-build/daa-design-assistance-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - design guidance
+      - layout review
+      - component notes
+      - UI hierarchy
+      - design support
+    workflow_tags:
+      - design
+      - ui-support
+      - layout
+    required_inputs:
+      - design brief
+      - existing UI
+      - brand rules
+      - user goals
+      - implementation constraints
+    outputs:
+      - design support notes
+      - layout recommendations
+      - component guidance
+      - review annotations
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: aaa-accessibility-audit-agent
+    agent_code: AAA
+    canonical_name: Accessibility Audit Agent
+    caribbean_name: Rochelle
+    department: delivery-build
+    path: 03_agent-skills/department-skill-pack/delivery-build/aaa-accessibility-audit-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - accessibility audit
+      - WCAG review
+      - alt text
+      - keyboard navigation
+      - contrast check
+    workflow_tags:
+      - accessibility
+      - audit
+      - compliance
+    required_inputs:
+      - UI build artifact
+      - accessibility criteria
+      - component inventory
+      - test evidence
+    outputs:
+      - accessibility reports
+      - issue lists
+      - severity rankings
+      - remediation notes
+    confidence_floor: 90
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: dra-deployment-readiness-agent
+    agent_code: DRA
+    canonical_name: Deployment Readiness Agent
+    caribbean_name: Terrence
+    department: delivery-build
+    path: 03_agent-skills/department-skill-pack/delivery-build/dra-deployment-readiness-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - deployment readiness
+      - release checklist
+      - rollback plan
+      - environment verification
+      - pre-release review
+    workflow_tags:
+      - deployment
+      - release-readiness
+      - pre-release
+    required_inputs:
+      - build artifact
+      - checklist
+      - QA status
+      - environment notes
+      - dependency status
+    outputs:
+      - deployment readiness report
+      - blocker list
+      - release checklist result
+    confidence_floor: 95
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  # --- QUALITY & COMPLIANCE ---
+
+  - skill_id: qda-qa-documentation-agent
+    agent_code: QDA
+    canonical_name: QA Documentation Agent
+    caribbean_name: Patrice
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/qda-qa-documentation-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - QA documentation
+      - evidence log
+      - defect record
+      - QA summary
+      - completion record
+    workflow_tags:
+      - qa-documentation
+      - evidence
+      - audit-trail
+    required_inputs:
+      - QA results
+      - defect notes
+      - checklist outcomes
+      - project context
+    outputs:
+      - QA documentation packets
+      - evidence logs
+      - completion support docs
+    confidence_floor: 100
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: qadm-qa-drift-monitor-agent
+    agent_code: QADM
+    canonical_name: QA Drift Monitor Agent
+    caribbean_name: Fabian
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/qadm-qa-drift-monitor-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - drift detection
+      - regression monitoring
+      - variance report
+      - standard comparison
+      - output drift
+    workflow_tags:
+      - drift-monitoring
+      - regression
+      - variance
+    required_inputs:
+      - accepted baseline
+      - new output
+      - quality rules
+      - prior issue history
+    outputs:
+      - drift reports
+      - regression flags
+      - variance summaries
+    confidence_floor: 85
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: ipga-ip-guardian-agent
+    agent_code: IPGA
+    canonical_name: IP Guardian Agent
+    caribbean_name: Camille
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/ipga-ip-guardian-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - IP risk
+      - copyright review
+      - provenance check
+      - license flag
+      - attribution
+    workflow_tags:
+      - ip-protection
+      - copyright
+      - provenance
+    required_inputs:
+      - draft deliverables
+      - source references
+      - assets list
+      - third-party component list
+    outputs:
+      - IP risk reports
+      - provenance notes
+      - flagged items
+      - remediation instructions
+    confidence_floor: 90
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: sca-security-compliance-agent
+    agent_code: SCA
+    canonical_name: Security Compliance Agent
+    caribbean_name: Omari
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/sca-security-compliance-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - security review
+      - vulnerability scan
+      - secrets exposure
+      - compliance check
+      - incident flag
+    workflow_tags:
+      - security
+      - compliance
+      - risk
+    required_inputs:
+      - code build artifact
+      - security scan outputs
+      - environment notes
+      - compliance requirements
+    outputs:
+      - security findings
+      - risk rankings
+      - remediation notes
+      - incident flags
+    confidence_floor: 90
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: bpa-bilingual-parity-agent
+    agent_code: BPA
+    canonical_name: Bilingual Parity Agent
+    caribbean_name: Maritza
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/bpa-bilingual-parity-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - bilingual parity
+      - EN ES comparison
+      - CTA parity
+      - false cognate
+      - glossary check
+    workflow_tags:
+      - bilingual
+      - parity
+      - translation-review
+    required_inputs:
+      - EN version
+      - ES version
+      - glossary
+      - CTA library
+      - bilingual standards
+    outputs:
+      - parity reports
+      - divergence logs
+      - cultural flags
+      - pass-fail result
+    confidence_floor: 90
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: pla-plain-language-agent
+    agent_code: PLA
+    canonical_name: Plain Language Agent
+    caribbean_name: Simone
+    department: quality-compliance
+    path: 03_agent-skills/department-skill-pack/quality-compliance/pla-plain-language-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - plain language review
+      - jargon check
+      - reading level
+      - acronym log
+      - buyer-safe language
+    workflow_tags:
+      - plain-language
+      - readability
+      - jargon-review
+    required_inputs:
+      - document content
+      - glossary
+      - buyer profile
+      - plain-language rules
+    outputs:
+      - plain-language reviews
+      - acronym logs
+      - jargon flags
+      - replacement suggestions
+    confidence_floor: 90
+    escalates_to_ai:
+      - QAS
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  # --- CLIENT SUCCESS ---
+
+  - skill_id: coa-client-onboarding-agent
+    agent_code: COA
+    canonical_name: Client Onboarding Agent
+    caribbean_name: Talia
+    department: client-success
+    path: 03_agent-skills/department-skill-pack/client-success/coa-client-onboarding-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - onboarding prep
+      - kickoff packet
+      - access checklist
+      - onboarding readiness
+      - client kickoff
+    workflow_tags:
+      - onboarding
+      - kickoff
+      - access-management
+    required_inputs:
+      - signed deal info
+      - client contacts
+      - approved scope
+      - communication preferences
+      - access requirements
+    outputs:
+      - onboarding checklist
+      - kickoff packet
+      - access list
+      - readiness report
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: cca-client-communication-agent
+    agent_code: CCA
+    canonical_name: Client Communication Agent
+    caribbean_name: Renzo
+    department: client-success
+    path: 03_agent-skills/department-skill-pack/client-success/cca-client-communication-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - client update draft
+      - status communication
+      - delay notice
+      - renewal reminder
+      - revision acknowledgment
+    workflow_tags:
+      - client-communication
+      - drafting
+      - status-updates
+    required_inputs:
+      - project state from CSM
+      - template
+      - event details
+      - communication preferences
+    outputs:
+      - communication drafts
+      - subject lines
+      - attachment lists
+      - communication logs
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+    source_status: approved
+
+  - skill_id: rma-retainer-management-agent
+    agent_code: RMA
+    canonical_name: Retainer Management Agent
+    caribbean_name: Celeste
+    department: client-success
+    path: 03_agent-skills/department-skill-pack/client-success/rma-retainer-management-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - retainer usage
+      - utilization tracking
+      - renewal sequence
+      - overage alert
+      - retainer renewal
+    workflow_tags:
+      - retainer
+      - utilization
+      - renewal
+    required_inputs:
+      - retainer allocation
+      - task logs
+      - period dates
+      - approved overage rate
+    outputs:
+      - utilization reports
+      - warning alerts
+      - renewal drafts
+      - overage flags
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: psa-project-status-agent
+    agent_code: PSA
+    canonical_name: Project Status Agent
+    caribbean_name: Donovan
+    department: client-success
+    path: 03_agent-skills/department-skill-pack/client-success/psa-project-status-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - project status
+      - progress summary
+      - milestone update
+      - blocker visibility
+      - weekly status
+    workflow_tags:
+      - status-reporting
+      - progress-tracking
+      - visibility
+    required_inputs:
+      - PMA progress
+      - CSM state
+      - blocker logs
+      - milestone definitions
+    outputs:
+      - status reports
+      - progress summaries
+      - weekly packets
+      - blocker visibility notes
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+      - HR-GROWTH
+    source_status: approved
+
+  # --- FINANCE & BOOKKEEPING ---
+
+  - skill_id: iga-invoice-generation-agent
+    agent_code: IGA
+    canonical_name: Invoice Generation Agent
+    caribbean_name: Shanice
+    department: finance-bookkeeping
+    path: 03_agent-skills/department-skill-pack/finance-bookkeeping/iga-invoice-generation-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - invoice draft
+      - billing milestone
+      - invoice generation
+      - payment terms
+      - billing cycle
+    workflow_tags:
+      - invoicing
+      - billing
+      - finance
+    required_inputs:
+      - signed contract SOW
+      - approved pricing
+      - milestone confirmation
+      - billing info
+      - tax requirements
+    outputs:
+      - invoice drafts
+      - deviation flags
+      - invoice logs
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: arca-accounts-receivable-collections-agent
+    agent_code: ARCA
+    canonical_name: Accounts Receivable Collections Agent
+    caribbean_name: Ricardo
+    department: finance-bookkeeping
+    path: 03_agent-skills/department-skill-pack/finance-bookkeeping/arca-accounts-receivable-collections-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - accounts receivable
+      - overdue invoice
+      - collections sequence
+      - AR aging
+      - kill-switch alert
+    workflow_tags:
+      - accounts-receivable
+      - collections
+      - aging
+    required_inputs:
+      - invoice records
+      - payment status
+      - due dates
+      - collections policy
+    outputs:
+      - AR status updates
+      - reminder drafts
+      - kill-switch alerts
+      - aging reports
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: ecfa-expense-cash-flow-agent
+    agent_code: ECFA
+    canonical_name: Expense Cash Flow Agent
+    caribbean_name: Janelle
+    department: finance-bookkeeping
+    path: 03_agent-skills/department-skill-pack/finance-bookkeeping/ecfa-expense-cash-flow-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - expense tracking
+      - cash flow
+      - burn rate
+      - budget variance
+      - spend summary
+    workflow_tags:
+      - expense-tracking
+      - cash-flow
+      - budgeting
+    required_inputs:
+      - expense records
+      - budget
+      - subscriptions
+      - project costs
+      - revenue receipts
+    outputs:
+      - expense summaries
+      - cash-flow notes
+      - burn-risk flags
+      - variance reports
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: fra-financial-reporting-agent
+    agent_code: FRA
+    canonical_name: Financial Reporting Agent
+    caribbean_name: Winston
+    department: finance-bookkeeping
+    path: 03_agent-skills/department-skill-pack/finance-bookkeeping/fra-financial-reporting-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - financial report
+      - monthly summary
+      - KPI trends
+      - projections vs actuals
+      - management packet
+    workflow_tags:
+      - financial-reporting
+      - kpi
+      - management-reporting
+    required_inputs:
+      - revenue data
+      - expense data
+      - AR aging
+      - budgets
+      - projections
+    outputs:
+      - financial reports
+      - KPI summaries
+      - variance analyses
+      - management packets
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  # --- STRATEGIC INTELLIGENCE ---
+
+  - skill_id: tsa-trend-surveillance-agent
+    agent_code: TSA
+    canonical_name: Trend Surveillance Agent
+    caribbean_name: Kareem
+    department: strategic-intelligence
+    path: 03_agent-skills/department-skill-pack/strategic-intelligence/tsa-trend-surveillance-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - trend monitoring
+      - market surveillance
+      - tool risk
+      - industry change
+      - watchlist update
+    workflow_tags:
+      - trend-surveillance
+      - market-intelligence
+      - monitoring
+    required_inputs:
+      - monitoring targets
+      - product categories
+      - competitor list
+      - market questions
+    outputs:
+      - trend briefs
+      - watchlists
+      - implication notes
+      - alerts
+    confidence_floor: 80
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: moa-g-market-opportunity-agent
+    agent_code: MOA-G
+    canonical_name: Market Opportunity Agent
+    caribbean_name: Aaliyah
+    department: strategic-intelligence
+    path: 03_agent-skills/department-skill-pack/strategic-intelligence/moa-g-market-opportunity-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - market opportunity
+      - niche analysis
+      - expansion hypothesis
+      - offer evaluation
+      - opportunity scoring
+    workflow_tags:
+      - market-opportunity
+      - expansion
+      - analysis
+    required_inputs:
+      - market data
+      - trend briefs
+      - internal capabilities
+      - pricing data
+      - strategic goals
+    outputs:
+      - opportunity briefs
+      - comparative analyses
+      - prioritization notes
+    confidence_floor: 80
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: chsa-client-health-score-agent
+    agent_code: CHSA
+    canonical_name: Client Health Score Agent
+    caribbean_name: Lennox
+    department: strategic-intelligence
+    path: 03_agent-skills/department-skill-pack/strategic-intelligence/chsa-client-health-score-agent
+    activation_status: active-triggered-workflow
+    load_priority: standard
+    trigger_terms:
+      - client health score
+      - churn risk
+      - retention signal
+      - expansion opportunity
+      - at-risk account
+    workflow_tags:
+      - client-health
+      - churn-risk
+      - retention
+    required_inputs:
+      - client comms logs
+      - project status
+      - billing status
+      - usage data
+      - issue history
+    outputs:
+      - health scores
+      - risk flags
+      - expansion prompts
+      - client health summaries
+    confidence_floor: 80
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-GROWTH
+      - HR-FOUNDER
+    source_status: approved
+
+  # --- PEOPLE, ROLES & GOVERNANCE ---
+
+  - skill_id: prga-people-roles-governance-agent
+    agent_code: PRGA
+    canonical_name: People Roles Governance Agent
+    caribbean_name: Ayanna
+    department: people-roles-governance
+    path: 03_agent-skills/department-skill-pack/people-roles-governance/prga-people-roles-governance-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - role governance
+      - onboarding checklist
+      - org chart
+      - role charter
+      - acknowledgment log
+    workflow_tags:
+      - people-governance
+      - role-management
+      - onboarding
+    required_inputs:
+      - role registry
+      - onboarding data
+      - policy docs
+      - access requests
+      - training records
+    outputs:
+      - role records
+      - onboarding packets
+      - acknowledgment logs
+      - governance checklists
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: pca-prompt-configuration-agent
+    agent_code: PCA
+    canonical_name: Prompt Configuration Agent
+    caribbean_name: Trevon
+    department: people-roles-governance
+    path: 03_agent-skills/department-skill-pack/people-roles-governance/pca-prompt-configuration-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - prompt versioning
+      - prompt change log
+      - rollback reference
+      - prompt governance
+      - unauthorized prompt edit
+    workflow_tags:
+      - prompt-governance
+      - versioning
+      - configuration
+    required_inputs:
+      - prompt files
+      - change requests
+      - approval records
+      - version history
+    outputs:
+      - version records
+      - change logs
+      - diff notes
+      - rollback references
+    confidence_floor: 100
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: taca-tooling-access-control-agent
+    agent_code: TACA
+    canonical_name: Tooling Access Control Agent
+    caribbean_name: Khadija
+    department: people-roles-governance
+    path: 03_agent-skills/department-skill-pack/people-roles-governance/taca-tooling-access-control-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - tool whitelist
+      - access review
+      - credential ownership
+      - stale access
+      - permission flag
+    workflow_tags:
+      - access-control
+      - tooling-governance
+      - permissions
+    required_inputs:
+      - tool inventory
+      - access requests
+      - provider approvals
+      - security policies
+      - account records
+    outputs:
+      - access reviews
+      - whitelist records
+      - stale-access flags
+      - permission logs
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved
+
+  - skill_id: kdga-knowledge-documentation-governance-agent
+    agent_code: KDGA
+    canonical_name: Knowledge Documentation Governance Agent
+    caribbean_name: Mikael
+    department: people-roles-governance
+    path: 03_agent-skills/department-skill-pack/people-roles-governance/kdga-knowledge-documentation-governance-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - document governance
+      - archive map
+      - version control
+      - document status
+      - active superseded
+    workflow_tags:
+      - documentation-governance
+      - knowledge-management
+      - archive
+    required_inputs:
+      - document library
+      - version records
+      - policy updates
+      - owner approvals
+    outputs:
+      - document status registry
+      - archive records
+      - version maps
+      - documentation gap flags
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: vpca-vendor-procurement-control-agent
+    agent_code: VPCA
+    canonical_name: Vendor Procurement Control Agent
+    caribbean_name: Sabine
+    department: people-roles-governance
+    path: 03_agent-skills/department-skill-pack/people-roles-governance/vpca-vendor-procurement-control-agent
+    activation_status: always-on
+    load_priority: standard
+    trigger_terms:
+      - vendor review
+      - renewal alert
+      - procurement comparison
+      - spend control
+      - vendor risk
+    workflow_tags:
+      - vendor-management
+      - procurement
+      - spend-control
+    required_inputs:
+      - vendor contracts
+      - tool usage
+      - budgets
+      - renewal dates
+      - performance notes
+    outputs:
+      - vendor reviews
+      - renewal alerts
+      - procurement comparisons
+      - spend-control notes
+    confidence_floor: 90
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  # --- SPECIALIST POOL ---
+
+  - skill_id: cda-contract-drafting-assistant
+    agent_code: CDA
+    canonical_name: Contract Drafting Assistant
+    caribbean_name: Rochelle-Ann
+    department: specialist-pool
+    path: 03_agent-skills/department-skill-pack/specialist-pool/cda-contract-drafting-assistant
+    activation_status: on-demand-specialist
+    load_priority: specialist
+    trigger_terms:
+      - contract draft
+      - MSA population
+      - SOW population
+      - NDA draft
+      - legal template
+    workflow_tags:
+      - legal-support
+      - contract-drafting
+      - template-population
+    required_inputs:
+      - approved template
+      - client info
+      - project scope
+      - pricing
+      - non-standard terms
+    outputs:
+      - contract drafts
+      - deviation flags
+      - legal review checklist
+    confidence_floor: 95
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: tca-transcreation-agent
+    agent_code: TCA
+    canonical_name: Transcreation Agent
+    caribbean_name: Xiomara
+    department: specialist-pool
+    path: 03_agent-skills/department-skill-pack/specialist-pool/tca-transcreation-agent
+    activation_status: on-demand-specialist
+    load_priority: specialist
+    trigger_terms:
+      - Spanish transcreation
+      - bilingual adaptation
+      - tone preservation
+      - cultural appropriateness
+      - EN to ES
+    workflow_tags:
+      - transcreation
+      - bilingual
+      - spanish
+    required_inputs:
+      - English source
+      - bilingual standards
+      - target audience
+      - glossary
+      - brand voice
+    outputs:
+      - Spanish drafts
+      - adaptation notes
+      - cultural flags
+    confidence_floor: 90
+    escalates_to_ai:
+      - BPA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: pdb-presentation-deck-builder
+    agent_code: PDB
+    canonical_name: Presentation Deck Builder
+    caribbean_name: Stefan
+    department: specialist-pool
+    path: 03_agent-skills/department-skill-pack/specialist-pool/pdb-presentation-deck-builder
+    activation_status: on-demand-specialist
+    load_priority: specialist
+    trigger_terms:
+      - deck structure
+      - slide brief
+      - presentation flow
+      - speaker notes
+      - visualization suggestion
+    workflow_tags:
+      - presentation
+      - deck-building
+      - narrative-structure
+    required_inputs:
+      - presentation purpose
+      - audience
+      - key messages
+      - source data
+      - brand guidance
+    outputs:
+      - deck structures
+      - slide-by-slide briefs
+      - visualization suggestions
+      - speaker notes
+    confidence_floor: 85
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-FOUNDER
+    source_status: approved
+
+  - skill_id: desa-data-extraction-structuring-agent
+    agent_code: DESA
+    canonical_name: Data Extraction Structuring Agent
+    caribbean_name: Niko
+    department: specialist-pool
+    path: 03_agent-skills/department-skill-pack/specialist-pool/desa-data-extraction-structuring-agent
+    activation_status: on-demand-specialist
+    load_priority: specialist
+    trigger_terms:
+      - data extraction
+      - schema mapping
+      - unstructured data
+      - confidence scoring
+      - ambiguity flag
+    workflow_tags:
+      - data-extraction
+      - structuring
+      - schema
+    required_inputs:
+      - source data
+      - target schema
+      - field rules
+      - validation rules
+    outputs:
+      - structured records
+      - confidence logs
+      - ambiguity reports
+      - validation results
+    confidence_floor: 70
+    escalates_to_ai:
+      - MOA
+      - HHC
+    escalates_to_human:
+      - HR-ARE
+    source_status: approved

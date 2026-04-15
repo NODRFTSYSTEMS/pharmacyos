@@ -1,0 +1,3 @@
+display_name: CCA - Client Communication Agent
+short_description: Drafts professional client communications for updates, revisions, delays, and renewals based on confirmed project state.
+default_prompt: Use CCA to draft client communications within NoDrftSystems scope and tone rules and escalate when authority or confidence limits are reached.

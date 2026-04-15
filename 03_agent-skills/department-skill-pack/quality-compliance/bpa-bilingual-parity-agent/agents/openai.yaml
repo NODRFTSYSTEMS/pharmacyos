@@ -1,0 +1,3 @@
+display_name: BPA - Bilingual Parity Agent
+short_description: Verifies English-Spanish content parity for meaning, CTA strength, glossary consistency, and cultural appropriateness before bilingual publication.
+default_prompt: Use BPA to review bilingual content parity within NoDrftSystems standards and escalate when authority or confidence limits are reached.

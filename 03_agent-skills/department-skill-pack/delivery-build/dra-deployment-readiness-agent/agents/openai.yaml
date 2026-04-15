@@ -1,0 +1,3 @@
+display_name: DRA - Deployment Readiness Agent
+short_description: Runs pre-release readiness checks verifying environment, dependencies, QA status, and rollback readiness before the ARE release decision.
+default_prompt: Use DRA to verify deployment readiness within NoDrftSystems release standards and escalate when authority or confidence limits are reached.

@@ -1,0 +1,3 @@
+display_name: CPA - Campaign Performance Agent
+short_description: Analyzes campaign KPI performance and channel results, producing data-backed summaries and improvement recommendations.
+default_prompt: Use CPA to analyze campaign performance within NoDrftSystems measurement rules and escalate when authority or confidence limits are reached.

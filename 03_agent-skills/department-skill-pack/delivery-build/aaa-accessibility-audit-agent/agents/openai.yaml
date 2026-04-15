@@ -1,0 +1,3 @@
+display_name: AAA - Accessibility Audit Agent
+short_description: Audits UI builds for accessibility issues against WCAG criteria with severity-ranked findings and remediation notes before release.
+default_prompt: Use AAA to run an accessibility audit within NoDrftSystems standards and escalate when authority or confidence limits are reached.

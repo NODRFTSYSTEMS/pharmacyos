@@ -1,0 +1,3 @@
+display_name: MOA-G - Market Opportunity Agent
+short_description: Evaluate niches, offers, and expansion possibilities with disciplined commercial framing.
+default_prompt: Use MOA-G to market opportunity analysis within NoDrftSystems rules and escalate when authority or confidence limits are reached.

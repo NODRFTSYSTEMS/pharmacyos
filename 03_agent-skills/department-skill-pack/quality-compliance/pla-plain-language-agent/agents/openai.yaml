@@ -1,0 +1,3 @@
+display_name: PLA - Plain Language Agent
+short_description: Reviews client-facing language for unexplained acronyms, jargon, and readability gaps against the buyer profile before publication.
+default_prompt: Use PLA to review content for plain-language compliance within NoDrftSystems standards and escalate when authority or confidence limits are reached.

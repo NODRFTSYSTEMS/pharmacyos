@@ -1,0 +1,3 @@
+display_name: CHSA - Client Health Score Agent
+short_description: Spot retention, dissatisfaction, and expansion signals early enough for human action.
+default_prompt: Use CHSA to client health and churn-risk scoring within NoDrftSystems rules and escalate when authority or confidence limits are reached.

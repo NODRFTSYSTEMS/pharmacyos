@@ -1,0 +1,3 @@
+display_name: BCA - Brand Consistency Agent
+short_description: Reviews content drafts for voice, terminology, and positioning consistency against the NoDrftSystems brand rules.
+default_prompt: Use BCA to review content for brand consistency within NoDrftSystems approved standards and escalate when authority or confidence limits are reached.

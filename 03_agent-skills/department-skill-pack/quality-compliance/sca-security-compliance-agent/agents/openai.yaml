@@ -1,0 +1,3 @@
+display_name: SCA - Security Compliance Agent
+short_description: Reviews code and build artifacts for security vulnerabilities, secrets exposure, dependency risks, and compliance concerns before release.
+default_prompt: Use SCA to assess security and compliance risk within NoDrftSystems standards and escalate when authority or confidence limits are reached.

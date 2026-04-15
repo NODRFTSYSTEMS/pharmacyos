@@ -1,0 +1,3 @@
+display_name: VPCA - Vendor Procurement Control Agent
+short_description: Controls vendor selection, renewal tracking, and subscription spend with documented commercial discipline and spend-risk flagging.
+default_prompt: Use VPCA to review vendors and track procurement discipline within NoDrftSystems rules and escalate when authority or confidence limits are reached.

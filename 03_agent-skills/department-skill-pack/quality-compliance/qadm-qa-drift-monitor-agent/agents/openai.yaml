@@ -1,0 +1,3 @@
+display_name: QADM - QA Drift Monitor Agent
+short_description: Detects output variance from approved baselines, classifying drift as expected change, regression, or new deviation.
+default_prompt: Use QADM to monitor output drift within NoDrftSystems quality standards and escalate when authority or confidence limits are reached.

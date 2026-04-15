@@ -1,0 +1,32 @@
+INTAKE SUMMARY
+==============
+
+Date:
+Intake method (form / call / referral):
+Lead source:
+
+--- CONTACT ---
+Name:
+Role / Title:
+Company / Organization:
+Email:
+Phone:
+
+--- PROJECT ---
+Project type:
+Stated objective:
+Stated timeline:
+Stated budget:
+
+--- QUALIFICATION SIGNALS ---
+Decision-maker confirmed (Y/N):
+Budget authority confirmed (Y/N):
+Timeline realistic (Y/N):
+ICP fit (High / Medium / Low):
+Red flags noted:
+
+--- ROUTING ---
+Initial recommendation (Decline / Discovery / Proposal / Founder Review):
+Assigned to:
+Intake packet JSON location:
+Next action:

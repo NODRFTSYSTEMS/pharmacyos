@@ -66,7 +66,7 @@ Use this file for:
 
 ### Source of truth for role behavior
 
-2. `C:\Users\nkwtr\Downloads\NoDrftSystems_Skills_Library_v1.md`
+2. `90_source-documents/ai-architecture/NoDrftSystems_Skills_Library_v1.md`
 
 Use this file for:
 
@@ -294,7 +294,7 @@ version: 1
 generated_at: 2026-04-14
 source_priority:
   approved_registry: 01_system/registry/final-approved-department-and-agent-registry.md
-  skill_library: C:/Users/nkwtr/Downloads/NoDrftSystems_Skills_Library_v1.md
+  skill_library: 90_source-documents/ai-architecture/NoDrftSystems_Skills_Library_v1.md
   skill_creator: C:/Users/nkwtr/.codex/skills/.system/skill-creator/SKILL.md
 pack_root: 03_agent-skills/department-skill-pack
 authority_routing:

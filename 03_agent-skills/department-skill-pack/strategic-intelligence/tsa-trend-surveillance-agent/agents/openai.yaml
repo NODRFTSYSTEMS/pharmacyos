@@ -1,0 +1,3 @@
+display_name: TSA - Trend Surveillance Agent
+short_description: Monitor relevant market, tooling, and industry developments with operational relevance.
+default_prompt: Use TSA to trend surveillance within NoDrftSystems rules and escalate when authority or confidence limits are reached.

@@ -69,6 +69,11 @@ Status definitions:
   Status: canonical governance
   Action: use before generating per-department or per-agent skills from the approved registry and role library
 
+- `90_source-documents/ai-architecture/NoDrftSystems_Skills_Library_v1.md`
+  Role: normalized skill-source document containing role behavior, duties, triggers, inputs, outputs, and escalation rules for all approved agents
+  Status: active reference
+  Action: use as the source of truth for role behavior when building or regenerating department skill packs
+
 ## Skill System
 
 - `03_agent-skills/repository-triage/SKILL.md`
@@ -290,6 +295,12 @@ Status definitions:
   Action: preserve only as reference; do not treat as operative intake surface
 
 ## AI Architecture
+
+- `90_source-documents/ai-architecture/NoDrftSystems_Skills_Library_v1.md`
+  Role: normalized role-behavior source for all 45 AI agents — primary objective, bounded scope, core duties, inputs, outputs, escalation triggers, confidence floors, and evidence requirements
+  Status: active reference
+  Action: use as the role-behavior source when generating department skill pack files; treat as authoritative for role content; note that the internal count summary (43 AI agents, 32 Tier 2) is incorrect — actual content contains 45 AI agents (37 Tier 2), which matches the approved registry
+  Path: archived to repository from uncontrolled Downloads location on 2026-04-14
 
 - `90_source-documents/ai-architecture/NoDrftSystems_AI_Agent_Architecture.docx`
   Role: early agent architecture baseline

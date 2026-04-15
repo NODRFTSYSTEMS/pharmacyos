@@ -1,0 +1,3 @@
+display_name: COA - Client Onboarding Agent
+short_description: Prepares kickoff packets, access checklists, and onboarding readiness reports to ensure clean client onboarding before project execution begins.
+default_prompt: Use COA to prepare client onboarding within NoDrftSystems rules and escalate when authority or confidence limits are reached.

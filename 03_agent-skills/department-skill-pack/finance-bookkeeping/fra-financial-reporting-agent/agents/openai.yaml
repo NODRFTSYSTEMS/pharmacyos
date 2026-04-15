@@ -1,0 +1,3 @@
+display_name: FRA - Financial Reporting Agent
+short_description: Provide periodic, decision-useful financial summaries grounded in recorded data.
+default_prompt: Use FRA to internal financial reporting within NoDrftSystems rules and escalate when authority or confidence limits are reached.

@@ -1,0 +1,3 @@
+display_name: STAA - SEO Technical Audit Agent
+short_description: Audits technical SEO readiness including metadata, crawl structure, indexability, and internal linking with prioritized remediation recommendations.
+default_prompt: Use STAA to run a technical SEO audit within NoDrftSystems scope and escalate when authority or confidence limits are reached.

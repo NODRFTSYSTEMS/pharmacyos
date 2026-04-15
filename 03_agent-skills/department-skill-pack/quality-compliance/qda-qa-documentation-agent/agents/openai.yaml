@@ -1,0 +1,3 @@
+display_name: QDA - QA Documentation Agent
+short_description: Maintains complete QA evidence records, defect logs, and completion documentation for all NoDrftSystems release gates and handoffs.
+default_prompt: Use QDA to document QA evidence within NoDrftSystems standards and escalate when authority or confidence limits are reached.

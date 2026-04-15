@@ -1,0 +1,3 @@
+display_name: PRGA - People Roles Governance Agent
+short_description: Maintains role definitions, onboarding and offboarding controls, and governance records for all human and AI roles.
+default_prompt: Use PRGA to maintain role governance records within NoDrftSystems rules and escalate when authority or confidence limits are reached.

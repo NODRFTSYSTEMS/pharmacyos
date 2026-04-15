@@ -1,0 +1,3 @@
+display_name: HHC - Human Handoff Coordinator
+short_description: Classifies, formats, and routes all AI escalations to the correct human authority with structured decision briefs and tracked resolution records.
+default_prompt: Use HHC to route escalations to the correct human authority within NoDrftSystems rules and ensure all escalations are logged and resolved with documented human decisions.

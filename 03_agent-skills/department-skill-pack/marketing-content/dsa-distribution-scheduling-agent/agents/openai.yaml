@@ -1,0 +1,3 @@
+display_name: DSA - Distribution Scheduling Agent
+short_description: Places approved content into the correct channel cadence with dependency sequencing, calendar management, and publication checklists.
+default_prompt: Use DSA to schedule approved content distribution within NoDrftSystems channel rules and escalate when authority or confidence limits are reached.

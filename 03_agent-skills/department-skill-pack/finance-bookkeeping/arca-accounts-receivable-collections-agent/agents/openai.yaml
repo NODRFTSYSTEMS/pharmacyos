@@ -1,0 +1,3 @@
+display_name: ARCA - Accounts Receivable & Collections Agent
+short_description: Track outstanding invoices and trigger collections or kill-switch review on time.
+default_prompt: Use ARCA to accounts receivable tracking and collections sequence within NoDrftSystems rules and escalate when authority or confidence limits are reached.

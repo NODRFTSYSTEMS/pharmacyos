@@ -1,0 +1,3 @@
+display_name: OOA - Outreach Orchestration Agent
+short_description: Drafts and sequences outbound messaging for qualified leads and classifies prospect replies for pipeline movement.
+default_prompt: Use OOA to prepare outreach drafts and classify replies within NoDrftSystems approved messaging rules and escalate when authority or confidence limits are reached.

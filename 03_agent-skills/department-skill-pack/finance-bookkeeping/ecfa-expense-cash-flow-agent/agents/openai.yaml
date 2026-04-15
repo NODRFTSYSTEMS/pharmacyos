@@ -1,0 +1,3 @@
+display_name: ECFA - Expense & Cash Flow Agent
+short_description: Maintain realistic visibility into spending, burn, and near-term cash position.
+default_prompt: Use ECFA to expense and cash-flow tracking within NoDrftSystems rules and escalate when authority or confidence limits are reached.

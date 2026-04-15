@@ -1,0 +1,3 @@
+display_name: RMA - Retainer Management Agent
+short_description: Tracks retainer utilization, flags overage and underuse, and prepares renewal sequences before disputes or lapses occur.
+default_prompt: Use RMA to track retainer usage and prepare renewal actions within NoDrftSystems commercial rules and escalate when authority or confidence limits are reached.

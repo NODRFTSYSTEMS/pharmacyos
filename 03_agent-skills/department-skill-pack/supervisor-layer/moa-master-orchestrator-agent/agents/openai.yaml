@@ -1,0 +1,3 @@
+display_name: MOA - Master Orchestrator Agent
+short_description: Routes tasks to the correct NoDrftSystems agent sequence and manages workflow dependencies and stall detection.
+default_prompt: Use MOA to route work to the correct agent sequence within NoDrftSystems rules and escalate when authority or confidence limits are reached.
