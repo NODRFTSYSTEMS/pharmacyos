@@ -1,0 +1,81 @@
+▲ Next.js 16.2.4 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 9.2s
+  Running TypeScript ...
+  Finished TypeScript in 11.6s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/20) ...
+  Generating static pages using 7 workers (5/20) 
+  Generating static pages using 7 workers (10/20) 
+  Generating static pages using 7 workers (15/20) 
+✓ Generating static pages using 7 workers (20/20) in 361ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /[locale]
+├ ƒ /[locale]/academy
+├ ƒ /[locale]/academy/formula-stack
+├ ƒ /[locale]/academy/glossary
+├ ƒ /[locale]/academy/methodology
+├ ƒ /[locale]/academy/strategies
+├ ƒ /[locale]/academy/templates
+├ ƒ /[locale]/estimator
+├ ƒ /[locale]/faq
+├ ƒ /[locale]/for-investors
+├ ƒ /[locale]/for-sellers
+├ ƒ /[locale]/how-it-works
+├ ƒ /[locale]/investor
+├ ƒ /[locale]/investor/analysis/[id]
+├ ƒ /[locale]/investor/analysis/[id]/report
+├ ƒ /[locale]/investor/analyze
+├ ƒ /[locale]/legal/disclosures
+├ ƒ /[locale]/legal/privacy
+├ ƒ /[locale]/legal/terms
+├ ƒ /[locale]/pricing
+├ ƒ /[locale]/seller
+├ ƒ /[locale]/seller/application
+├ ƒ /[locale]/seller/application/[id]
+├ ƒ /[locale]/test
+├ ƒ /[locale]/trust
+├ ƒ /api/admin/applications
+├ ƒ /api/admin/applications/[id]
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]/role
+├ ƒ /api/estimator
+├ ƒ /api/investor/analysis
+├ ƒ /api/investor/analysis/[id]
+├ ƒ /api/investor/analysis/[id]/export
+├ ƒ /api/investor/analysis/[id]/run
+├ ƒ /api/public/faq
+├ ƒ /api/readiness/[id]
+├ ƒ /api/readiness/[id]/item/[itemId]
+├ ƒ /api/seller/application
+├ ƒ /api/seller/application/[id]
+├ ƒ /api/seller/application/[id]/submit
+├ ƒ /api/test/analysis
+├ ƒ /api/test/property-data
+├ ƒ /api/test/seller-analysis
+├ ƒ /api/triage/result/[id]
+├ ƒ /api/triage/run
+├ ƒ /api/vendor/apply
+├ ƒ /api/vendor/directory
+├ ƒ /api/vendor/directory/[id]
+├ ƒ /api/vendor/directory/[id]/contact
+├ ƒ /api/vendor/directory/[id]/reviews
+├ ƒ /api/vendor/leads
+├ ƒ /api/vendor/leads/[id]/contact
+├ ƒ /api/vendor/profile
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

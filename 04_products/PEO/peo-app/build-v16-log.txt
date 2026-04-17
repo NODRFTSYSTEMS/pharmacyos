@@ -1,0 +1,38 @@
+
+> peo-app@0.1.0 build C:\Users\nkwtr\OneDrive\Desktop\NODRFTSYSTEMS MASTER\04_products\PEO\peo-app
+> next build --turbopack
+
+▲ Next.js 16.2.4 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.7s
+  Running TypeScript ...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next/dev/types/**/*.ts'
+
+  The following mandatory changes were made to your tsconfig.json:
+
+  	- jsx was set to react-jsx (next.js uses the React automatic runtime)
+
+  Finished TypeScript in 11.7s ...
+  Collecting page data using 7 workers ...
+Error [PageNotFoundError]: Cannot find module for page: /[locale]/estimator
+    at ignore-listed frames {
+  code: 'ENOENT'
+}
+Error [PageNotFoundError]: Cannot find module for page: /_not-found
+    at ignore-listed frames {
+  code: 'ENOENT'
+}
+
+> Build error occurred
+Error: Failed to collect page data for /[locale]/estimator
+    at ignore-listed frames {
+  type: 'Error'
+}
+ ELIFECYCLE  Command failed with exit code 1.

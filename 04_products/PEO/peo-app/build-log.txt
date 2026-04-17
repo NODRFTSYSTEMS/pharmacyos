@@ -1,0 +1,33 @@
+
+> peo-app@0.1.0 build
+> next build --turbopack
+
+   ▲ Next.js 15.5.15 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Finished writing to disk in 620ms
+ ✓ Compiled successfully in 21.0s
+   Linting and checking validity of types ...
+
+./src/app/api/investor/analysis/route.ts
+119:27  Warning: '_request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/test/property-data/route.ts
+22:12  Warning: 'err' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/formulas/calculations.ts
+600:58  Warning: '_state' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/formulas/investor-advanced.ts
+3:3  Warning: 'calculateRiskBand' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/property-data/stub.ts
+90:43  Warning: '_address' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+unhandledRejection [Error [PageNotFoundError]: Cannot find module for page: /_document] {
+  type: 'PageNotFoundError',
+  code: 'ENOENT'
+}

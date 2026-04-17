@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Walcott Design System */
+    --paper: 36 24% 90%;
+    --ink: 0 0% 7%;
+    --gold: 40 45% 60%;
+    --warm-gray: 36 8% 41%;
+    
+    --background: 36 24% 90%;
+    --foreground: 0 0% 7%;
+    --card: 36 24% 90%;
+    --card-foreground: 0 0% 7%;
+    --popover: 36 24% 90%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 7%;
+    --primary-foreground: 36 24% 90%;
+    --secondary: 36 15% 85%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 36 15% 85%;
+    --muted-foreground: 36 8% 41%;
+    --accent: 40 45% 60%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 36 15% 80%;
+    --input: 36 15% 80%;
+    --ring: 40 45% 60%;
+    --radius: 0px;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 36 24% 90%;
+    --card: 0 0% 7%;
+    --card-foreground: 36 24% 90%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 36 24% 90%;
+    --primary: 36 24% 90%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 36 24% 90%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 36 15% 70%;
+    --accent: 40 45% 60%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 40 45% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: auto;
+    -webkit-tap-highlight-color: rgba(19, 16, 12, 0.08);
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  :is(main, section, footer)[id] {
+    scroll-margin-top: 7rem;
+  }
+
+  :is(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid hsl(var(--gold));
+    outline-offset: 4px;
+  }
+
+  :is(a, button) {
+    touch-action: manipulation;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+  }
+}
+
+@layer components {
+  .font-serif {
+    font-family: 'Cormorant Garamond', serif;
+  }
+  
+  .font-sans {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  
+  .bg-paper {
+    background-color: hsl(var(--paper));
+  }
+  
+  .bg-ink {
+    background-color: hsl(var(--ink));
+  }
+  
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+  
+  .text-warm-gray {
+    color: hsl(var(--warm-gray));
+  }
+  
+  /* Ink wash overlay */
+  .ink-wash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+  
+  /* Corner marks */
+  .corner-mark {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: hsl(var(--gold));
+    opacity: 0.6;
+  }
+  
+  .corner-mark-tl {
+    border-top: 1.5px solid;
+    border-left: 1.5px solid;
+    top: -8px;
+    left: -8px;
+  }
+  
+  .corner-mark-br {
+    border-bottom: 1.5px solid;
+    border-right: 1.5px solid;
+    bottom: -8px;
+    right: -8px;
+  }
+  
+  /* Section base */
+  .section-pinned {
+    position: relative;
+    width: 100%;
+    min-height: 100svh;
+    height: 100svh;
+    overflow: hidden;
+  }
+  
+  /* CTA Button styles */
+  .cta-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper font-sans text-sm font-medium tracking-wide transition-colors duration-300;
+  }
+  
+  .cta-primary:hover {
+    @apply bg-gold text-ink;
+  }
+  
+  .cta-secondary {
+    @apply inline-flex items-center gap-2 text-ink font-sans text-sm font-medium tracking-wide border-b border-gold pb-1 transition-colors duration-300;
+  }
+  
+  .cta-secondary:hover {
+    @apply text-gold;
+  }
+  
+  /* Link underline animation */
+  .link-underline {
+    position: relative;
+  }
+  
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: hsl(var(--gold));
+    transition: width 0.3s ease;
+  }
+  
+  .link-underline:hover::after {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .section-pinned {
+    height: 100vh;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

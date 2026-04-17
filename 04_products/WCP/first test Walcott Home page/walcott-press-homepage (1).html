@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walcott &amp; Co. Press — Book Launch Strategy, Author Websites &amp; Pre-Publication Visibility</title>
+
+<!-- Core SEO -->
+<meta name="description" content="Walcott &amp; Co. Press builds the pre-launch visibility systems, author websites, and launch content that serious books and publishers need before release day. Based in Medellín, serving authors and publishers globally.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://walcottpress.com/">
+
+<!-- Favicon (replace SVG data URI with actual asset at deployment) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2313100C'/><text x='50%25' y='72%25' text-anchor='middle' font-family='Georgia,serif' font-size='22' fill='%23F6F2EB'>W</text></svg>">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://walcottpress.com/">
+<meta property="og:title" content="Walcott &amp; Co. Press — Book Launch Strategy &amp; Pre-Publication Visibility">
+<meta property="og:description" content="We build the visibility systems, author websites, and launch content that serious books need before release. Authors and publishers — strategy starts here.">
+<meta property="og:image" content="https://walcottpress.com/assets/og-cover.jpg">
+<meta property="og:site_name" content="Walcott &amp; Co. Press">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Walcott &amp; Co. Press — Book Launch Strategy &amp; Pre-Publication Visibility">
+<meta name="twitter:description" content="We build the visibility systems, author websites, and launch content that serious books need before release.">
+<meta name="twitter:image" content="https://walcottpress.com/assets/og-cover.jpg">
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Walcott &amp; Co. Press",
+  "url": "https://walcottpress.com",
+  "logo": "https://walcottpress.com/assets/logo.svg",
+  "description": "A boutique publishing studio building pre-launch visibility systems, author websites, and launch infrastructure for books and publishers.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Medellín",
+    "addressCountry": "CO"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "hello@walcottpress.com"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/walcott-co-press"
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #13100C;
+    --ink-mid: #3A3530;
+    --ink-light: #7A7269;
+    --parchment: #F6F2EB;
+    --parchment-dark: #EDE8DF;
+    --parchment-deep: #E0D9CE;
+    --oxblood: #6B1A24;
+    --oxblood-light: #8E2434;
+    --oxblood-muted: #F0E8E9;
+    --white: #FFFFFF;
+    --font-display: 'Cormorant', Georgia, serif;
+    --font-body: 'Jost', sans-serif;
+    --max-w: 1200px;
+    --section-gap: 8rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  /* ── MOBILE NAV ── */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .nav-hamburger span {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: var(--ink);
+    transition: all 0.25s ease;
+    transform-origin: center;
+  }
+
+  .nav-hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .nav-hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .nav-hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--parchment);
+    z-index: 99;
+    padding: 7rem 2.5rem 3rem;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+  }
+
+  .mobile-menu.open { display: flex; }
+
+  .mobile-menu a {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(19,16,12,0.08);
+    transition: color 0.2s;
+  }
+
+  .mobile-menu a:hover { color: var(--oxblood); }
+
+  .mobile-menu .mobile-cta {
+    margin-top: 2.5rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    background: var(--ink);
+    padding: 1rem 2rem;
+    border-radius: 2px;
+    text-align: center;
+    border-bottom: none;
+    border: none;
+  }
+
+  .mobile-menu .mobile-cta:hover {
+    background: var(--oxblood);
+    color: var(--white);
+  }
+
+  @media (max-width: 900px) {
+    .nav-hamburger { display: flex; }
+  }
+
+  /* ── NAVIGATION ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1.5rem 0;
+    background: rgba(246, 242, 235, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(19,16,12,0.08);
+    transition: all 0.3s ease;
+  }
+
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-brand span {
+    color: var(--oxblood);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--oxblood); }
+
+  .nav-cta {
+    background: var(--ink) !important;
+    color: var(--parchment) !important;
+    padding: 0.55rem 1.4rem;
+    border-radius: 2px;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.12em !important;
+    transition: background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: var(--oxblood) !important; color: var(--white) !important; }
+
+  /* ── HERO ── */
+  #hero {
+    padding: 14rem 0 8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-bottom: 2rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--oxblood);
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 6.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    max-width: 760px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--oxblood);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 3rem;
+  }
+
+  .cta-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.15s;
+    border: 1px solid var(--ink);
+  }
+
+  .btn-primary:hover {
+    background: var(--oxblood);
+    border-color: var(--oxblood);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    border-radius: 2px;
+    text-decoration: none;
+    border: 1px solid rgba(19,16,12,0.25);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--ink);
+    color: var(--oxblood);
+  }
+
+  .btn-arrow {
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+  }
+
+  .btn-primary:hover .btn-arrow,
+  .btn-secondary:hover .btn-arrow { transform: translateX(3px); }
+
+  .hero-credibility {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-credibility span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-credibility span::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--oxblood);
+    flex-shrink: 0;
+  }
+
+  .hero-credibility span:first-child::before { display: none; }
+
+  /* Hero background decoration */
+  .hero-deco {
+    position: absolute;
+    top: 8rem;
+    right: -2rem;
+    width: 480px;
+    height: 580px;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  /* ── EMAIL CAPTURE ── */
+  #email-capture {
+    padding: 5rem 0;
+    background: var(--ink);
+    border-top: 1px solid rgba(246,242,235,0.06);
+  }
+
+  .capture-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .capture-left h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 300;
+    color: var(--parchment);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .capture-left h2 em { font-style: italic; color: rgba(246,242,235,0.45); }
+
+  .capture-left p {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.45);
+    line-height: 1.75;
+  }
+
+  .capture-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .capture-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(246,242,235,0.3);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .capture-input {
+    background: rgba(246,242,235,0.06);
+    border: 1px solid rgba(246,242,235,0.12);
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding: 0.9rem 1.2rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .capture-input::placeholder { color: rgba(246,242,235,0.2); }
+
+  .capture-input:focus { border-color: rgba(246,242,235,0.35); }
+
+  .capture-submit {
+    background: var(--oxblood);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    align-self: flex-start;
+  }
+
+  .capture-submit:hover {
+    background: #8E2434;
+    transform: translateY(-1px);
+  }
+
+  .capture-privacy {
+    font-size: 0.68rem;
+    color: rgba(246,242,235,0.2);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 900px) {
+    .capture-inner { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  /* ── PROOF STRIP ── */
+  #proof-strip {
+    background: var(--ink);
+    padding: 1.2rem 0;
+    overflow: hidden;
+  }
+
+  .proof-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .proof-item {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(246,242,235,0.55);
+    padding: 0.3rem 2.5rem;
+    border-right: 1px solid rgba(246,242,235,0.12);
+    white-space: nowrap;
+  }
+
+  .proof-item:last-child { border-right: none; }
+
+  /* ── PROBLEM SECTION ── */
+  #problem {
+    padding: var(--section-gap) 0;
+    background: var(--parchment);
+  }
+
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 1.5rem;
+    height: 1px;
+    background: var(--oxblood);
+  }
+
+  .section-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-headline em { font-style: italic; color: var(--oxblood); }
+
+  .problem-intro {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 4rem;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .problem-card {
+    background: var(--parchment-dark);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--oxblood);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+
+  .problem-card:hover::before { transform: scaleX(1); }
+
+  .problem-num {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: rgba(19,16,12,0.07);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .problem-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .problem-card p {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.75;
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    padding: var(--section-gap) 0;
+    background: var(--ink);
+  }
+
+  #services .section-label { color: rgba(246,242,235,0.4); }
+  #services .section-label::before { background: rgba(246,242,235,0.2); }
+
+  #services .section-headline { color: var(--parchment); }
+
+  .services-intro {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.55);
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 4rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: rgba(246,242,235,0.08);
+  }
+
+  .service-card {
+    background: var(--ink);
+    padding: 3rem 2.5rem;
+    position: relative;
+    transition: background 0.3s;
+    cursor: default;
+  }
+
+  .service-card:hover { background: #1E1A15; }
+
+  .service-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oxblood-light);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  .service-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: var(--parchment);
+    margin-bottom: 0.75rem;
+    line-height: 1.15;
+  }
+
+  .service-problem {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: rgba(246,242,235,0.35);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .service-card p {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.55);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-includes {
+    font-size: 0.75rem;
+    color: rgba(246,242,235,0.3);
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    border-top: 1px solid rgba(246,242,235,0.07);
+    padding-top: 1.25rem;
+    margin-top: 0.5rem;
+    line-height: 1.7;
+  }
+
+  /* ── HOW IT WORKS ── */
+  #process {
+    padding: var(--section-gap) 0;
+    background: var(--parchment);
+  }
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 4rem;
+    position: relative;
+  }
+
+  .process-grid::before {
+    content: '';
+    position: absolute;
+    top: 2.25rem;
+    left: 3rem;
+    right: 3rem;
+    height: 1px;
+    background: rgba(19,16,12,0.12);
+    z-index: 0;
+  }
+
+  .process-step {
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .process-step:first-child { padding-left: 0; }
+  .process-step:last-child { padding-right: 0; }
+
+  .step-num {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: var(--parchment);
+    border: 1px solid rgba(19,16,12,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 2rem;
+    transition: all 0.25s;
+  }
+
+  .process-step:hover .step-num {
+    background: var(--oxblood);
+    border-color: var(--oxblood);
+    color: var(--white);
+  }
+
+  .process-step h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+    line-height: 1.2;
+  }
+
+  .process-step p {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.75;
+  }
+
+  /* ── TRANSFORMATION / BEFORE-AFTER ── */
+  #transformation {
+    padding: var(--section-gap) 0;
+    background: var(--parchment-dark);
+  }
+
+  .ba-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    margin-top: 4rem;
+  }
+
+  .ba-col {
+    padding: 3rem;
+  }
+
+  .ba-col.before {
+    background: var(--parchment-deep);
+  }
+
+  .ba-col.after {
+    background: var(--ink);
+  }
+
+  .ba-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .before .ba-label { color: var(--ink-light); }
+  .after .ba-label { color: var(--oxblood-light); }
+
+  .ba-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .before .ba-item { color: var(--ink-mid); }
+  .after .ba-item { color: rgba(246,242,235,0.7); }
+
+  .ba-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.55rem;
+  }
+
+  .before .ba-dot { background: rgba(19,16,12,0.2); }
+  .after .ba-dot { background: var(--oxblood-light); }
+
+  /* ── ENGAGEMENT PATHS ── */
+  #paths {
+    padding: var(--section-gap) 0;
+    background: var(--parchment);
+  }
+
+  .paths-intro {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    max-width: 500px;
+    margin-bottom: 3.5rem;
+    line-height: 1.8;
+  }
+
+  .paths-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .path-card {
+    background: var(--parchment-dark);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+    transition: background 0.25s;
+    text-decoration: none;
+  }
+
+  .path-card:hover {
+    background: var(--parchment-deep);
+  }
+
+  .path-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .path-card p {
+    font-size: 0.82rem;
+    color: var(--ink-mid);
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
+  }
+
+  .path-cta {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* ── FOUNDER PROOF ── */
+  #founder-proof {
+    padding: var(--section-gap) 0;
+    background: var(--ink);
+  }
+
+  #founder-proof .section-label { color: rgba(246,242,235,0.3); }
+  #founder-proof .section-label::before { background: rgba(246,242,235,0.15); }
+  #founder-proof .section-headline { color: var(--parchment); margin-bottom: 3rem; }
+
+  .founder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 4rem;
+  }
+
+  .founder-statement {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(246,242,235,0.06);
+    padding: 3rem;
+    grid-column: 1 / -1;
+  }
+
+  .founder-quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(246,242,235,0.8);
+    line-height: 1.65;
+    margin-bottom: 2rem;
+    max-width: 820px;
+  }
+
+  .founder-attr {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-top: 1px solid rgba(246,242,235,0.07);
+    padding-top: 1.5rem;
+  }
+
+  .founder-initial {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgba(107,26,36,0.35);
+    border: 1px solid rgba(142,36,52,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--oxblood-light);
+    flex-shrink: 0;
+  }
+
+  .founder-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(246,242,235,0.65);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.15rem;
+  }
+
+  .founder-title {
+    font-size: 0.72rem;
+    color: rgba(246,242,235,0.3);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .proof-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(246,242,235,0.06);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .proof-card-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oxblood-light);
+    font-weight: 500;
+  }
+
+  .proof-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--parchment);
+    line-height: 1.2;
+  }
+
+  .proof-card p {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.5);
+    line-height: 1.75;
+    flex: 1;
+  }
+
+  .proof-card-note {
+    font-size: 0.7rem;
+    color: rgba(246,242,235,0.2);
+    font-weight: 300;
+    font-style: italic;
+    border-top: 1px solid rgba(246,242,235,0.06);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .testimonial-placeholder {
+    background: rgba(246,242,235,0.02);
+    border: 1px dashed rgba(246,242,235,0.08);
+    padding: 2rem;
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+
+  .testimonial-placeholder p {
+    font-size: 0.78rem;
+    color: rgba(246,242,235,0.2);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 900px) {
+    .founder-grid { grid-template-columns: 1fr; }
+    .founder-statement { grid-column: 1; }
+    .testimonial-placeholder { grid-column: 1; }
+  }
+
+  /* ── FINAL CTA ── */
+  #final-cta {
+    padding: 8rem 0;
+    background: var(--parchment-dark);
+    text-align: center;
+  }
+
+  .final-cta-head {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 300;
+    color: var(--ink);
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.15;
+  }
+
+  .final-cta-head em { font-style: italic; color: var(--oxblood); }
+
+  .final-cta-sub {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    max-width: 480px;
+    margin: 0 auto 3rem;
+    line-height: 1.8;
+  }
+
+  .final-cta-note {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 4rem 0 2.5rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(246,242,235,0.08);
+    margin-bottom: 2rem;
+  }
+
+  .footer-brand {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--parchment);
+    margin-bottom: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .footer-brand span { color: var(--oxblood-light); }
+
+  .footer-tagline {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.35);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(246,242,235,0.3);
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .footer-col a {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: rgba(246,242,235,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--parchment); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-copy {
+    font-size: 0.72rem;
+    color: rgba(246,242,235,0.2);
+    font-weight: 300;
+  }
+
+  .footer-legal {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer-legal a {
+    font-size: 0.72rem;
+    color: rgba(246,242,235,0.2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-legal a:hover { color: rgba(246,242,235,0.5); }
+
+  /* ── FEATURED PUBLICATIONS ── */
+  #publications {
+    padding: var(--section-gap) 0;
+    background: var(--parchment);
+  }
+
+  .pub-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 3.5rem;
+  }
+
+  .pub-card {
+    background: var(--parchment-dark);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: background 0.25s;
+    overflow: hidden;
+  }
+
+  .pub-card:hover { background: var(--parchment-deep); }
+
+  .pub-cover {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: var(--parchment-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pub-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: rgba(19,16,12,0.1);
+    letter-spacing: -0.02em;
+  }
+
+  .pub-meta {
+    padding: 1.5rem 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .pub-genre {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .pub-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .pub-line {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: 1.25rem;
+  }
+
+  .pub-cta {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+  }
+
+  .pub-footer-link {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .pub-footer-link:hover { color: var(--oxblood); }
+
+  /* ── SHOP TEASER ── */
+  #shop-teaser {
+    padding: var(--section-gap) 0;
+    background: var(--parchment-dark);
+  }
+
+  .shop-rule {
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--ink-light);
+    font-style: italic;
+    margin-bottom: 3rem;
+    padding: 0.8rem 1.2rem;
+    border-left: 2px solid rgba(19,16,12,0.12);
+    max-width: 480px;
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 3rem;
+  }
+
+  .shop-card {
+    background: var(--parchment);
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: background 0.25s;
+  }
+
+  .shop-card:hover { background: var(--white); }
+
+  .shop-item-tag {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 500;
+  }
+
+  .shop-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .shop-card p {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.65;
+    flex: 1;
+  }
+
+  .shop-cta {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-top: 0.5rem;
+  }
+
+  .shop-footer-link {
+    margin-top: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .shop-footer-link:hover { color: var(--oxblood); }
+
+  /* ── DIVIDER ── */
+  .rule {
+    width: 3rem;
+    height: 1px;
+    background: var(--oxblood);
+    margin: 1.5rem 0 3rem;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  .fade-up:nth-child(1) { animation-delay: 0.1s; }
+  .fade-up:nth-child(2) { animation-delay: 0.22s; }
+  .fade-up:nth-child(3) { animation-delay: 0.34s; }
+  .fade-up:nth-child(4) { animation-delay: 0.46s; }
+  .fade-up:nth-child(5) { animation-delay: 0.58s; }
+
+  /* Intersection observer targets */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    :root { --section-gap: 5rem; }
+    .problem-grid,
+    .services-grid,
+    .paths-grid,
+    .testi-grid,
+    .pub-grid,
+    .shop-grid { grid-template-columns: 1fr 1fr; }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    .process-grid::before { display: none; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    #hero { padding: 10rem 0 5rem; }
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 0 1.5rem; }
+    .process-grid { grid-template-columns: 1fr; }
+    .cta-group { flex-direction: column; align-items: flex-start; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="container">
+    <a href="#" class="nav-brand">Walcott <span>&</span> Co. Press</a>
+    <ul class="nav-links">
+      <li><a href="#publications">Publish</a></li>
+      <li><a href="#services">Studio</a></li>
+      <li><a href="#">Insights</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Submit</a></li>
+      <li><a href="#book-call" class="nav-cta">Book a Call</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU DRAWER -->
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Site navigation">
+  <a href="#publications">Publish</a>
+  <a href="#services">Studio</a>
+  <a href="#">Insights</a>
+  <a href="#">About</a>
+  <a href="#">Submit</a>
+  <a href="#book-call" class="mobile-cta">Book a Strategy Call →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <!-- Decorative letterform -->
+  <svg class="hero-deco" viewBox="0 0 480 580" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <text x="50%" y="85%" text-anchor="middle" font-family="Georgia, serif" font-size="520" font-weight="300" fill="#13100C">W</text>
+  </svg>
+
+  <div class="container">
+    <div class="hero-eyebrow fade-up">Pre-Launch Visibility for Books &amp; Publishers</div>
+    <h1 class="hero-headline fade-up">Books should not<br>launch into <em>silence.</em></h1>
+    <p class="hero-sub fade-up">We design the websites, launch content, and visibility systems that help authors and publishers build attention, audience, and demand before a book reaches the market.</p>
+    <div class="cta-group fade-up">
+      <a href="#book-call" class="btn-primary">Book a Strategy Call <span class="btn-arrow">→</span></a>
+      <a href="#process" class="btn-secondary">See How We Build Visibility <span class="btn-arrow">→</span></a>
+    </div>
+    <div class="hero-credibility fade-up">
+      <span>Websites</span>
+      <span>Launch Content</span>
+      <span>Audience Pathways</span>
+      <span>Built for Books &amp; Publishers</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF STRIP -->
+<div id="proof-strip">
+  <div class="container">
+    <div class="proof-inner">
+      <div class="proof-item">Structured for authors &amp; publishers</div>
+      <div class="proof-item">Websites built to convert attention into inquiry</div>
+      <div class="proof-item">Launch systems around visibility &amp; audience capture</div>
+      <div class="proof-item">Editorial discipline + digital execution</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM SECTION -->
+<section id="problem">
+  <div class="container">
+    <div class="section-label reveal">The core problem</div>
+    <h2 class="section-headline reveal">Most books are published<br><em>too late to matter.</em></h2>
+    <p class="problem-intro reveal">By the time most authors consider websites, video, audience growth, or content strategy, the launch window is already weak. The result is predictable: low visibility, fragmented messaging, weak pre-orders, and a book that depends too heavily on marketplaces alone.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <div class="problem-num">01</div>
+        <h3>No Audience Before Launch</h3>
+        <p>Most books arrive before demand exists. Without pre-launch infrastructure, visibility depends entirely on the release moment — which cannot carry the weight placed on it.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="problem-num">02</div>
+        <h3>Scattered Digital Presence</h3>
+        <p>Authors often have disconnected websites, social channels, and launch materials that do not reinforce each other or point toward a single conversion outcome.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="problem-num">03</div>
+        <h3>No Conversion System</h3>
+        <p>Attention may exist, but without a clear path from interest to inquiry, email capture, pre-order, or sale, that attention produces nothing commercially durable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES SECTION -->
+<section id="services">
+  <div class="container">
+    <div class="section-label reveal">What we build</div>
+    <h2 class="section-headline reveal">The digital infrastructure<br>your book <em>actually needs.</em></h2>
+    <p class="services-intro reveal">Walcott creates the digital architecture around a book so visibility starts before publication and continues after release.</p>
+    <div class="rule reveal"></div>
+
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <span class="service-tag">System Design</span>
+        <h3>Pre-Launch Visibility Systems</h3>
+        <p class="service-problem">For authors and publishers who need traction before release.</p>
+        <p>We build the strategy, messaging architecture, pre-launch content direction, and conversion pathways that create demand before a single copy ships.</p>
+        <div class="service-includes">Launch strategy — Messaging architecture — Pre-launch content direction — Conversion pathways</div>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="service-tag">Web Design &amp; Development</span>
+        <h3>Author &amp; Title Websites</h3>
+        <p class="service-problem">For books that need a credible digital home.</p>
+        <p>Purpose-built sites for authors and titles: landing pages, title pages, inquiry flows, lead capture, and content-ready architecture designed for the book's commercial lifecycle.</p>
+        <div class="service-includes">Landing pages — Title pages — Inquiry flows — Lead capture — Content architecture</div>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="service-tag">Content Production</span>
+        <h3>Launch Content Production</h3>
+        <p class="service-problem">For books that need attention in motion.</p>
+        <p>Trailers, short-form content, graphics, and promotional assets developed specifically for how audiences consume content on modern platforms — not just repurposed marketing filler.</p>
+        <div class="service-includes">Book trailers — Short-form content — Platform graphics — Promotional asset packages</div>
+      </div>
+
+      <div class="service-card reveal">
+        <span class="service-tag">Audience Growth</span>
+        <h3>Content &amp; Audience Systems</h3>
+        <p class="service-problem">For brands that need sustained visibility rather than one-time promotion.</p>
+        <p>Content structures, blog architecture, lead magnets, and ongoing audience-building pathways that extend a book's themes into continuous public conversation and repeat engagement.</p>
+        <div class="service-includes">Content structures — Blog architecture — Lead magnets — Ongoing audience pathways</div>
+      </div>
+
+      <div class="service-card reveal" style="grid-column: 1 / -1;">
+        <span class="service-tag">Execution Capacity</span>
+        <h3>Publisher Support</h3>
+        <p class="service-problem">For small publishers that need execution capacity across their list.</p>
+        <p>White-label support, packaging, web assets, and launch infrastructure built to handle multiple titles and the operational reality of running a press — not just a single author project.</p>
+        <div class="service-includes">White-label support — Packaging — Web assets — Multi-title launch infrastructure</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="process">
+  <div class="container">
+    <div class="section-label reveal">The process</div>
+    <h2 class="section-headline reveal">From manuscript<br><em>to market presence.</em></h2>
+
+    <div class="process-grid">
+      <div class="process-step reveal">
+        <div class="step-num">1</div>
+        <h3>Diagnose the launch gap</h3>
+        <p>We assess what is missing between the manuscript and market visibility. No two books have the same gap, and the diagnosis determines everything that follows.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">2</div>
+        <h3>Build the digital foundation</h3>
+        <p>We create the website, structure, messaging, and audience pathways. The foundation must be in place before any launch activity can produce durable results.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">3</div>
+        <h3>Produce launch-ready content</h3>
+        <p>We develop the assets that carry the book into public view — built to work across the specific platforms where this book's audience already exists.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">4</div>
+        <h3>Convert visibility into action</h3>
+        <p>We connect attention to inquiry, subscriptions, pre-orders, and sales. Visibility without conversion infrastructure produces awareness but not commercial traction.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSFORMATION / BEFORE–AFTER -->
+<section id="transformation">
+  <div class="container">
+    <div class="section-label reveal">What changes</div>
+    <h2 class="section-headline reveal">When the system is built correctly,<br><em>everything shifts.</em></h2>
+
+    <div class="ba-grid">
+      <div class="ba-col before reveal">
+        <div class="ba-label">Without structure</div>
+        <div class="ba-item"><div class="ba-dot"></div><span>A book page with no supporting ecosystem or content infrastructure around it</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Social posts with no strategic continuity and no clear conversion intent</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Launch activity concentrated entirely too late to build meaningful pre-release momentum</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Weak email capture and low repeat engagement from readers who were never given a clear next step</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Heavy dependence on marketplace algorithms with no owned audience channel</span></div>
+      </div>
+
+      <div class="ba-col after reveal">
+        <div class="ba-label">With Walcott infrastructure</div>
+        <div class="ba-item"><div class="ba-dot"></div><span>A credible, conversion-ready digital home for the author and the title</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Content that extends the book's themes into ongoing public conversation before and after release</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Clear conversion pathways from attention to inquiry, email capture, pre-order, or sale</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>A stronger commercial foundation for launch performance and backlist growth over time</span></div>
+        <div class="ba-item"><div class="ba-dot"></div><span>Owned audience infrastructure that compounds in value across multiple titles and releases</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PUBLICATIONS (Section 7) -->
+<section id="publications">
+  <div class="container">
+    <div class="section-label reveal">From the press</div>
+    <h2 class="section-headline reveal">Selected works from<br><em>Walcott &amp; Co.</em></h2>
+
+    <div class="pub-grid">
+      <a href="#" class="pub-card reveal">
+        <div class="pub-cover">
+          <div class="pub-cover-placeholder">W</div>
+        </div>
+        <div class="pub-meta">
+          <div class="pub-genre">History / Atlantic World</div>
+          <div class="pub-title">The Shattered Crown</div>
+          <p class="pub-line">Authority, displacement, and political continuity in the Black Atlantic, 1680–1850. A scholarly examination of power under colonial rupture.</p>
+          <div class="pub-cta">View Title →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pub-card reveal">
+        <div class="pub-cover">
+          <div class="pub-cover-placeholder">W</div>
+        </div>
+        <div class="pub-meta">
+          <div class="pub-genre">Orientation Literature</div>
+          <div class="pub-title">Medellín: City in Your Pocket</div>
+          <p class="pub-line">A precision orientation guide to one of Latin America's most dynamic cities — built for the serious new arrival, not the casual tourist.</p>
+          <div class="pub-cta">View Title →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pub-card reveal">
+        <div class="pub-cover">
+          <div class="pub-cover-placeholder">W</div>
+        </div>
+        <div class="pub-meta">
+          <div class="pub-genre">Forthcoming</div>
+          <div class="pub-title">Grand Cayman: City in Your Pocket</div>
+          <p class="pub-line">The next volume in the Walcott Horizons orientation series. Precision local knowledge for the serious expatriate and long-term resident.</p>
+          <div class="pub-cta">Explore Publication →</div>
+        </div>
+      </a>
+
+      <a href="#" class="pub-card reveal">
+        <div class="pub-cover" style="background: var(--ink);">
+          <div class="pub-cover-placeholder" style="color: rgba(246,242,235,0.06);">W</div>
+        </div>
+        <div class="pub-meta">
+          <div class="pub-genre">Full Catalog</div>
+          <div class="pub-title">Browse All Publications</div>
+          <p class="pub-line">The complete Walcott &amp; Co. Press catalog — books, research publications, and forthcoming titles across every imprint and genre.</p>
+          <div class="pub-cta">Visit Publish →</div>
+        </div>
+      </a>
+    </div>
+
+    <a href="#" class="pub-footer-link reveal">View full catalog in Publish →</a>
+  </div>
+</section>
+
+<!-- FOUNDER PROOF + PROCESS EVIDENCE -->
+<section id="founder-proof">
+  <div class="container">
+    <div class="section-label reveal">From the studio</div>
+    <h2 class="section-headline reveal">Why this work<br><em>is structured differently.</em></h2>
+
+    <div class="founder-grid">
+      <!-- Founder Statement -->
+      <div class="founder-statement reveal">
+        <div class="founder-quote">"Most publishing services are built around what is easy to sell — design, social content, a press release. We built Walcott around what actually determines whether a book finds its audience: the infrastructure that should exist before release day. That means diagnosing the gap, building the system, and connecting attention to a real conversion path. It is not a faster version of what already exists. It is a different approach entirely."</div>
+        <div class="founder-attr">
+          <div class="founder-initial">W</div>
+          <div>
+            <div class="founder-name">Sir Walcott</div>
+            <div class="founder-title">Founder, Walcott &amp; Co. Press — Medellín, Colombia</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Process Proof Card 1 -->
+      <div class="proof-card reveal">
+        <div class="proof-card-label">What we assess first</div>
+        <h3>The Launch Gap Diagnostic</h3>
+        <p>Before any website is built or content produced, we map what is structurally missing between the manuscript and its market. In nearly every case, the gap is the same: no pre-release audience pathway, no conversion architecture, and launch activity scheduled too late to matter.</p>
+        <div class="proof-card-note">Applied at the start of every engagement — author, publisher, or expert project.</div>
+      </div>
+
+      <!-- Process Proof Card 2 -->
+      <div class="proof-card reveal">
+        <div class="proof-card-label">What we build before launch</div>
+        <h3>Infrastructure, Not Just Content</h3>
+        <p>A website. A content system. Audience capture pathways. Messaging architecture. These are not deliverables we hand over and leave. They are the foundation the launch operates on. We build them before the release window, not during it.</p>
+        <div class="proof-card-note">Client testimonials will be published as engagements are completed and releases go to market.</div>
+      </div>
+    </div>
+
+    <!-- Testimonial placeholder — visible only until real quotes are available -->
+    <div class="testimonial-placeholder reveal">
+      <p>Client testimonials are published here as engagements are completed and verified. If you want to speak with someone familiar with this work, contact us directly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ENGAGEMENT PATHS -->
+<section id="paths">
+  <div class="container">
+    <div class="section-label reveal">Where do you need to start?</div>
+    <h2 class="section-headline reveal">Find the right<br><em>entry point.</em></h2>
+    <p class="paths-intro reveal">Different projects have different gaps. Tell us what you need most and we will show you what that looks like in practice.</p>
+
+    <div class="paths-grid">
+      <a href="#services" class="path-card reveal">
+        <div>
+          <h3>I need visibility before launch</h3>
+          <p>You have a manuscript, a release window, and no system in place yet to build pre-release demand.</p>
+        </div>
+        <div class="path-cta">Explore Pre-Launch Systems →</div>
+      </a>
+
+      <a href="#services" class="path-card reveal">
+        <div>
+          <h3>I need a website for an author or book</h3>
+          <p>Your book or author brand needs a credible digital home designed around conversion and inquiry, not just presence.</p>
+        </div>
+        <div class="path-cta">View Website Solutions →</div>
+      </a>
+
+      <a href="#services" class="path-card reveal">
+        <div>
+          <h3>I need launch content and digital assets</h3>
+          <p>You need the trailers, short-form content, and platform assets that carry the book into public attention.</p>
+        </div>
+        <div class="path-cta">See Content Production →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- EMAIL CAPTURE / LEAD MAGNET -->
+<section id="email-capture">
+  <div class="container">
+    <div class="capture-inner">
+      <div class="capture-left">
+        <h2>Get the pre-launch<br><em>gap framework.</em></h2>
+        <p>A structured checklist of what is missing between your manuscript and market visibility — the same diagnostic we use before every engagement. Free. No obligation.</p>
+      </div>
+      <div>
+        <div class="capture-label">Send it to me</div>
+        <div class="capture-form">
+          <input type="text" class="capture-input" placeholder="Your name" autocomplete="name">
+          <input type="email" class="capture-input" placeholder="Your email address" autocomplete="email">
+          <button type="button" class="capture-submit">Send the Framework →</button>
+          <p class="capture-privacy">We do not sell or share your information. One email with the framework, then only content worth reading. Unsubscribe at any time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP TEASER (Section 10 — Optional, V1 Placeholder) -->
+<section id="shop-teaser">
+  <div class="container">
+    <div class="section-label reveal">The shop</div>
+    <h2 class="section-headline reveal">Premium objects<br><em>for serious readers.</em></h2>
+
+    <div class="shop-rule reveal">
+      Selected merchandise and bundles. The full catalog is in the Shop — this section features representative items only.
+    </div>
+
+    <div class="shop-grid">
+      <a href="#" class="shop-card reveal">
+        <div class="shop-item-tag">Stationery</div>
+        <h3>Editorial Notebooks</h3>
+        <p>Premium writing journals designed for manuscript development, research annotation, and long-form thinking. Structured for the working author.</p>
+        <div class="shop-cta">View in Shop →</div>
+      </a>
+
+      <a href="#" class="shop-card reveal">
+        <div class="shop-item-tag">Bundle</div>
+        <h3>Launch Preparation Bundle</h3>
+        <p>A curated collection of tools, templates, and reference materials for authors moving a manuscript toward market. Built around the Walcott pre-launch framework.</p>
+        <div class="shop-cta">View in Shop →</div>
+      </a>
+
+      <a href="#" class="shop-card reveal">
+        <div class="shop-item-tag">Title-Linked Merchandise</div>
+        <h3>Publication Objects</h3>
+        <p>Physical objects linked to specific Walcott titles — maps, prints, reference cards, and collector items that extend a book beyond the page.</p>
+        <div class="shop-cta">View in Shop →</div>
+      </a>
+    </div>
+
+    <a href="#" class="shop-footer-link reveal">Visit the Shop — full merchandise catalog →</a>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="book-call">
+  <div class="container">
+    <h2 class="final-cta-head reveal">If your book has no system around it,<br>the launch is <em>already weaker</em><br>than it should be.</h2>
+    <p class="final-cta-sub reveal">We work with a select number of authors, publishers, and expert projects each quarter. Strategy calls are free and without obligation.</p>
+    <div style="display: flex; justify-content: center;" class="reveal">
+      <a href="mailto:hello@walcottpress.com?subject=Strategy Call Request" class="btn-primary" style="font-size: 0.82rem;">Book a Strategy Call <span class="btn-arrow">→</span></a>
+    </div>
+    <p class="final-cta-note reveal">hello@walcottpress.com — For authors, publishers, and idea-led projects that need serious launch infrastructure.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+      <div>
+        <div class="footer-brand">Walcott <span>&</span> Co. Press</div>
+        <p class="footer-tagline">We build the pre-launch visibility systems, websites, and digital infrastructure that serious books and publishing projects require to reach their market with force.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Publish</h4>
+        <ul>
+          <li><a href="#">Full Catalog</a></li>
+          <li><a href="#">Forthcoming</a></li>
+          <li><a href="#">Submit a Manuscript</a></li>
+          <li><a href="#">Audio</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="#">Pre-Launch Systems</a></li>
+          <li><a href="#">Author Websites</a></li>
+          <li><a href="#">Launch Content</a></li>
+          <li><a href="#">Publisher Support</a></li>
+          <li><a href="#">Vault</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#">Notebooks</a></li>
+          <li><a href="#">Launch Bundles</a></li>
+          <li><a href="#">Title Objects</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Insights</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#book-call">Book a Strategy Call</a></li>
+          <li><a href="https://www.linkedin.com/company/walcott-co-press" target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© <span id="copy-year"></span> Walcott &amp; Co. Press Colombia S.A.S. All rights reserved. Medellín, Colombia.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Staggered reveal for siblings
+  const staggerGroups = ['.problem-grid', '.services-grid', '.process-grid', '.ba-grid', '.pub-grid', '.shop-grid', '.paths-grid', '.founder-grid'];
+  staggerGroups.forEach(selector => {
+    const container = document.querySelector(selector);
+    if (!container) return;
+    const children = container.querySelectorAll('.reveal');
+    children.forEach((child, i) => {
+      child.style.transitionDelay = `${i * 0.08}s`;
+    });
+  });
+
+  // Nav scroll behavior
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.padding = '1rem 0';
+      nav.style.borderBottomColor = 'rgba(19,16,12,0.12)';
+    } else {
+      nav.style.padding = '1.5rem 0';
+      nav.style.borderBottomColor = 'rgba(19,16,12,0.08)';
+    }
+  }, { passive: true });
+
+  // Mobile hamburger nav
+  const hamburger = document.getElementById('nav-hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  // Dynamic copyright year
+  const yearEl = document.getElementById('copy-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // Email capture — client-side handler (wire to ESP at deployment)
+  const captureBtn = document.querySelector('.capture-submit');
+  if (captureBtn) {
+    captureBtn.addEventListener('click', () => {
+      const emailInput = document.querySelector('.capture-input[autocomplete="email"]');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!email || !emailValid) {
+        if (emailInput) { emailInput.style.borderColor = 'rgba(142,36,52,0.7)'; emailInput.focus(); }
+        return;
+      }
+      captureBtn.textContent = 'Framework on its way →';
+      captureBtn.style.background = '#3A3530';
+      captureBtn.disabled = true;
+      document.querySelectorAll('.capture-input').forEach(i => i.disabled = true);
+      // TODO: POST to your ESP endpoint (Mailchimp, ConvertKit, etc.)
+    });
+  }
+</script>
+</body>
+</html>
