@@ -45,6 +45,7 @@ QAS involvement is required at every project stage and phase. No artifact may ad
 - Stage gate sign-off record with advancement authorization
 - Release recommendation (Pass / Conditional Pass / Hold)
 - Remediation assignment list with assigned agent per defect
+- SRA routing flag when the QA report requires critical synthesis, cross-phase gap analysis, or a strategic recommendation before the decision-maker acts
 
 ## Escalation Behavior
 
