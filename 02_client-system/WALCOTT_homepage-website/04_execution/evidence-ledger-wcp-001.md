@@ -119,3 +119,121 @@ Produced retroactively after protocol breach and Founder authorization.
   1. Populate `03_strategy/strategy-brief.md` before next build cycle
   2. Resolve 5 open discovery decisions (stack, delivery path, POD, email capture, SEO approach)
   3. Future builds must use full Mandatory Build Activation Protocol with live agent routing
+
+---
+
+## 11. Corrective Build — WCP-HOTFIX-001 (2026-04-18)
+
+**Build Class:** Class 1 — Corrective Build  
+**Trigger:** Founder reported blank pages visible at `https://walcottcapitalgroup.github.io/walcottcostudios/#problem`  
+**Human Owner:** Founder  
+**Build Lead:** FIS (frontend) / TVA (verification) / DRA (deployment)  
+**Reviewer:** QAS (post-execution, same session)
+
+### Root Cause
+
+GSAP `ScrollTrigger` animations in `App.tsx` faded all content (`img`, `.section-headline`, `.section-body`, `.section-cta`) to `opacity: 0` from scrub position `0.7` to `1.0` in every `PinnedSection` and `HeroSection`. With 10 pinned sections each carrying `end: '+=130%'`, this produced 30% × 130% = ~39vh of blank cream-colored screen per section — creating the perception of blank pages throughout the scroll.
+
+### Changes Applied
+
+| File | Change |
+| --- | --- |
+| `app/src/App.tsx` | Removed 4 exit `fromTo` animations from `HeroSection` scroll timeline |
+| `app/src/App.tsx` | Removed 4 exit `fromTo` animations from `PinnedSection` scroll timeline |
+| `app/src/App.tsx` | Reduced `end` from `'+=130%'` to `'+=80%'` in both section types |
+| `app/src/App.tsx` | Raised initial image enter opacity from `0.6` to `0.85` |
+| `website/index.html` | Replaced with rebuilt output |
+| `website/assets/` | Replaced stale 7-file bundle with fresh 2-file bundle |
+
+### Evidence
+
+| Evidence Type | Result | Notes |
+| --- | --- | --- |
+| TypeScript build | PASS | `tsc -b && vite build` — no errors |
+| Vite build | PASS | `347 kB JS`, `86 kB CSS` — clean output |
+| Live URL | PASS | Site accessible; GitHub Actions deployed successfully |
+| Git push | PASS | `c5c536f..ac01017 main -> main` to `walcottcapitalgroup/walcottcostudios` |
+
+### Protocol Note
+
+Session began without mandatory preload. Preload was completed mid-session after Founder intervention. Incorrect git operations were made on NODRFTSYSTEMS MASTER (wrong remote added, incorrect commits) before correct repo (`04_products/WCP/`) was identified. NODRFTSYSTEMS MASTER was reset to `208b211` to undo those errors. All final git operations ran correctly from `04_products/WCP/`.
+
+### Release Disposition
+
+- **Release Status:** Released — commit `ac01017`
+- **Rollback:** `git revert ac01017` in `04_products/WCP/` — GitHub Pages redeploys in ~60s
+
+---
+
+## 12. Build WCP-002 — Homepage Rebuild (2026-04-18)
+
+**Build Class:** Class 2 — Standard Feature Build
+**Build ID:** WCP-002
+**Trigger:** Founder authorized full 14-section homepage rebuild; existing 4-section teaser insufficient to support visitor or client conversion
+**Human Owner:** Founder
+**Build Lead:** FIS / Kiara (implementation) + BCA / Nadine (copy direction)
+**Reviewer:** QAS / Imani
+
+### Scope Delivered
+
+| Section | Status |
+| --- | --- |
+| 1. Hero — headline, 3 CTAs, support line | Delivered |
+| 2. Trust Strip — 4 authority signals | Delivered |
+| 3. Problem Diagnosis — 3-card failure diagnosis | Delivered |
+| 4. Core Studio Offers — 4 named service packages | Delivered |
+| 5. How Walcott Works — 4-step process sequence | Delivered |
+| 6. Proof of Practice — founder note + publishing proof | Delivered (real founder note applied) |
+| 7. Featured Publications — 3 title cards | Delivered (Coming Soon — no live titles confirmed) |
+| 8. Forthcoming Titles — 3 in-production works | Delivered |
+| 9. House Authors — 5 author profiles | Delivered (real editorial positioning applied) |
+| 10. Email Capture — dual-path (service + reader) | Delivered (formsubmit.co bridge; Kit pending) |
+| 11. Insights Preview — 3 article previews | Delivered |
+| 12. Segmented Paths — 4 engagement routes | Delivered |
+| 13. Final CTA — high-intent conversion block | Delivered |
+| 14. Contact form + Footer | Delivered |
+
+### Founder Decisions Resolved at Build
+
+| Decision | Resolution |
+| --- | --- |
+| House author names, disciplines, positioning | Applied — Ash Calder, Jonah Keene, M. L. Voss, Elena Rathbone, Thomas Ireton (5, not 4) |
+| Publication titles and status | Applied — 3 titles, all Coming Soon; no live sales endpoint confirmed |
+| Founder note (Proof of Practice) | Applied — 3-sentence note supplied by Founder |
+| Book a Strategy Call destination | /studio/strategy-call (page not yet built; pending WCP-003) |
+| Email capture service | Kit selected; formsubmit.co bridging until Kit integration is configured |
+| Stack direction | Next.js + Sanity CMS selected for migration; React/Vite SPA completes this phase |
+
+### Changes Applied
+
+| File | Change |
+| --- | --- |
+| `app/src/App.tsx` | Complete rewrite — 14-section homepage, useScrollReveal hook, 8-item nav |
+| `app/src/index.css` | Removed `.section-pinned` class and associated media query |
+| `app/src/App.css` | Cleared all Vite defaults |
+| `website/index.html` | Replaced with new build output |
+| `website/assets/` | Replaced stale bundle with fresh 2-file bundle |
+
+### Evidence
+
+| Evidence Type | Result | Notes |
+| --- | --- | --- |
+| TypeScript build | PASS | `tsc -b && vite build` — no errors |
+| Vite build | PASS | 367 kB JS, 86 kB CSS — clean output |
+| Git push | PASS | `ac01017..e9d1899 main -> main` to `walcottcapitalgroup/walcottcostudios` |
+| Live URL | PENDING | GitHub Actions deploying |
+
+### Open Items for WCP-003
+
+| Item | Notes |
+| --- | --- |
+| `/studio/strategy-call` page | All primary CTAs reference this; returns 404 until built |
+| Kit email capture integration | Form IDs required from Kit account |
+| Stack migration to Next.js + Sanity | Founder decision; React/Vite deprecated after this build |
+| Cover images for all 3 titles | Pending Founder supply |
+| Privacy Policy and Terms of Service pages | Footer links present; pages not built |
+
+### Release Disposition
+
+- **Release Status:** Released — commit `e9d1899`
+- **Rollback:** `git revert e9d1899` in `04_products/WCP/` — GitHub Pages redeploys in ~60s
