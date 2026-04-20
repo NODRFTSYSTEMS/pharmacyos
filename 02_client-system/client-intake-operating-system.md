@@ -224,8 +224,10 @@ Minimum repository-side records after acceptance or formal review:
 
 ### Website and positioning work
 
-- smaller bounded website scope with ready content:
-  - route toward Launch Site or equivalent bounded website package
+- smaller bounded brochure-style website scope with stable content and no client-editable content requirement:
+  - route toward Static Business Site
+- business site requiring CMS handoff, client-editable content, or a second bounded form type:
+  - route toward Business Launch Site
 - authority site with heavier content architecture, proof, multiple forms, bilingual needs, or stronger UX complexity:
   - route toward Authority Website or discovery-backed phased path
 

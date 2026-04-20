@@ -597,7 +597,9 @@ function normalizeDeliverableHint(text){
   const value=text.toLowerCase();
   if(value.includes('landing'))return 'Conversion Landing Page Sprint';
   if(value.includes('portal')||value.includes('dashboard')||value.includes('auth')||value.includes('api')||value.includes('app'))return 'Platform Starter';
-  if(value.includes('website')||value.includes('site'))return 'Launch Site / Authority Website';
+  if(value.includes('brochure')||value.includes('static'))return 'Static Business Site';
+  if(value.includes('cms')||value.includes('blog')||value.includes('editable'))return 'Business Launch Site / Authority Website';
+  if(value.includes('website')||value.includes('site'))return 'Static Business Site / Business Launch Site / Authority Website';
   return 'Discovery Sprint';
 }
 
