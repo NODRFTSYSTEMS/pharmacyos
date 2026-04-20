@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoDrftSystems — Client Intake Form</title>
+<style>
+  /* ── Screen styles ──────────────────────────────────────── */
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:#111;background:#f4f4f4;padding:24px 16px}
+  .page{background:#fff;max-width:720px;margin:0 auto;padding:40px 48px;border:1px solid #ddd;border-radius:4px}
+  .brand-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #042C53}
+  .brand-name{font-size:16px;font-weight:700;letter-spacing:-0.3px;color:#042C53}
+  .brand-tag{font-size:11px;color:#666;letter-spacing:0.4px;text-transform:uppercase}
+  .form-title{font-size:22px;font-weight:600;color:#042C53;margin-bottom:6px;letter-spacing:-0.4px}
+  .form-intro{font-size:13px;color:#444;line-height:1.7;margin-bottom:32px;max-width:560px}
+  .form-intro strong{color:#042C53}
+  .section{margin-bottom:32px;page-break-inside:avoid}
+  .section-header{background:#042C53;color:#fff;padding:8px 14px;border-radius:3px;font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:20px}
+  .q-block{margin-bottom:20px}
+  .q-label{font-size:13px;font-weight:600;color:#111;margin-bottom:8px;line-height:1.5}
+  .q-hint{font-size:11.5px;color:#666;font-weight:400;margin-top:2px;font-style:italic;line-height:1.5}
+  .q-required{color:#c0392b;margin-left:3px}
+  .options{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .options.inline{flex-direction:row;flex-wrap:wrap;gap:8px}
+  .opt{display:flex;align-items:flex-start;gap:9px;cursor:pointer}
+  .opt-box{width:14px;height:14px;border:1.5px solid #888;border-radius:2px;flex-shrink:0;margin-top:1px}
+  .opt-circle{width:14px;height:14px;border:1.5px solid #888;border-radius:50%;flex-shrink:0;margin-top:1px}
+  .opt-text{font-size:13px;color:#222;line-height:1.5}
+  .opt-yn{display:flex;gap:20px;margin-top:8px}
+  .write-line{border-bottom:1px solid #bbb;min-height:22px;margin-top:6px;margin-bottom:4px}
+  .write-lines{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .write-lines .write-line{min-height:20px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .note-box{background:#f9f9f9;border:1px solid #ddd;border-radius:3px;padding:12px 14px;font-size:12px;color:#555;line-height:1.6;margin-top:8px}
+  .page-footer{margin-top:36px;padding-top:16px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:11px;color:#888}
+  .print-btn{display:block;margin:24px auto 0;padding:10px 28px;background:#042C53;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.2px}
+  .print-btn:hover{background:#185FA5}
+
+  /* ── Print styles ───────────────────────────────────────── */
+  @media print{
+    body{background:#fff;padding:0}
+    .page{border:none;border-radius:0;padding:20px 28px;max-width:100%;margin:0;box-shadow:none}
+    .print-btn,.no-print{display:none!important}
+    .section{page-break-inside:avoid}
+    .brand-bar{margin-bottom:20px;padding-bottom:14px}
+    h1.form-title{font-size:18px}
+    @page{margin:18mm 16mm;size:letter}
+  }
+</style>
+</head>
+<body>
+
+<div class="page" id="printArea">
+
+  <!-- Header -->
+  <div class="brand-bar">
+    <div>
+      <div class="brand-name">NoDrftSystems</div>
+      <div class="brand-tag">Zero Drift. Zero Compromise. Built to Last.</div>
+    </div>
+    <div style="text-align:right;font-size:11px;color:#888;line-height:1.6">
+      Client Intake Form<br>
+      Date: ______________________<br>
+      Ref: ________________________
+    </div>
+  </div>
+
+  <h1 class="form-title">Client Intake Questionnaire</h1>
+  <p class="form-intro">
+    <strong>Instructions:</strong> Circle or check the option that best fits your situation. Use the blank lines for written responses.
+    All information is kept strictly confidential. There are no wrong answers — just answer as accurately as you can.
+    If you are unsure about a question, circle the closest option and add a note.
+  </p>
+  <p class="form-intro" style="margin-top:-16px">
+    Complete this form and return it by email to <strong>info@nodrftsystems.com</strong>,
+    or bring it to your first meeting.
+  </p>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- SECTION 1 -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Part 1 — About You &amp; Your Business</div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Your full name <span class="q-required">*</span></div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Business name <span class="q-required">*</span></div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Email address <span class="q-required">*</span></div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Phone number</div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Your role in the business <span class="q-required">*</span></div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Current website URL</div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">What type of business do you run? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one)</span>
+      </div>
+      <div class="options inline">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Technology / Software</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Professional services (law, accounting, consulting)</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Healthcare</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Real estate / property</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Online shop / retail / e-commerce</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Food, hospitality, or events</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Construction / trades / home services</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Education / training</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Media / content / publishing</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Non-profit or charity</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Other: ________________</span></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">How many people work in your business? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one)</span>
+      </div>
+      <div class="options inline">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Just me (solo)</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">2 – 10 people</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">11 – 50 people</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">51 – 200 people</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">200+ people</span></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Do you currently have a website? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one)</span>
+      </div>
+      <div class="options inline">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — it needs to stay up while we build the new one</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — but it's outdated and I'm fine replacing it</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — I don't have one yet</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- SECTION 2 -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Part 2 — Your Project</div>
+
+    <div class="q-block">
+      <div class="q-label">Which best describes what you're looking for? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one)</span>
+      </div>
+      <div class="options">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">A brand new website (I don't have one, or I need to start completely over)</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">A simple business website — just a few pages, no regular updates needed&nbsp;&nbsp;<em style="font-size:11px;color:#888">($3,500 starting)</em></span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">A business website I can update myself (with a content management system)&nbsp;&nbsp;<em style="font-size:11px;color:#888">($5,500 starting)</em></span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">A larger website with a blog, multiple sections, and content strategy&nbsp;&nbsp;<em style="font-size:11px;color:#888">($12,000 starting)</em></span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">A web application, portal, or custom software tool (more than a website)</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Improvements or additions to something that already exists</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">I'm not sure yet — I need help figuring that out&nbsp;&nbsp;<em style="font-size:11px;color:#888">(Discovery Sprint, $2,000)</em></span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Do you have a logo and brand colors? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — complete logo and brand guidelines</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">I have a logo but nothing else</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — I need these created too</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Not sure what I have</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Is your text / copy written and ready? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — fully written and approved</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Partially — some is done</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — I need help writing it</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Not sure yet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Do you need more than one language? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — English and Spanish</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — English and other: _________</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — English only</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Not sure</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Does your project involve any of the following?
+          <span class="q-hint">(Check all that apply)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">Online payments / e-commerce</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">Patient or health data (HIPAA)</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">Customer personal data / privacy</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">User logins or member area</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">Booking or scheduling</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">Connecting to existing software</span></div>
+          <div class="opt"><span class="opt-box"></span><span class="opt-text">None of the above / Not sure</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">What is the main problem you want to solve? <span class="q-required">*</span>
+        <div class="q-hint">Plain language only. e.g. "Our site looks old and customers can't find our phone number."</div>
+      </div>
+      <div class="write-lines">
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">How will you know the project worked? <span class="q-required">*</span>
+        <div class="q-hint">e.g. "Customers can book online without calling us."</div>
+      </div>
+      <div class="write-lines">
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Who are the people this project is meant to reach or serve?
+        <div class="q-hint">e.g. "Local homeowners in Miami," "Small business owners who need payroll help."</div>
+      </div>
+      <div class="write-lines">
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- SECTION 3 -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Part 3 — Timeline &amp; Budget</div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">When would you like to start? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">As soon as possible</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Within the next month</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Within the next 3 months</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Within the next 6 months</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No rush — still planning</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Do you have a hard deadline? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — specific date or event</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — flexible</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Not sure yet</span></div>
+        </div>
+        <div class="q-label" style="margin-top:12px;font-weight:400">If yes, what is it?</div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">What is your rough budget for this project? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one — confidential, used only for package recommendation)</span>
+      </div>
+      <div class="options inline">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Under $2,500</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">$2,500 – $5,000</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">$5,000 – $15,000</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">$15,000 – $30,000</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">$30,000 – $50,000</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">$50,000 or more</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Prefer not to say</span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Is your budget already approved? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — set aside and approved</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Partially — working on approval</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — budget not yet decided</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Not sure</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Preferred payment structure
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Half upfront, half at the end</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Three milestone payments</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Monthly payments</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Let's discuss</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- SECTION 4 -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Part 4 — Decision Making &amp; Communication</div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">Are you the final decision-maker? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — I have full authority</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — someone else approves</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Shared decision between 2+ people</span></div>
+        </div>
+        <div class="q-label" style="margin-top:12px;font-weight:400">If no — who approves?</div>
+        <div class="write-lines"><div class="write-line"></div></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">How many people need to approve the work? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Just me</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">2 – 3 people</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">4 or more people</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">How do you prefer we communicate? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Email</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Video calls (Zoom / Google Meet)</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Phone calls</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Slack or Teams</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Project management tool</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">No preference</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">How often would you like updates? <span class="q-required">*</span>
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Every day</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Every 2–3 days</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Once a week</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Every two weeks</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Only when something important happens</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <!-- SECTION 5 -->
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">Part 5 — Prior Experience &amp; Final Notes</div>
+
+    <div class="q-block">
+      <div class="q-label">Have you worked with a web agency or developer before? <span class="q-required">*</span>
+        <span class="q-hint">(Circle one)</span>
+      </div>
+      <div class="options inline">
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — it went well</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — mixed results</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">Yes — I was not satisfied</span></div>
+        <div class="opt"><span class="opt-circle"></span><span class="opt-text">No — this is my first time</span></div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">If yes — what went wrong or felt frustrating?
+        <div class="q-hint">e.g. "They went quiet for weeks," "Price went up unexpectedly," "Final result didn't match what we discussed."</div>
+      </div>
+      <div class="write-lines">
+        <div class="write-line"></div>
+        <div class="write-line"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="q-block">
+        <div class="q-label">How did you hear about NoDrftSystems?
+          <span class="q-hint">(Circle one)</span>
+        </div>
+        <div class="options">
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Referral from a colleague or client</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">LinkedIn</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Web search</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Direct outreach from NoDrftSystems</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Event or conference</span></div>
+          <div class="opt"><span class="opt-circle"></span><span class="opt-text">Other: ________________</span></div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Who referred you? (if anyone)</div>
+        <div class="write-lines"><div class="write-line"></div></div>
+        <div class="q-label" style="margin-top:20px;font-weight:600">Anything else we should know?</div>
+        <div class="write-lines">
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signature block -->
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid #ddd">
+      <div class="note-box">
+        <strong>Confirmation:</strong> By signing below, I confirm that the information provided in this form is
+        accurate to the best of my knowledge, and that I am the appropriate person to initiate this inquiry on
+        behalf of the business named above.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px">
+        <div>
+          <div style="font-size:12px;color:#666;margin-bottom:6px">Signature</div>
+          <div style="border-bottom:1px solid #444;min-height:30px"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#666;margin-bottom:6px">Date</div>
+          <div style="border-bottom:1px solid #444;min-height:30px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <span>NoDrftSystems &nbsp;|&nbsp; info@nodrftsystems.com</span>
+    <span>Confidential — For NoDrftSystems use only</span>
+    <span>Page 1</span>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Print button (screen only) -->
+<button class="print-btn no-print" onclick="window.print()">&#128438;&nbsp; Print this form</button>
+
+<p style="text-align:center;font-size:12px;color:#888;margin-top:14px" class="no-print">
+  To use in Microsoft Word: File &rarr; Open &rarr; select this file. Word will import it as an editable document.
+</p>
+
+</body>
+</html>

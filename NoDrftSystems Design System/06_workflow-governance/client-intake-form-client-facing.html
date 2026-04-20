@@ -51,10 +51,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .confirm-meta h3{font-size:14px;font-weight:600;color:var(--color-text-primary);margin-bottom:0.5rem}
 .confirm-meta p{max-width:none;margin:0 0 0.35rem;text-align:left}
 .confirm-meta ul{text-align:left;padding-left:1.25rem;font-size:14px;color:var(--color-text-secondary);line-height:1.8}
-.confirm-actions{display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap}
-.btn-print{font-family:var(--font-sans);font-size:13px;font-weight:500;padding:8px 18px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);transition:background 0.2s,color 0.2s}
-.btn-print:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
-@media print{.form-header,.progress-bar,.section-card,.btn-print{display:none!important}.confirm-card{display:block!important;border:none;padding:0}.confirm-card .confirm-actions{display:none!important}}
 @media(max-width:520px){.two-col,.inline-checks{grid-template-columns:1fr}}
 </style>
 
@@ -480,7 +476,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="confirm-icon">&#10003;</div>
     <h2>Thank you — we've received your information!</h2>
     <p>We'll review what you've shared and reach out within 1–2 business days to schedule a quick call. No commitments yet — just a conversation to make sure we're the right fit for each other.</p>
-    <div class="confirm-meta" id="responseSummary">
+    <div class="confirm-meta">
       <h3>What happens next</h3>
       <ul>
         <li>We'll review your answers carefully.</li>
@@ -489,9 +485,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <li>If it's a good fit, we'll put together a clear plan and a quote — no surprises.</li>
       </ul>
       <p style="margin-top:0.75rem;font-size:13px;color:var(--color-text-secondary)">Questions in the meantime? Email us at <strong>info@nodrftsystems.com</strong></p>
-    </div>
-    <div class="confirm-actions">
-      <button class="btn-print" onclick="printSummary()">&#128438; Print a copy of my responses</button>
     </div>
     <p style="margin-top:1.25rem;font-size:13px;color:var(--color-text-secondary)">Zero Drift. Zero Compromise. Built to Last.</p>
   </div>
@@ -502,8 +495,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 let cur=0;
 const total=7;
 let lastSubmission=null;
-// Paste your Formspree endpoint URL here after setup (e.g. https://formspree.io/f/xxxxxxxx)
-const INTAKE_ENDPOINT='';
 
 function updateProgress(step){
   for(let i=0;i<total;i++){
@@ -600,9 +591,7 @@ function normalizeDeliverableHint(text){
   const value=text.toLowerCase();
   if(value.includes('landing'))return 'Conversion Landing Page Sprint';
   if(value.includes('portal')||value.includes('dashboard')||value.includes('auth')||value.includes('api')||value.includes('app'))return 'Platform Starter';
-  if(value.includes('brochure')||value.includes('static'))return 'Static Business Site';
-  if(value.includes('cms')||value.includes('blog')||value.includes('editable'))return 'Business Launch Site / Authority Website';
-  if(value.includes('website')||value.includes('site'))return 'Static Business Site / Business Launch Site / Authority Website';
+  if(value.includes('website')||value.includes('site'))return 'Launch Site / Authority Website';
   return 'Discovery Sprint';
 }
 
@@ -886,77 +875,16 @@ function downloadIntakeJson(){
   downloadFile(JSON.stringify(lastSubmission.data,null,2),safeFileStem(lastSubmission.data.company.name||lastSubmission.data.project.title)+'-intake-packet.json','application/json;charset=utf-8');
 }
 
-async function submitForm(){
+function submitForm(){
   if(!validate(6))return;
   const data=buildSubmission();
   const summary=buildSummary(data);
   lastSubmission={data,summary};
-
-  if(INTAKE_ENDPOINT){
-    const body=new FormData();
-    body.append('_subject','New Intake: '+data.company.name+' — Score '+data.analysis.qualification_score);
-    body.append('_replyto',data.contact.email);
-    body.append('Name',data.contact.name);
-    body.append('Email',data.contact.email);
-    body.append('Phone',data.contact.phone||'');
-    body.append('Company',data.company.name);
-    body.append('Industry',data.company.industry);
-    body.append('Company size',data.company.size||'');
-    body.append('Engagement type',data.project.engagement_type||'');
-    body.append('Business problem',data.project.business_problem||'');
-    body.append('Success outcome',data.project.success_outcome||'');
-    body.append('Budget',data.budget.range||'');
-    body.append('Budget approved',data.budget.approved||'');
-    body.append('Timeline',data.timeline.start_date+' → '+data.timeline.target_completion);
-    body.append('Decision maker',data.stakeholders.decision_maker||'');
-    body.append('Qualification score',data.analysis.qualification_score);
-    body.append('Recommendation',data.analysis.recommendation);
-    try{
-      const res=await fetch(INTAKE_ENDPOINT,{method:'POST',headers:{Accept:'application/json'},body});
-      if(!res.ok)console.error('[NoDrft Intake] Delivery error:',res.status);
-    }catch(e){
-      console.error('[NoDrft Intake] Delivery failed:',e);
-    }
-  }
-
+  /* Log to console for operator retrieval — replace with a form endpoint when ready */
+  console.log('[NoDrft Intake] Packet ready. Call downloadIntakeSummary() or downloadIntakeJson() to export.');
+  console.log('[NoDrft Intake] Score:',data.analysis.qualification_score,'| Route:',data.analysis.recommendation);
   document.getElementById('step6').classList.remove('active');
   document.getElementById('progress').style.display='none';
   document.getElementById('confirmCard').classList.add('active');
-}
-
-function printSummary(){
-  if(!lastSubmission)return;
-  const d=lastSubmission.data;
-  const lines=[
-    '<div style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:24px;color:#111">',
-    '<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #042C53;padding-bottom:12px;margin-bottom:20px">',
-    '<div><strong style="font-size:16px;color:#042C53">NoDrftSystems</strong><br><span style="font-size:11px;color:#666;letter-spacing:0.4px;text-transform:uppercase">Client Intake — Response Summary</span></div>',
-    '<div style="font-size:11px;color:#888;text-align:right">Submitted: '+new Date().toLocaleDateString()+'</div>',
-    '</div>',
-    row('Business','',d.company.name+' &nbsp;|&nbsp; '+d.company.industry+' &nbsp;|&nbsp; '+d.company.size),
-    row('Contact','',d.contact.name+' &nbsp;|&nbsp; '+d.contact.role+'<br>'+d.contact.email+(d.contact.phone?' &nbsp;|&nbsp; '+d.contact.phone:'')),
-    row('Project','',d.project.title+' — '+d.project.engagement_type),
-    row('Problem','',d.project.business_problem),
-    row('Success looks like','',d.project.success_outcome),
-    row('Deliverables','',d.project.deliverables),
-    row('Timeline','',d.timeline.start_date+' → '+d.timeline.target_completion+(d.timeline.flexibility?' ('+d.timeline.flexibility+')'   :'')),
-    row('Budget','',d.budget.range+' — '+d.budget.approved),
-    row('Decision maker','',d.stakeholders.decision_maker+(d.stakeholders.approval_count?' ('+d.stakeholders.approval_count+' approver(s))':'')),
-    row('Communication','',d.stakeholders.communication_channel+' / '+d.stakeholders.update_frequency),
-    (d.project.compliance&&d.project.compliance.length?row('Compliance flags','',d.project.compliance.join(', ')):''),
-    (d.additional.notes?row('Additional notes','',d.additional.notes):''),
-    '<div style="margin-top:24px;padding:12px;background:#f5f5f5;border-radius:3px;font-size:11px;color:#666">',
-    'This is a summary of your responses submitted to NoDrftSystems. We\'ll be in touch within 1–2 business days.<br>',
-    'info@nodrftsystems.com &nbsp;|&nbsp; Zero Drift. Zero Compromise. Built to Last.',
-    '</div></div>'
-  ];
-  const w=window.open('','_blank','width=760,height=900');
-  w.document.write('<!DOCTYPE html><html><head><title>NoDrftSystems — Your Intake Summary</title><style>body{margin:0}@media print{@page{margin:18mm}}</style></head><body>'+lines.join('')+'<script>window.onload=function(){window.print();}<\/script></body></html>');
-  w.document.close();
-}
-
-function row(label,_unused,value){
-  if(!value||value.trim()==='')return'';
-  return '<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:0.5px solid #ddd"><div style="font-size:11px;font-weight:600;color:#042C53;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">'+label+'</div><div style="font-size:13px;color:#222;line-height:1.6">'+value+'</div></div>';
 }
 </script>
