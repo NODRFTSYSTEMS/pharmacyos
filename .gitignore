@@ -1,3 +1,21 @@
+# NoDrftSystems Proprietary — Never Commit
+CLAUDE.md
+.claude/
+
+# Client Data — NDA-protected, never commit
+02_client-system/
+
+# Internal Governance — Proprietary, never commit
+01_system/legal/
+01_system/commercial/
+01_system/operations/
+
+# Internal Source Documents — Proprietary, never commit
+90_source-documents/
+
+# QA Mobile Review Captures — local artifacts, not source
+04_products/**/mobile-review-*/
+
 # OS artifacts
 .DS_Store
 Thumbs.db
