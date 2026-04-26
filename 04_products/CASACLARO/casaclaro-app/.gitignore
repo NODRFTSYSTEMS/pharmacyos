@@ -1,0 +1,31 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Next.js build output
+.next
+out
+dist
+
+# Environment secrets
+.env
+.env.*
+!.env.local.example
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage
+test-results
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json

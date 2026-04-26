@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Guide | CasaClaro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="currency-engine.js"></script>
+  <script src="weather-engine.js"></script>
+  <style>
+    .city-hero { height: 70vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
+    .city-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(44, 36, 27, 0.9) 0%, transparent 60%); }
+    .city-hero-content { position: relative; z-index: 2; padding: 4rem 2rem; color: white; max-width: 1400px; margin: 0 auto; width: 100%; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .metric-card { background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center; border-top: 4px solid var(--terracotta); }
+    .neighborhood-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+    .neighborhood-card { background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); transition: transform 0.3s; }
+    .neighborhood-card:hover { transform: translateY(-4px); }
+    .neighborhood-header { background: var(--cream-dark); padding: 1.5rem; border-bottom: 2px solid var(--latte); }
+    .rental-indicator { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--caribbean); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; }
+    .rate-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem; }
+    .weather-widget { display: inline-flex; align-items: center; gap: 2rem; background: rgba(0,0,0,0.45); backdrop-filter: blur(10px); border-radius: 14px; padding: 1rem 1.5rem; margin-top: 2rem; color: white; flex-wrap: wrap; }
+    .weather-current { display: flex; align-items: center; gap: 1rem; }
+    .weather-temp { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+    .weather-temp-alt { font-size: 0.875rem; opacity: 0.7; margin-top: 0.25rem; }
+    .weather-condition { font-size: 0.8125rem; opacity: 0.85; letter-spacing: 0.03em; }
+    .weather-icon { font-size: 2.25rem; }
+    .weather-divider { width: 1px; height: 3rem; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+    .weather-forecast { display: flex; gap: 1.25rem; }
+    .weather-day { text-align: center; min-width: 48px; }
+    .weather-day-name { font-size: 0.75rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+    .weather-day-icon { font-size: 1.1rem; margin-bottom: 0.35rem; }
+    .weather-day-temps { font-size: 0.8125rem; }
+    .weather-day-hi { font-weight: 600; }
+    .weather-day-lo { opacity: 0.65; }
+    .weather-source { font-size: 0.7rem; opacity: 0.5; margin-top: 0.5rem; width: 100%; }
+    @media (max-width: 600px) { .weather-divider { display: none; } .weather-forecast { flex-wrap: wrap; } }
+  </style>
+</head>
+<body data-page="city">
+  <div id="site-header"></div>
+
+  <main id="city-content">
+    <div style="text-align: center; padding: 4rem;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--terracotta);"></i>
+      <p>Loading city data...</p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+  <script>
+    const CityPage = {
+      data: null,
+      city: null,
+
+      async init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const citySlug = urlParams.get('id');
+
+        if (!citySlug) { this.showError('No city specified'); return; }
+
+        try {
+          const response = await fetch('data/cities_enhanced.json');
+          this.data = await response.json();
+          this.city = this.data.cities.find(c => c.slug === citySlug);
+
+          if (!this.city) { this.showError('City not found'); return; }
+          this.render();
+        } catch (error) {
+          console.error('Error loading city:', error);
+          this.showError('Failed to load city data');
+        }
+      },
+
+      render() {
+        const c = this.city;
+        const d = this.data;
+
+        document.title = `${c.name} — CasaClaro`;
+
+        const rentalBadge = c.rentalMarket
+          ? `<div class="rental-indicator"><i class="fas fa-home"></i> Rentals Available</div>`
+          : '';
+
+        document.getElementById('city-content').innerHTML = `
+
+          <!-- Section 1: Hero -->
+          <section id="overview" class="city-hero" style="background-image: url('${c.heroImage}');">
+            <div class="city-hero-content">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <span style="background: var(--gold); color: var(--charcoal); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.875rem;">${c.tagline}</span>
+                ${rentalBadge}
+              </div>
+              <h1 style="font-size: clamp(2.5rem, 7vw, 4rem); margin-bottom: 1rem; color: white;">${c.name}</h1>
+              <p style="font-size: 1.25rem; max-width: 600px; opacity: 0.9;">${c.vibe}</p>
+              <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="#neighborhoods" class="btn btn-gold">Explore Neighborhoods</a>
+                ${c.rentalMarket ? `<a href="#rentals" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">View Rentals</a>` : ''}
+                <a href="#retirees" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">For Retirees</a>
+              </div>
+              <div id="weather-widget-container" class="weather-widget" style="display:none;" aria-label="Live weather for ${c.name}">
+                <span style="opacity:0.6; font-size:0.875rem;"><i class="fas fa-spinner fa-spin"></i> Loading weather…</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Sticky Sub-nav -->
+          <nav class="city-subnav" aria-label="Page sections">
+            <div class="container city-subnav-inner">
+              <a href="#overview" class="nav-link">Overview</a>
+              <a href="#neighborhoods" class="nav-link">Neighborhoods</a>
+              <a href="#investment" class="nav-link">Investment</a>
+              <a href="#retirees" class="nav-link">Living</a>
+              ${c.rentalMarket ? `<a href="#rentals" class="nav-link">Rentals</a>` : ''}
+            </div>
+          </nav>
+
+          <!-- Section 2: Quick Scorecard -->
+          <section id="scorecard" class="section" style="background: var(--cream);">
+            <div class="container">
+              <p class="section-kicker">At a Glance</p>
+              <h2>City Scorecard</h2>
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div style="font-size: 2rem; color: var(--terracotta); font-weight: 700;" data-usd-price="${c.metrics.pricePerSqm}" class="dual-display">$${c.metrics.pricePerSqm}</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">Price / m²</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2rem; color: var(--terracotta); font-weight: 700;">${c.metrics.rentalYield}%</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">Rental Yield</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 1.5rem; color: var(--terracotta); font-weight: 700; line-height: 1.2;">${c.metrics.roiRange}</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">ROI Range</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2rem; color: var(--terracotta); font-weight: 700;">${c.retireeProfile.suitabilityScore}</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">Retiree Score</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2rem; color: var(--terracotta); font-weight: 700;">${c.walkability.score}</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">Walkability</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 1.25rem; color: var(--terracotta); font-weight: 700; line-height: 1.3;">${c.retireeProfile.costOfLiving}</div>
+                  <div style="color: var(--coffee); font-size: 0.875rem; margin-top: 0.25rem;">Cost of Living / mo</div>
+                </div>
+              </div>
+              <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); border-left: 4px solid var(--emerald);">
+                <h3 style="color: var(--emerald); margin-bottom: 0.75rem;"><i class="fas fa-info-circle"></i> Local Market Insight</h3>
+                <p style="margin: 0; color: var(--coffee);">${c.introText.investmentAppeal}</p>
+                <div style="margin-top: 1rem; font-size: 0.8125rem; color: var(--coffee); opacity: 0.7;">
+                  <i class="fas fa-sync-alt"></i> Data verified: ${new Date(d.metadata.lastUpdated).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
+                  · Next update: ${new Date(d.metadata.nextUpdate).toLocaleDateString('en-US', {month:'short', year:'numeric'})}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: City Context -->
+          <section id="city-context" class="section" style="background: white;">
+            <div class="container">
+              <p class="section-kicker">City Profile</p>
+              <h2>History, Lifestyle &amp; Getting Around</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div style="background: var(--cream); padding: 2rem; border-radius: var(--radius-lg);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-landmark" style="margin-right: 0.5rem;"></i>History &amp; Culture</h3>
+                  <p style="color: var(--charcoal); margin: 0;">${c.introText.history}</p>
+                </div>
+                <div style="background: var(--cream); padding: 2rem; border-radius: var(--radius-lg);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-coffee" style="margin-right: 0.5rem;"></i>Lifestyle</h3>
+                  <p style="color: var(--charcoal); margin: 0;">${c.introText.lifestyle}</p>
+                </div>
+                <div style="background: var(--cream); padding: 2rem; border-radius: var(--radius-lg);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-subway" style="margin-right: 0.5rem;"></i>Transit &amp; Community</h3>
+                  <p style="color: var(--charcoal); margin-bottom: 0.75rem;">${c.walkability.description}</p>
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <li style="font-size: 0.9rem; color: var(--coffee);"><strong>Transit:</strong> ${c.walkability.transit}</li>
+                    <li style="font-size: 0.9rem; color: var(--coffee);"><strong>Bike-friendly:</strong> ${c.walkability.bikeFriendly ? 'Yes' : 'No'}</li>
+                    <li style="font-size: 0.9rem; color: var(--coffee);"><strong>Expat community:</strong> ${c.retireeProfile.expatCommunity}</li>
+                    <li style="font-size: 0.9rem; color: var(--coffee);"><strong>English ease:</strong> ${c.retireeProfile.languageEase}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4: Neighborhoods -->
+          <section id="neighborhoods" class="section" style="background: var(--cream);">
+            <div class="container">
+              <p class="section-kicker">Micro-Markets</p>
+              <h2>Neighborhoods &amp; Sectores</h2>
+              <p>Drill down to specific barrios. Prices shown in both USD and COP (live rate).</p>
+              <div class="neighborhood-grid">
+                ${c.neighborhoods.map(n => `
+                  <div class="neighborhood-card">
+                    <div class="neighborhood-header">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h3 style="margin: 0;">${n.name}</h3>
+                        <span style="background: var(--terracotta); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">Walk ${n.walkScore}</span>
+                      </div>
+                      <div style="font-size: 0.875rem; color: var(--coffee);">${n.character}</div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                      <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--terracotta);" data-usd-price="${n.pricePerSqm}" class="dual-display">$${n.pricePerSqm}/m²</div>
+                        <div style="font-size: 0.875rem; color: var(--coffee);">Average listing price</div>
+                      </div>
+                      <p style="color: var(--coffee); font-size: 0.95rem; margin-bottom: 1.5rem;">${n.description}</p>
+                      <a href="submit-property.html?city=${c.slug}&neighborhood=${encodeURIComponent(n.name)}" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-user-tie"></i> Connect with Local Agent
+                      </a>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 5: Investment Detail -->
+          <section id="investment" class="section" style="background: white;">
+            <div class="container">
+              <p class="section-kicker">Investment Detail</p>
+              <h2>Market Dynamics &amp; Repair Rates</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div style="background: var(--cream); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+                  <div style="background: var(--terracotta); padding: 1rem 1.5rem;">
+                    <h3 style="color: white; margin: 0; font-size: 1rem;"><i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>Market Dynamics</h3>
+                  </div>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 0.9375rem;">
+                    ${[
+                      ['Appreciation trend',  c.metrics.appreciationTrend],
+                      ['Closing cost',        c.metrics.closingCostPercent + '%'],
+                      ['Annual property tax', c.metrics.propertyTaxAnnual + '%'],
+                      ['Short-term rental',   c.regulations.airbnb],
+                      ['Foreign ownership',   c.regulations.foreignOwnership],
+                      ['Mortgages',           c.regulations.mortgages],
+                    ].map(([label, val]) => `
+                      <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 0.85rem 1.5rem; color: var(--coffee); font-size: 0.875rem;">${label}</td>
+                        <td style="padding: 0.85rem 1.5rem; font-weight: 600; color: var(--charcoal); text-align: right;">${val}</td>
+                      </tr>
+                    `).join('')}
+                  </table>
+                </div>
+                <div style="background: var(--cream); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+                  <div style="background: var(--lagoon); padding: 1rem 1.5rem;">
+                    <h3 style="color: white; margin: 0; font-size: 1rem;"><i class="fas fa-tools" style="margin-right: 0.5rem;"></i>Repair Rates</h3>
+                  </div>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 0.9375rem;">
+                    ${[
+                      ['Handyman / day',  c.repairs.handyman],
+                      ['Plumber',         c.repairs.plumber],
+                      ['Electrician',     c.repairs.electrician],
+                      ['Renovation / m²', c.repairs.renovation],
+                    ].map(([label, val]) => `
+                      <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 0.85rem 1.5rem; color: var(--coffee); font-size: 0.875rem;">${label}</td>
+                        <td style="padding: 0.85rem 1.5rem; font-weight: 600; color: var(--charcoal); text-align: right;">${val}</td>
+                      </tr>
+                    `).join('')}
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 6: For Retirees -->
+          <section id="retirees" class="section" style="background: var(--cream);">
+            <div class="container">
+              <p class="section-kicker">For Retirees</p>
+              <h2>Healthcare, Golden Age &amp; First 30 Days</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-hospital" style="margin-right: 0.5rem;"></i>Healthcare</h3>
+                  <p style="color: var(--charcoal); margin-bottom: 1rem;">${c.healthcare.overview}</p>
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Insurance:</strong> ${c.healthcare.insurance}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Specialists:</strong> ${c.healthcare.specialists}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Emergency:</strong> ${c.healthcare.emergency}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Pharmacies:</strong> ${c.healthcare.pharmacies}</li>
+                  </ul>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-sun" style="margin-right: 0.5rem;"></i>Golden Age Life</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Activities:</strong> ${c.goldenAge.activities}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Social scene:</strong> ${c.goldenAge.social}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Cost of living:</strong> ${c.retireeProfile.costOfLiving}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>In-home assistance:</strong> ${c.goldenAge.assistance}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Climate:</strong> ${c.retireeProfile.climate}</li>
+                    <li style="font-size: 0.875rem; color: var(--coffee);"><strong>Healthcare rank:</strong> ${c.retireeProfile.healthcareRank}</li>
+                  </ul>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                  <h3 style="color: var(--terracotta); margin-bottom: 1rem;"><i class="fas fa-clipboard-check" style="margin-right: 0.5rem;"></i>First 30 Days</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem;">
+                    ${c.first30Days.map(item => `
+                      <li style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.875rem; color: var(--charcoal);">
+                        <i class="fas fa-check-circle" style="color: var(--emerald); margin-top: 0.15rem; flex-shrink: 0;"></i>
+                        ${item}
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 7: Rental Market -->
+          ${c.rentalMarket ? `
+          <section id="rentals" class="section" style="background: white;">
+            <div class="container">
+              <p class="section-kicker">Rental Market</p>
+              <h2>Long-Term Rentals</h2>
+              <p>Monthly rates for unfurnished units. Furnished adds ${c.rentalMarket.furnishedPremium || '15–20%'} premium.</p>
+              <div style="background: var(--cream); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                  <div style="text-align: center; padding: 2rem; background: white; border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; color: var(--caribbean); margin-bottom: 0.5rem;"><i class="fas fa-bed"></i> 2 BR</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;" data-usd-price="${c.rentalMarket.avgMonthly2BR}" class="dual-display">$${c.rentalMarket.avgMonthly2BR}/mo</div>
+                    <div style="font-size: 0.875rem; color: var(--coffee);">Unfurnished average</div>
+                  </div>
+                  <div style="text-align: center; padding: 2rem; background: white; border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; color: var(--caribbean); margin-bottom: 0.5rem;"><i class="fas fa-bed"></i> 3 BR</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;" data-usd-price="${c.rentalMarket.avgMonthly3BR}" class="dual-display">$${c.rentalMarket.avgMonthly3BR}/mo</div>
+                    <div style="font-size: 0.875rem; color: var(--coffee);">Unfurnished average</div>
+                  </div>
+                </div>
+                <div style="margin-top: 2rem; padding: 1rem; background: rgba(14, 165, 199, 0.1); border-radius: var(--radius-md); border-left: 4px solid var(--caribbean);">
+                  <strong><i class="fas fa-info-circle"></i> Local Note:</strong> ${c.rentalMarket.leaseTerm}
+                  Deposits typically ${c.rentalMarket.depositMonths} month(s) rent.
+                  <br><small>${c.rentalMarket.shortTermRegulations || ''}</small>
+                </div>
+              </div>
+            </div>
+          </section>
+          ` : ''}
+
+          <!-- Section 8: CTA Closer -->
+          <section class="section" style="background: var(--terracotta); color: white; text-align: center;">
+            <div class="container">
+              <h2 style="color: white; margin-bottom: 1rem;">Ready to Explore ${c.name}?</h2>
+              <p style="color: rgba(255,255,255,0.9); margin-bottom: 2rem; font-size: 1.25rem;">Get personalized listings in ${c.name} within 2 hours.</p>
+              <a href="submit-property.html?city=${c.slug}" class="btn btn-large" style="background: white; color: var(--terracotta);">
+                <i class="fas fa-paper-plane"></i> Get Listings
+              </a>
+            </div>
+          </section>
+        `;
+
+        if (window.CurrencyEngine) CurrencyEngine.updateAllCalculations();
+        this.loadWeather();
+      },
+
+      async loadWeather() {
+        const el = document.getElementById('weather-widget-container');
+        if (!el || !this.city.coordinates) return;
+        const { lat, lon } = this.city.coordinates;
+        el.style.display = 'inline-flex';
+
+        try {
+          const w = await WeatherEngine.getWeather(this.city.slug, lat, lon);
+          el.innerHTML = `
+            <div class="weather-current">
+              <i class="fas ${w.icon} weather-icon"></i>
+              <div>
+                <div class="weather-temp">${w.tempF}°F</div>
+                <div class="weather-temp-alt">${w.tempC}°C</div>
+                <div class="weather-condition">${w.label}</div>
+              </div>
+            </div>
+            <div class="weather-divider"></div>
+            <div class="weather-forecast">
+              ${w.forecast.map(day => `
+                <div class="weather-day">
+                  <div class="weather-day-name">${day.day}</div>
+                  <div class="weather-day-icon"><i class="fas ${day.icon}"></i></div>
+                  <div class="weather-day-temps">
+                    <span class="weather-day-hi">${day.hiF}°</span>
+                    <span class="weather-day-lo"> / ${day.loF}°</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="weather-source">Live · Open-Meteo · updates every 30 min</div>
+          `;
+        } catch (_) {
+          el.style.display = 'none';
+        }
+      },
+
+      showError(msg) {
+        document.getElementById('city-content').innerHTML = `
+          <div style="text-align: center; padding: 4rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error); margin-bottom: 1rem;"></i>
+            <h2>Error</h2>
+            <p>${msg}</p>
+            <a href="index.html" class="btn btn-primary" style="margin-top: 2rem;">Return Home</a>
+          </div>
+        `;
+      }
+    };
+
+    CityPage.init();
+  </script>
+</body>
+</html>

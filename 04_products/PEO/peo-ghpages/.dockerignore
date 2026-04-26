@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+dist
+out
+
+# Environment secrets
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Temp files
+*.tmp
+*.swp
+
+# Documentation (keep in repo, not in image)
+*.md
+!README.md
+
+# Large binary assets not needed for build
+public/*.mp4
+public/*.mov

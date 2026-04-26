@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "listings": "Listados",
+    "cities": "Ciudades",
+    "relocation": "Reubicación",
+    "residency": "Residencia",
+    "forSellers": "Para Vendedores",
+    "forAgents": "Para Agentes",
+    "switchLang": "English"
+  },
+  "metadata": {
+    "siteName": "CasaClaro",
+    "defaultTitle": "CasaClaro | Inteligencia inmobiliaria, arriendos y reubicación en Colombia",
+    "defaultDescription": "Plataforma bilingüe de propiedad raíz y reubicación en Colombia para compradores, arrendatarios, vendedores, expatriados, jubilados, corredores y familias. Compara ciudades, barrios y listados verificados — y pasa de la investigación a la acción local con contexto real.",
+    "listings": {
+      "title": "Listados Actuales | CasaClaro Colombia",
+      "description": "Explora propiedades verificadas en venta y arriendo en Medellín, Bogotá, Cartagena y más — cada una revisada por título, estado legal y valor de mercado."
+    }
+  },
+  "listings": {
+    "pageTitle": "Listados Actuales",
+    "pageSubtitle": "Propiedades verificadas en toda Colombia — revisadas por título, estado legal y valor de mercado.",
+    "showingCount": "Mostrando {count} de {total} listados",
+    "resetFilters": "Restablecer Filtros",
+    "filters": {
+      "type": "Tipo de Listado",
+      "city": "Ciudad",
+      "propertyType": "Tipo de Propiedad",
+      "priceRange": "Rango de Precio",
+      "badgeLevel": "Nivel de Verificación",
+      "all": "Todos",
+      "sale": "En Venta",
+      "rental": "En Arriendo",
+      "longTermRental": "Arriendo de Largo Plazo",
+      "apartment": "Apartamento",
+      "house": "Casa",
+      "penthouse": "Penthouse",
+      "studio": "Estudio",
+      "townhouse": "Casa Adosada",
+      "fullyVetted": "Verificado Completo",
+      "professionalReview": "Revisión Profesional",
+      "basic": "Básico"
+    },
+    "priceRanges": {
+      "sale": {
+        "under100k": "Menos de $100.000",
+        "100kTo250k": "$100.000 – $250.000",
+        "250kTo500k": "$250.000 – $500.000",
+        "over500k": "Más de $500.000"
+      },
+      "rental": {
+        "under1k": "Menos de $1.000/mes",
+        "1kTo2k": "$1.000 – $2.000/mes",
+        "over2k": "Más de $2.000/mes"
+      }
+    },
+    "card": {
+      "forSale": "En Venta",
+      "forRent": "por mes",
+      "longTerm": "Arriendo Largo Plazo",
+      "beds": "hab",
+      "baths": "baños",
+      "area": "m²",
+      "parking": "parqueo",
+      "furnished": "Completamente Amueblado"
+    },
+    "emptyState": {
+      "headingFiltered": "Ningún listado coincide con tus filtros.",
+      "headingEmpty": "Aún no hay listados.",
+      "bodyFiltered": "Ajusta los filtros o restablécelos para ver todas las propiedades disponibles.",
+      "bodyEmpty": "Nuevas propiedades verificadas se agregan regularmente en Medellín, Bogotá, Cartagena y las principales ciudades de reubicación de Colombia.",
+      "cta": "Enviar una Propiedad"
+    },
+    "syntheticBanner": "Datos de desarrollo — estos listados son sintéticos y no representan propiedades reales en venta o arriendo."
+  },
+  "badge": {
+    "fullyVetted": {
+      "label": "Verificado Completo",
+      "tooltip": "Título limpio, revisión legal completa, inspección física y reglamento de propiedad horizontal confirmados por un profesional CasaClaro."
+    },
+    "professionalReview": {
+      "label": "Revisión Profesional",
+      "tooltip": "Un profesional habilitado revisó documentos clave. La inspección física y verificación completa están en proceso o parcialmente realizadas."
+    },
+    "basic": {
+      "label": "Básico",
+      "tooltip": "Este listado superó una revisión de completitud. La verificación legal y física no está incluida — revisa toda la documentación de forma independiente antes de proceder."
+    }
+  },
+  "footer": {
+    "tagline": "Lee Colombia con claridad. Compra, arrienda, reubícate o publica con contexto real.",
+    "exploreHeading": "Explorar",
+    "resourcesHeading": "Recursos",
+    "companyHeading": "Empresa",
+    "cities": "Ciudades",
+    "listings": "Listados",
+    "relocation": "Reubicación",
+    "residency": "Residencia",
+    "costSimulator": "Simulador de Costos",
+    "map": "Mapa",
+    "guide": "Guía de Propiedad",
+    "forSellers": "Para Vendedores",
+    "forAgents": "Para Agentes",
+    "terms": "Términos de Servicio",
+    "copyright": "© 2026 CasaClaro. Todos los derechos reservados."
+  }
+}

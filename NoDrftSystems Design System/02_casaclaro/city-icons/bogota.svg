@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Bogota hero art</title>
+  <desc id="desc">High plateau skyline with eastern hills for Bogota.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dce8f5"/>
+      <stop offset="55%" stop-color="#9bbbd4"/>
+      <stop offset="100%" stop-color="#355070"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <path d="M1060 190 L1190 70 L1310 210 L1450 110 L1600 230 L1600 900 L1060 900 Z" fill="#243b53" opacity="0.32"/>
+  <rect x="120" y="360" width="96" height="300" rx="10" fill="#1d3557"/><rect x="246" y="410" width="74" height="250" rx="10" fill="#1d3557"/><rect x="348" y="320" width="112" height="340" rx="10" fill="#1d3557"/><rect x="486" y="440" width="82" height="220" rx="10" fill="#1d3557"/><rect x="596" y="280" width="138" height="380" rx="10" fill="#1d3557"/><rect x="766" y="380" width="94" height="280" rx="10" fill="#1d3557"/><rect x="892" y="250" width="156" height="410" rx="10" fill="#1d3557"/><rect x="1080" y="350" width="112" height="310" rx="10" fill="#1d3557"/><rect x="1220" y="300" width="144" height="360" rx="10" fill="#1d3557"/>
+  <path d="M0 690 C260 640 480 720 760 680 C980 650 1240 730 1600 680" stroke="#f1faee" stroke-width="8" fill="none" opacity="0.8"/>
+  <circle cx="240" cy="180" r="88" fill="#f1faee" opacity="0.72"/>
+  <rect x="100" y="104" width="470" height="188" rx="28" fill="rgba(255,255,255,0.8)"/>
+  <text x="138" y="180" font-size="34" font-family="Segoe UI, sans-serif" font-weight="700" fill="#1d3557" letter-spacing="6">CASACLARO</text>
+  <text x="138" y="240" font-size="76" font-family="Georgia, serif" font-weight="700" fill="#1d3557">Bogota</text>
+  <text x="138" y="284" font-size="28" font-family="Segoe UI, sans-serif" font-weight="700" fill="#355070">ALTITUDE, SCALE, AND EASTERN HILLS</text>
+</svg>

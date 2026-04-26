@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Rentals | Colombia Rental Markets and Neighborhoods</title>
+  <meta name="description" content="Explore Colombia rental markets by city and neighborhood, from long-stay and furnished demand to short-stay rules and landlord realities.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="rentals">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="rentals-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Rentals</p>
+        <h1>Colombian rental math changes block by block. Here's where to start.</h1>
+        <p class="hero-lede">Compare long-stay leases, furnished demand, short-stay realities, and landlord watchouts across Colombia — at both city and neighborhood level.</p>
+      </div>
+    </section>
+
+    <section id="rentals-city-snapshot" class="section-shell">
+      <div class="container">
+        <p class="section-kicker">City Rental Snapshot</p>
+        <h2>How the major markets differ</h2>
+        <div id="rental-city-grid"></div>
+      </div>
+    </section>
+
+    <section id="rentals-neighborhoods" class="section-cream">
+      <div class="container">
+        <p class="section-kicker">Neighborhood Rental Angles</p>
+        <h2>Because the rent story changes inside each city</h2>
+        <div id="rental-neighborhood-grid"></div>
+      </div>
+    </section>
+
+    <section id="rentals-next-step" class="section-shell">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">For Landlords</p>
+          <ul class="check-list">
+            <li>Underwrite building rules before underwriting nightly-rate upside.</li>
+            <li>Price furnished units off actual tenant demand, not social-media folklore.</li>
+            <li>Ask whether your market is really long-stay, executive, retiree, or tourism-led.</li>
+            <li>Track repair burden and turnover cost, especially on the coast.</li>
+          </ul>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">Next Step</p>
+          <h2>Once a neighborhood fits, run the numbers.</h2>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="cost-simulator.html">Run the simulator</a>
+            <a class="btn btn-secondary" href="cities.html">Compare cities</a>
+            <a class="btn btn-secondary" href="for-sellers.html">Submit rental-friendly inventory</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

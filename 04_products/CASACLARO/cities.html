@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Cities | Explore Colombia City by City</title>
+  <meta name="description" content="Each Colombian city at a glance — walkability, healthcare depth, retiree fit, rental yield, and repair reality in one card. Filter and sort by what matters to you.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="cities">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="cities-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Cities</p>
+        <h1>Explore Colombia city by city</h1>
+        <p class="hero-lede">Filter by walkability, retiree fit, coastal living, value, healthcare strength, and repair burden before you narrow to a shortlist or a neighborhood.</p>
+      </div>
+    </section>
+
+    <section id="cities-explorer" class="section-shell">
+      <div class="container">
+        <div class="explorer-toolbar">
+          <div>
+            <p class="section-kicker">Filters</p>
+            <div class="filter-row">
+              <button class="filter-button is-active" type="button" data-explorer-filter="all">All</button>
+              <button class="filter-button" type="button" data-explorer-filter="walkable">Most walkable</button>
+              <button class="filter-button" type="button" data-explorer-filter="retiree">Retiree-friendly</button>
+              <button class="filter-button" type="button" data-explorer-filter="coastal">Coastal</button>
+              <button class="filter-button" type="button" data-explorer-filter="value">Value entry</button>
+              <button class="filter-button" type="button" data-explorer-filter="healthcare">Healthcare depth</button>
+              <button class="filter-button" type="button" data-explorer-filter="low-maintenance">Lower maintenance</button>
+              <button class="filter-button" type="button" data-explorer-filter="remote-work">Remote-work fit</button>
+              <button class="filter-button" type="button" data-explorer-filter="forever-young">Long-stay fit</button>
+            </div>
+            <p class="helper-text">Use filters if you know your lens. Use search if you only know the kind of life or trip you want.</p>
+          </div>
+          <div>
+            <label>Search city or lifestyle cue
+              <input type="search" id="explorer-search" placeholder="Medellin, coastal, retiree, walkable, healthcare">
+            </label>
+            <label>Sort cities
+              <select id="explorer-sort">
+                <option value="featured">Featured order</option>
+                <option value="price-low">Lowest price per m2</option>
+                <option value="yield-high">Highest rental yield</option>
+                <option value="walkability">Best walkability</option>
+                <option value="healthcare">Best healthcare</option>
+                <option value="retirement">Best retiree fit</option>
+              </select>
+            </label>
+            <p class="helper-text" id="explorer-count">8 cities shown</p>
+          </div>
+        </div>
+        <div id="explorer-city-grid"></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #1A1A1A;
+    background-color: #FFFFFF;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  /* Scroll Reveal System */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 100ms; }
+  .reveal-delay-2 { transition-delay: 200ms; }
+  .reveal-delay-3 { transition-delay: 300ms; }
+  .reveal-delay-4 { transition-delay: 400ms; }
+  .reveal-delay-5 { transition-delay: 500ms; }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Hero entrance animations */
+  @keyframes heroFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-badge {
+    animation: heroFadeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms both;
+  }
+  .hero-heading {
+    animation: heroFadeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms both;
+  }
+  .hero-subheading {
+    animation: heroFadeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 400ms both;
+  }
+  .hero-cta {
+    animation: heroFadeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 600ms both;
+  }
+
+  @keyframes bounceDown {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(8px);
+    }
+  }
+
+  .bounce-indicator {
+    animation: bounceDown 2s ease-in-out infinite;
+  }
+
+  /* Star bounce animation */
+  @keyframes starBounce {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    60% {
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .star-animate {
+    opacity: 0;
+    animation: starBounce 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+}

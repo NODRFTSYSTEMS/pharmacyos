@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1f3a4d"/>
+  <!-- Stylized house/arch mark -->
+  <path d="M16 6 L26 14 L26 26 L6 26 L6 14 Z" fill="none" stroke="#e67e22" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Door/entry arch -->
+  <path d="M13 26 L13 19 Q13 16 16 16 Q19 16 19 19 L19 26" fill="#e67e22" opacity="0.9"/>
+  <!-- Roof peak accent -->
+  <circle cx="16" cy="6" r="1.5" fill="#fdf5e6"/>
+</svg>

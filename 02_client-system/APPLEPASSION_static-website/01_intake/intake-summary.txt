@@ -1,0 +1,82 @@
+INTAKE SUMMARY — Apple Passion Hardware & Construction
+======================================================
+Intake Date: 2026-04-25
+Source: Client-submitted handoff package + intake form
+Workspace: 02_client-system/APPLEPASSION_static-website
+
+--- CLIENT IDENTITY ---
+Company: Apple Passion Hardware & Construction
+Location: Rockhall / Waugh Hill, Jamaica
+Contact: nkwtrds@hotmail.com
+Role: Owner
+Decision-maker: Owner (direct authority)
+
+--- PROJECT CLASSIFICATION ---
+Service category: Static website (mobile-first, phone/WhatsApp conversion)
+Industry: Construction / Building Supplies / Hardware
+Project slug: APPLEPASSION_static-website
+
+--- INTAKE FORM DATA ---
+Name: Apple
+Email: nkwtrds@hotmail.com
+Organization: Apple Passion Hardware & Construction
+Offer: Growth
+Challenge: visibility, channel customers to call. interacts mostly by telephone. website for credibility and visibility. professional, always on time, affordable, best rates in town.
+Objective: Static website with mobile view (WhatsApp links). does not use email. uses WhatsApp.
+Investment Range: $2.5K – $5K
+Timeline: ASAP to 4/29/2026
+Message: customers are not tech savvy. need call to actions. marketing prowess needed
+Role: Owner
+Video Needed: No
+Copy Status: Needs NoDrft
+Design Style: Not sure
+Primary Cta: Phone call
+Page Count: 2–5 (brief expands to 6)
+Photography: Stock OK
+Qualification Score: 90
+Brand Assets: Full guidelines
+Animation Pref: Subtle
+Recommendation: Proceed to scoped proposal
+
+--- VERIFIED FACTS FROM HANDOFF PACKAGE ---
+Website type: static, mobile-first
+Primary action: phone call / WhatsApp (not email)
+Customer base: not highly tech savvy; prioritize clear CTAs
+Confirmed products/services:
+  - Sand, Gravel, Cement
+  - Rebar / reinforcement steel (for columns, mattings, slabs)
+  - Ply / plywood, Blocks
+  - General hardware, Building supplies
+  - Direct island-wide delivery
+  - Construction builds, big and small
+  - Heavy equipment rental
+Approved contact info:
+  - Office: 876-994-5269
+  - Mobile Digicel: 876-443-8702
+  - Mobile LIME: 658-201-0651
+Brand assets located:
+  - 04_products/Apple/APPLEPASSIONLOGO.png
+  - 04_products/Apple/Official Biz Card and Sign.png
+Brand palette: red, black, white, yellow/gold, green, gray, construction neutrals
+Typography: Oswald + Inter (recommended)
+SEO focus: Hardware store Rockhall/Waugh Hill Jamaica, building supplies, rebar, construction, equipment rental, island-wide delivery
+
+--- SCOPE BOUNDARIES ---
+In scope:
+  - 6-page static site (Home, Supplies, Construction, Equipment Rental, Island-Wide Delivery, Contact)
+  - Mobile-first responsive design
+  - Sticky mobile CTA bar (Call Office, WhatsApp Digicel, WhatsApp LIME)
+  - Click-to-call and WhatsApp deep links with prefilled text
+  - Basic SEO metadata and Open Graph
+  - Compressed images, fast load, favicon
+  - Vercel/Netlify static deployment
+
+Out of scope (this phase):
+  - Ecommerce, inventory, booking, CMS, backend
+  - Email-first contact flow
+  - Fixed pricing display (unless separately approved)
+  - Business hours (unless confirmed)
+  - Delivery fees (unless confirmed)
+  - Specific equipment inventory claims
+  - Licensed contractor claims
+  - Construction trade specifics (roofing, electrical, plumbing, etc.)

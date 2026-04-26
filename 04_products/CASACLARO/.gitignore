@@ -1,0 +1,17 @@
+node_modules/
+qa-profile*/
+qa-shots*/
+qa-refresh*/
+qa-sweep*/
+*.pdf
+casaclaro-app-summary.html
+# Exclude QA/temp screenshots but allow production image assets
+qa-shots*.png
+qa-refresh*.png
+public/og-default.png
+# Next.js app — committed separately
+casaclaro-app/node_modules/
+casaclaro-app/.next/
+# Root-level source logo exports (production asset lives in assets/)
+CasaClaro*.png
+test-logo.html

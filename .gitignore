@@ -45,3 +45,8 @@ __pycache__/
 # OneDrive temp artifacts
 .tmp.driveupload/
 
+
+# Nested git repositories and backups
+**/.git/
+**/*.bak
+

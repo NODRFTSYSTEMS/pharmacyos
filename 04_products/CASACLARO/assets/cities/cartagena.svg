@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Cartagena hero art</title>
+  <desc id="desc">Coastal wall, towers, and sea for Cartagena.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd6a5"/>
+      <stop offset="50%" stop-color="#f4a261"/>
+      <stop offset="100%" stop-color="#2a9d8f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect y="610" width="1600" height="290" fill="#2a9d8f"/>
+  <path d="M0 650 C180 620 340 690 520 660 C700 630 880 690 1080 650 C1260 620 1440 680 1600 645 L1600 900 L0 900 Z" fill="#1b7f7a"/>
+  <path d="M140 520 H870" stroke="#e9c46a" stroke-width="42" stroke-linecap="round"/>
+  <rect x="210" y="420" width="110" height="140" rx="12" fill="#e9c46a"/>
+  <rect x="840" y="360" width="70" height="200" rx="12" fill="#e9c46a"/>
+  <rect x="1010" y="250" width="120" height="330" rx="12" fill="#264653"/><rect x="1160" y="320" width="90" height="260" rx="12" fill="#264653"/><rect x="1280" y="280" width="140" height="300" rx="12" fill="#264653"/>
+  <circle cx="1260" cy="150" r="98" fill="#fff3d4" opacity="0.8"/>
+  <rect x="100" y="98" width="500" height="188" rx="28" fill="rgba(255,255,255,0.8)"/>
+  <text x="138" y="174" font-size="34" font-family="Segoe UI, sans-serif" font-weight="700" fill="#264653" letter-spacing="6">CASACLARO</text>
+  <text x="138" y="236" font-size="76" font-family="Georgia, serif" font-weight="700" fill="#264653">Cartagena</text>
+  <text x="138" y="280" font-size="28" font-family="Segoe UI, sans-serif" font-weight="700" fill="#e76f51">WALLED COAST, HUMIDITY, AND HARBOR LIGHT</text>
+</svg>

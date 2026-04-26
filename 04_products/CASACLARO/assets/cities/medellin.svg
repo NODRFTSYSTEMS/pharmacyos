@@ -1,0 +1,50 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="medellin-title medellin-desc">
+  <title id="medellin-title">Medellin city illustration</title>
+  <desc id="medellin-desc">Stylized CasaClaro illustration for Medellin showing the valley, cable cars, and green mountains.</desc>
+  <defs>
+    <linearGradient id="sky-medellin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4f1c0"/>
+      <stop offset="55%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="mtn-medellin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+  </defs>
+  <!-- Sky -->
+  <rect width="1600" height="900" fill="url(#sky-medellin)"/>
+  <!-- Background mountains (Andes valley, lush green) -->
+  <path d="M0 520 C200 340 350 480 550 360 C700 260 900 430 1100 310 C1300 200 1500 380 1600 320 L1600 620 L0 620 Z" fill="#16a34a" opacity="0.72"/>
+  <path d="M0 580 C150 450 320 560 520 460 C700 370 880 500 1080 420 C1260 350 1450 470 1600 400 L1600 680 L0 680 Z" fill="#22c55e" opacity="0.62"/>
+  <!-- Valley floor / city base -->
+  <rect x="0" y="650" width="1600" height="250" fill="#1f2937" opacity="0.14"/>
+  <!-- City buildings in valley -->
+  <rect x="140" y="490" width="52" height="180" rx="6" fill="#1f2937" opacity="0.72"/>
+  <rect x="210" y="520" width="44" height="150" rx="6" fill="#374151" opacity="0.72"/>
+  <rect x="275" y="460" width="64" height="210" rx="6" fill="#1f2937" opacity="0.72"/>
+  <rect x="360" y="510" width="46" height="160" rx="6" fill="#374151" opacity="0.72"/>
+  <rect x="430" y="440" width="70" height="230" rx="6" fill="#1f2937" opacity="0.72"/>
+  <rect x="520" y="490" width="58" height="180" rx="6" fill="#374151" opacity="0.72"/>
+  <rect x="600" y="465" width="80" height="205" rx="6" fill="#1f2937" opacity="0.72"/>
+  <rect x="700" y="510" width="46" height="160" rx="6" fill="#374151" opacity="0.72"/>
+  <rect x="770" y="445" width="74" height="225" rx="6" fill="#1f2937" opacity="0.72"/>
+  <rect x="865" y="480" width="52" height="190" rx="6" fill="#374151" opacity="0.72"/>
+  <rect x="940" y="430" width="66" height="240" rx="6" fill="#1f2937" opacity="0.72"/>
+  <!-- Cable car towers and wires (Metrocable) -->
+  <line x1="80" y1="380" x2="1520" y2="260" stroke="#374151" stroke-width="3" opacity="0.55"/>
+  <line x1="80" y1="390" x2="1520" y2="270" stroke="#374151" stroke-width="2" opacity="0.28"/>
+  <!-- Cable car gondolas -->
+  <rect x="240" y="348" width="28" height="20" rx="4" fill="#f59e0b" opacity="0.92"/>
+  <rect x="520" y="330" width="28" height="20" rx="4" fill="#f59e0b" opacity="0.92"/>
+  <rect x="820" y="312" width="28" height="20" rx="4" fill="#f59e0b" opacity="0.92"/>
+  <rect x="1100" y="296" width="28" height="20" rx="4" fill="#f59e0b" opacity="0.92"/>
+  <!-- Cable car support lines -->
+  <line x1="254" y1="368" x2="254" y2="650" stroke="#6b7280" stroke-width="1.5" opacity="0.3"/>
+  <line x1="534" y1="350" x2="534" y2="650" stroke="#6b7280" stroke-width="1.5" opacity="0.3"/>
+  <!-- Info card -->
+  <rect x="88" y="96" width="420" height="168" rx="22" fill="rgba(255,255,255,0.84)"/>
+  <text x="126" y="158" font-size="30" font-family="Georgia, serif" font-weight="700" fill="#1f2937" letter-spacing="5">CASACLARO</text>
+  <text x="126" y="218" font-size="66" font-family="Georgia, serif" font-weight="700" fill="#1f2937">Medellin</text>
+  <text x="126" y="252" font-size="24" font-family="Georgia, serif" font-weight="600" fill="#f59e0b">CITY OF ETERNAL SPRING</text>
+</svg>

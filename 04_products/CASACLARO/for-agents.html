@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Partners | For Agents, Brokers, and Local Operators</title>
+  <meta name="description" content="Partner program for agents, brokers, lawyers, contractors, and property managers inside CasaClaro's Colombia marketplace.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="agents">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="agents-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Partners</p>
+        <h1>A marketplace needs standards, not just leads</h1>
+        <p class="hero-lede">CasaClaro is built for agents, brokers, lawyers, property managers, and contractors who work with international and local clients and meet clear, consistent response standards.</p>
+      </div>
+    </section>
+
+    <section id="agents-standards" class="section-shell">
+      <div class="container">
+        <p class="section-kicker">Partner Standards / SLA</p>
+        <h2>Response expectations are explicit</h2>
+        <div data-partner-standards></div>
+      </div>
+    </section>
+
+    <section id="agents-routing" class="section-cream">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">How Routing Works</p>
+          <h2>CasaClaro sends context, not chaos</h2>
+          <ul class="check-list">
+            <li>Investor leads carry city, budget, timeline, and stated goal.</li>
+            <li>Seller leads carry pricing, condition, repair notes, and attachment metadata.</li>
+            <li>Relocation-driven clients arrive with healthcare, walkability, and retiree-fit concerns already surfaced.</li>
+            <li>Partners are expected to respond clearly and update status instead of leaving the system blind.</li>
+          </ul>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">Marketplace Discipline</p>
+          <h2>What strong partners do differently</h2>
+          <ul class="check-list">
+            <li>Translate neighborhood fit into plain language for foreigners and casual market entrants.</li>
+            <li>Explain repair, legal, and HOA friction early instead of burying it.</li>
+            <li>Respect response-time targets because high-intent international clients interpret silence as risk.</li>
+            <li>Work well with lawyers, managers, and contractors instead of acting like the sale is the whole system.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="agents-apply" class="section-cream">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">Who fits</p>
+          <ul class="check-list">
+            <li>Agents and brokers who can explain pricing, regulations, and neighborhood fit clearly.</li>
+            <li>Lawyers who understand title, foreign investment registration, and contract review.</li>
+            <li>Property managers who can stabilize long-stay or hospitality assets after closing.</li>
+            <li>Contractors who can inspect, quote, and communicate repairs without vague optimism.</li>
+          </ul>
+        </article>
+        <form class="panel-card" data-form-type="agent-page">
+          <p class="section-kicker">Apply</p>
+          <h2>Join the network</h2>
+          <label>Name<input type="text" name="name" autocomplete="name" required></label>
+          <label>Company<input type="text" name="agency" autocomplete="organization" required></label>
+          <label>Primary city<select name="city" id="agent-page-city"></select></label>
+          <label>Role
+            <select name="role" required>
+              <option value="Agent">Agent</option>
+              <option value="Broker">Broker</option>
+              <option value="Lawyer">Lawyer</option>
+              <option value="Property manager">Property manager</option>
+              <option value="Contractor">Contractor</option>
+            </select>
+          </label>
+          <label>Specialization<input type="text" name="specialization" autocomplete="off" placeholder="Retiree buyers, coastal homes, legal diligence, repairs…" required></label>
+          <label>Typical response time<input type="text" name="responseTime" autocomplete="off" placeholder="Same day, 24 hours, 48 hours…" required></label>
+          <label>WhatsApp or phone<input type="tel" name="phone" autocomplete="tel" inputmode="tel" required></label>
+          <button class="btn btn-primary" type="submit">Submit Partner Application</button>
+          <p class="form-feedback" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="agents-backend" class="section-shell">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">What CasaClaro sends</p>
+          <h2>Lead details should travel with the introduction</h2>
+          <p>Partners receive the buyer's city preference, budget, timeline, and stated goal before the introduction — so the first reply is a qualified response, not a cold intake call.</p>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">What strong partners do next</p>
+          <ul class="check-list">
+            <li>Confirm receipt quickly and outline the next action clearly.</li>
+            <li>Translate neighborhood fit, legal complexity, and repair realities into plain language.</li>
+            <li>Coordinate with lawyers, managers, and contractors when the transaction requires more than a tour.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

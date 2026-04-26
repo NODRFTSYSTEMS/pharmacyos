@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Cost Simulator</title>
+  <meta name="description" content="Model Colombian acquisition costs, financing, and rental cash flow using CasaClaro city data.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="simulator">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="simulator-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Cost Simulator</p>
+        <h1>Model the numbers before the emotions take over</h1>
+        <p class="hero-lede">The simulator pulls pricing, yield, and closing-cost assumptions from the same shared dataset used by the city cards, relocation page, and map.</p>
+      </div>
+    </section>
+
+    <section id="simulator-main" class="section-shell">
+      <div class="container simulator-layout">
+        <form class="calculator-form" id="cost-simulator-form">
+          <label>Input currency
+            <select name="inputCurrency">
+              <option value="USD">USD</option>
+              <option value="COP">COP</option>
+            </select>
+          </label>
+          <label>Property price
+            <input type="number" name="price" min="0" step="1000" inputmode="numeric" autocomplete="off" value="200000" required>
+          </label>
+          <label>City
+            <select name="city" id="sim-city-select"></select>
+          </label>
+          <label>Renovation budget
+            <input type="number" name="renovation" min="0" step="500" inputmode="numeric" autocomplete="off" value="0" required>
+          </label>
+          <label>Currency view
+            <select name="currency">
+              <option value="USD">USD</option>
+              <option value="COP">COP</option>
+            </select>
+          </label>
+          <label><input type="checkbox" name="financing"> Use financing</label>
+          <div id="financing-fields" hidden>
+            <label>Down payment (%)
+              <input type="number" name="downPayment" min="0" max="100" step="1" inputmode="numeric" autocomplete="off" value="40">
+            </label>
+            <label>Interest rate (%)
+              <input type="number" name="interestRate" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" value="9.5">
+            </label>
+            <label>Loan term (years)
+              <input type="number" name="termYears" min="1" max="40" step="1" inputmode="numeric" autocomplete="off" value="20">
+            </label>
+          </div>
+          <button class="btn btn-secondary" type="button" id="download-report">Download Report</button>
+          <p class="helper-text">PDF export uses your browser print dialog for a quick report. Add jsPDF or a server-side PDF route later if you need branded exports.</p>
+          <p class="helper-text" id="simulator-rate-note">FX verification loading...</p>
+          <p class="form-feedback" id="simulator-feedback" aria-live="polite"></p>
+        </form>
+
+        <div class="simulator-results">
+          <p class="section-kicker">Illustrative output</p>
+          <div class="result-grid">
+            <article><span>Closing costs</span><strong id="result-closing-costs">-</strong></article>
+            <article><span>Total upfront cash</span><strong id="result-upfront">-</strong></article>
+            <article><span>Gross monthly rent</span><strong id="result-rent">-</strong></article>
+            <article><span id="result-cash-flow-label">Monthly operating cash flow</span><strong id="result-cash-flow">-</strong></article>
+          </div>
+          <div class="breakdown-list" id="closing-breakdown"></div>
+          <div class="breakdown-list" id="cash-flow-breakdown"></div>
+          <p class="helper-text">Estimates are illustrative. Actual costs, taxes, financing, and rent performance vary by property and by neighborhood.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

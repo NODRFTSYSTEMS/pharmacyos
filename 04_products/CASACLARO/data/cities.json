@@ -1,0 +1,1729 @@
+﻿{
+    "_instructions":  {
+                          "howToUpdate":  "Edit the city objects in this file and refresh the browser. No backend is required for this static build.",
+                          "howToAddCity":  "Copy an existing city object, provide a unique slug, fill every required field, add coordinates, heroImage, neighborhoods, regulations, and investment metrics, then include it in the cities array.",
+                          "futureApiNote":  "To replace this static file with a live source later, point script.js to a spreadsheet-backed JSON feed, headless CMS endpoint, or API that returns this same schema.",
+                          "adminNote":  "Market data should be reviewed quarterly before deployment. Editing this JSON is enough for the current static build."
+                      },
+    "siteMeta":  {
+                     "lastUpdated":  "2026-03-29",
+                     "dataUpdatedLabel":  "Data updated quarterly. Last update: March 29, 2026.",
+                     "legalReviewedLabel":  "Legal and residency guidance reviewed: March 29, 2026.",
+                     "healthcareReviewedLabel":  "Healthcare guidance reviewed: March 29, 2026.",
+                     "defaultCurrency":  "USD",
+                     "exchangeRateCopPerUsd":  3950,
+                     "exchangeRate":  {
+                                          "endpoint":  "https://api.frankfurter.dev/v2/rates?base=USD\u0026quotes=COP",
+                                          "sourceLabel":  "Frankfurter exchange-rate feed",
+                                          "sourceUrl":  "https://frankfurter.dev/docs/",
+                                          "fallbackLabel":  "Fallback FX rate from local dataset"
+                                      },
+                     "countryFocus":  "Colombia",
+                     "socialLinks":  [
+                                         {
+                                             "name":  "Instagram",
+                                             "url":  "https://www.instagram.com/",
+                                             "handle":  "@CasaClaroColombia",
+                                             "description":  "Neighborhood walks, listing reels, cafes, and street-level city feel."
+                                         },
+                                         {
+                                             "name":  "TikTok",
+                                             "url":  "https://www.tiktok.com/",
+                                             "handle":  "@CasaClaroColombia",
+                                             "description":  "Fast city comparisons, walkability clips, myth-busting, and repair stories."
+                                         },
+                                         {
+                                             "name":  "YouTube",
+                                             "url":  "https://www.youtube.com/",
+                                             "handle":  "@CasaClaroColombia",
+                                             "description":  "Long-form relocation guides, retiree breakdowns, rental walkthroughs, and partner interviews."
+                                         }
+                                     ],
+                     "partnerStandards":  [
+                                              {
+                                                  "metric":  "Investor intake review",
+                                                  "target":  "Within 1 business day",
+                                                  "detail":  "CasaClaro reviews city, budget, financing assumptions, and timing before routing."
+                                              },
+                                              {
+                                                  "metric":  "Seller submission acknowledgment",
+                                                  "target":  "Within 1 business day",
+                                                  "detail":  "Owners receive a first pass on fit, next steps, and document gaps quickly."
+                                              },
+                                              {
+                                                  "metric":  "Partner first response",
+                                                  "target":  "Within 24 business hours of handoff",
+                                                  "detail":  "Agents and brokers should confirm receipt and outline the next action clearly."
+                                              },
+                                              {
+                                                  "metric":  "Status update after introduction",
+                                                  "target":  "Within 48 business hours",
+                                                  "detail":  "Partners report whether the lead progressed, paused, or needs a different route."
+                                              }
+                                          ],
+                     "residency":  {
+                                       "lastReviewed":  "March 29, 2026",
+                                       "officialPagesUpdated":  "March 18, 2026",
+                                       "minimumWageReference":  "2026 monthly minimum wage reference used: COP 1,750,905 under Decree 159 of February 19, 2026.",
+                                       "minimumWageCop":  1750905,
+                                       "feeCheckerLabel":  "Official Cancilleria visa fee checker",
+                                       "feeCheckerUrl":  "https://www.cancilleria.gov.co/tramites_servicios/visa/costos-medios-pago-oficinas-atencion",
+                                       "feeNote":  "Visa fees can change and may vary by visa type, nationality, and filing office. Use the official fee checker before filing.",
+                                       "cards":  [
+                                                     {
+                                                         "slug":  "investor",
+                                                         "name":  "Visa M - Inversionista",
+                                                         "subhead":  "Current official investor path for qualifying foreign investment.",
+                                                         "thresholdLabel":  "350 monthly minimum wages (SMLMV)",
+                                                         "thresholdCopValue":  612816750,
+                                                         "thresholdCop":  "COP 612,816,750 reference using the current 2026 minimum wage",
+                                                         "thresholdUsd":  "About USD 155,100 using CasaClaro\u0027s verified FX rate",
+                                                         "summary":  "Used for foreign direct investment maintained in Colombian real estate or other approved investment channels, with funds registered correctly through the banking system.",
+                                                         "mustKnow":  [
+                                                                          "Official Cancilleria page reviewed March 29, 2026 and last updated March 18, 2026.",
+                                                                          "Requires proof that the qualifying investment has been made and maintained.",
+                                                                          "Requires a health policy covering all risks in Colombia.",
+                                                                          "Do not skip foreign investment registration if you want the visa strategy to remain clean."
+                                                                      ],
+                                                         "sourceLabel":  "Cancilleria - Visa M Inversionista",
+                                                         "sourceUrl":  "https://www.cancilleria.gov.co/v/inversionista"
+                                                     },
+                                                     {
+                                                         "slug":  "pensionado",
+                                                         "name":  "Visa M - Pensionado",
+                                                         "subhead":  "Current official retirement path for applicants with qualifying pension income.",
+                                                         "thresholdLabel":  "Monthly pension of at least 3 monthly minimum wages",
+                                                         "thresholdCopValue":  5252715,
+                                                         "thresholdCop":  "COP 5,252,715 per month using the current 2026 minimum wage",
+                                                         "thresholdUsd":  "About USD 1,330 per month using CasaClaro\u0027s verified FX rate",
+                                                         "summary":  "Built for retirees who can document pension income from a recognized government or private source and want a long-stay option in Colombia.",
+                                                         "mustKnow":  [
+                                                                          "Official Cancilleria page reviewed March 29, 2026 and last updated March 18, 2026.",
+                                                                          "Requires a pension certificate showing the recurring payment.",
+                                                                          "Requires a health policy covering all risks in Colombia.",
+                                                                          "The official page notes this category does not by itself grant affiliation to the Colombian social security health system except where bilateral or multilateral agreements apply."
+                                                                      ],
+                                                         "sourceLabel":  "Cancilleria - Visa M Pensionado",
+                                                         "sourceUrl":  "https://www.cancilleria.gov.co/v/pensionado"
+                                                     },
+                                                     {
+                                                         "slug":  "digital-nomad",
+                                                         "name":  "Visa V - Nomada Digital",
+                                                         "subhead":  "Useful for remote earners who are not yet buying at investor-visa scale.",
+                                                         "thresholdLabel":  "Income-focused, not property-investment focused",
+                                                         "thresholdCop":  "See official requirements because this path is tied to document type and income proof rather than a real estate threshold.",
+                                                         "thresholdUsd":  "N/A",
+                                                         "summary":  "Relevant for remote workers testing Colombia before a purchase, especially those deciding between Medellin, Pereira, Bucaramanga, or coastal living.",
+                                                         "mustKnow":  [
+                                                                          "Official page reviewed March 29, 2026.",
+                                                                          "Best used as a transition path, not a substitute for proper purchase due diligence.",
+                                                                          "The visa decision still requires clean supporting documents and private health coverage."
+                                                                      ],
+                                                         "sourceLabel":  "Cancilleria - Visa V Nomada Digital",
+                                                         "sourceUrl":  "https://www.cancilleria.gov.co/v/nomadadigital"
+                                                     }
+                                                 ]
+                                   },
+                     "healthcare":  {
+                                        "summary":  "Healthcare is one of the first practical questions expatriates and retirees ask, and it should be. In practice, many foreigners begin with private insurance, prepaid medicine, or international coverage while they confirm longer-term local eligibility with counsel and an insurer.",
+                                        "highlights":  [
+                                                           "Medellin and Bogota offer the deepest private specialist networks and bilingual support.",
+                                                           "Bucaramanga, Cali, and Pereira are strong mid-sized options for long-stay living with reputable private care.",
+                                                           "Coastal cities can work well for routine care, but complex treatment planning may still point you inland depending on your needs."
+                                                       ],
+                                        "sourceLabel":  "MinSalud affiliation and protection in health overview",
+                                        "sourceUrl":  "https://www.minsalud.gov.co/proteccionsocial/Paginas/afiliacion-en-salud.aspx",
+                                        "summaryEs":  "La salud es una de las primeras preguntas prácticas de expatriados, jubilados y familias locales. En la práctica, muchas personas combinan seguro privado, medicina prepagada o cobertura internacional mientras ajustan su estrategia de largo plazo con asesoría profesional.",
+                                        "highlightsEs":  [
+                                                             "Medellín y Bogotá concentran la red privada más amplia de especialistas y soporte bilingüe.",
+                                                             "Bucaramanga, Cali y Pereira son opciones sólidas de ciudad intermedia para vida de larga estancia con atención privada confiable.",
+                                                             "En ciudades costeras, los casos complejos pueden requerir planeación adicional o traslados a hubs médicos del interior según necesidad clínica."
+                                                         ]
+                                    },
+                     "integrations":  {
+                                          "note":  "This static build stores submissions locally until HTTPS endpoints are configured for CRM routing, file uploads, or server-side persistence.",
+                                          "routes":  {
+                                                         "updates":  {
+                                                                         "endpoint":  "",
+                                                                         "method":  "POST",
+                                                                         "crmStage":  "data_updates_waitlist"
+                                                                     },
+                                                         "investor-modal":  {
+                                                                                "endpoint":  "",
+                                                                                "method":  "POST",
+                                                                                "crmStage":  "investor_lead"
+                                                                            },
+                                                         "seller-modal":  {
+                                                                              "endpoint":  "",
+                                                                              "method":  "POST",
+                                                                              "crmStage":  "seller_lead"
+                                                                          },
+                                                         "seller-page":  {
+                                                                             "endpoint":  "",
+                                                                             "method":  "POST",
+                                                                             "crmStage":  "seller_lead"
+                                                                         },
+                                                         "agent-modal":  {
+                                                                             "endpoint":  "",
+                                                                             "method":  "POST",
+                                                                             "crmStage":  "partner_application"
+                                                                         },
+                                                         "agent-page":  {
+                                                                            "endpoint":  "",
+                                                                            "method":  "POST",
+                                                                            "crmStage":  "partner_application"
+                                                                        },
+                                                         "outdated-data":  {
+                                                                               "endpoint":  "",
+                                                                               "method":  "POST",
+                                                                               "crmStage":  "research_feedback"
+                                                                           }
+                                                     }
+                                      },
+                     "supportedLanguages":  [
+                                                "en",
+                                                "es"
+                                            ],
+                     "defaultLanguage":  "en",
+                     "exchangeRateSourceLabel":  "Frankfurter exchange-rate feed",
+                     "exchangeRateSourceUrl":  "https://frankfurter.dev/docs/",
+                     "exchangeRateApiUrl":  "https://api.frankfurter.dev/v2/rates?base=USD\u0026quotes=COP",
+                     "exchangeRateFallbackLabel":  "Fallback FX rate from local dataset",
+                     "localAudienceNote":  "CasaClaro is for Colombians too: owners, renters, local investors, brokers, and families comparing neighborhoods in COP as well as USD.",
+                     "localAudienceNoteEs":  "CasaClaro también es para colombianos: propietarios, arrendatarios, inversionistas locales, brokers y familias que comparan barrios en COP y en USD.",
+                     "dataUpdatedLabelEs":  "Datos actualizados trimestralmente. Última actualización: 29 de marzo de 2026.",
+                     "legalReviewedLabelEs":  "Guía legal y de residencia revisada: 29 de marzo de 2026.",
+                     "healthcareReviewedLabelEs":  "Guía de salud revisada: 29 de marzo de 2026."
+                 },
+    "cities":  [
+                   {
+                       "slug":  "medellin",
+                       "name":  "Medellin",
+                       "nameEs":  "Medellín",
+                       "tagline":  "City of Eternal Spring",
+                       "shortTagline":  "Spring weather, digital-nomad demand, and resilient hillside neighborhoods.",
+                       "region":  "Aburra Valley",
+                       "regionEs":  "Valle de Aburrá",
+                       "heroImage":  "assets/cities/medellin.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  6.2442,
+                       "lon":  -75.5812,
+                       "pricePerSqm":  2150,
+                       "roiRange":  "7.0% - 9.5%",
+                       "rentalYield":  7.8,
+                       "appreciationTrend":  "+8.1% year-over-year",
+                       "closingCostPercent":  4.2,
+                       "climate":  "Mild spring weather year-round with little temperature shock.",
+                       "pace":  "Lively, social, and easier to navigate than Bogota if you choose the right district.",
+                       "explorerTags":  [
+                                            "walkable",
+                                            "expat-friendly",
+                                            "retiree-friendly",
+                                            "healthcare",
+                                            "remote-work"
+                                        ],
+                       "walkability":  {
+                                           "score":  8,
+                                           "label":  "High in selected districts",
+                                           "summary":  "Laureles, parts of El Poblado, and Envigado work well on foot, though hillside geography still matters.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  9,
+                                          "label":  "Top-tier private care",
+                                          "summary":  "One of Colombia\u0027s strongest private healthcare markets, with major clinics, specialists, and health-tourism demand.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  8,
+                                          "label":  "Strong for active retirees",
+                                          "summary":  "Climate, healthcare depth, and service density make it a frequent first choice for healthy, social retirees.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Moderate",
+                                             "summary":  "Older apartments can need plumbing, waterproofing, or elevator reserve work, but inland weather is easier on buildings than the coast.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Remote workers, first-time expats, active retirees, and investors who want year-round rental depth.",
+                                                  "monthlyComfort":  "$1,800 - $3,200 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Jose Maria Cordova gives the city strong domestic and regional connectivity.",
+                                                  "englishSupport":  "Highest concentration of bilingual services outside Bogota.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Cafe culture, mountain views, and year-round outdoor living",
+                                                     "Weekend access to Guatape and the wider Antioquia region",
+                                                     "Strong coworking and relocation support ecosystem"
+                                                 ],
+                       "watchouts":  [
+                                         "Do not assume nightly rentals are legal in every building.",
+                                         "Micro-location matters more than citywide averages.",
+                                         "Some towers carry heavy HOA fees that can eat into gross yield."
+                                     ],
+                       "historicalContext":  "Medellin evolved from an industrial capital into one of Latin America\u0027s most studied urban transformation stories, with public transit, innovation districts, and strong neighborhood identities shaping its modern appeal.",
+                       "investorAppeal":  "Investors target Medellin for diversified rental demand from local professionals, remote workers, students, and health tourism, especially in established zones with strong services and walkability.",
+                       "lifestyleHighlights":  "Expats value the temperate climate, strong cafe culture, modern private healthcare, coworking scene, and weekend access to the broader Antioquia region.",
+                       "introText":  [
+                                         "Medellin combines mountain views, spring-like weather, and a mature urban fabric that appeals to both end users and income-focused investors. Neighborhood performance varies sharply, so block-level due diligence matters more here than headline city averages.",
+                                         "The city remains one of Colombia\u0027s most recognized destinations for foreigners, which supports leasing demand but also means buyers must stay disciplined on pricing and compliance. Poblado captures global attention, while Laureles, Envigado, and select emerging corridors can offer better value-adjusted entry points.",
+                                         "For expatriates, Medellin offers the strongest ecosystem of bilingual services, private clinics, coworking spaces, and lifestyle amenities outside Bogota. That makes it a practical first landing point, but also a competitive market where understanding local regulations is essential."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals are widely offered, but compliant operation depends on building bylaws, local registration requirements, and tourism-use permissions. Many buildings in El Poblado and Laureles now restrict nightly rentals through HOA rules.",
+                                           "airbnbDetails":  "Buyers should verify the building\u0027s property regime, tourism registration status, and whether the apartment can legally be marketed for stays under 30 days. In practice, enforcement risk is highest when owners assume city demand overrides building rules.",
+                                           "sourceLabel":  "MinCIT tourism registration guidance",
+                                           "sourceUrl":  "https://www.mincit.gov.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign buyers can generally own urban property in Colombia without nationality-based restrictions. Standard compliance includes registering inbound investment through the banking system; special restrictions are more relevant near national borders or protected coastal zones than within Medellin\u0027s urban neighborhoods.",
+                       "mortgageNote":  "Foreigners may obtain local financing in some cases, typically with 40% to 60% loan-to-value depending on income documentation and bank policy.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "El Poblado",
+                                                 "character":  "Luxury high-rises, nightlife, premium short-stay demand",
+                                                 "priceRange":  "$2,700 - $3,800 / m2",
+                                                 "bestFor":  "Furnished executives, lifestyle renters, and globally marketed resales.",
+                                                 "rentalProfile":  "Premium furnished demand with strong upside, but nightly-rental assumptions must be checked building by building.",
+                                                 "pricePerSqmUsd":  2472,
+                                                 "pricePerSqmCop":  9764400,
+                                                 "characterEs":  "Perfil barrial de El Poblado: Luxury high-rises, nightlife, premium short-stay demand",
+                                                 "bestForEs":  "Ideal para Furnished executives, lifestyle renters, and globally marketed resales.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Premium furnished demand with strong upside, but nightly-rental assumptions must be checked building by building."
+                                             },
+                                             {
+                                                 "name":  "Laureles",
+                                                 "character":  "Walkable, leafy, local-professional appeal",
+                                                 "priceRange":  "$2,100 - $2,900 / m2",
+                                                 "bestFor":  "Walkable long-stay tenants, remote workers, and returning Colombians.",
+                                                 "rentalProfile":  "One of the cleanest long-stay furnished submarkets thanks to walkability and service density.",
+                                                 "pricePerSqmUsd":  2258,
+                                                 "pricePerSqmCop":  8919100,
+                                                 "characterEs":  "Perfil barrial de Laureles: Walkable, leafy, local-professional appeal",
+                                                 "bestForEs":  "Ideal para Walkable long-stay tenants, remote workers, and returning Colombians.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: One of the cleanest long-stay furnished submarkets thanks to walkability and service density."
+                                             },
+                                             {
+                                                 "name":  "Envigado",
+                                                 "character":  "Family-friendly, upscale suburban feel, strong long-stay demand",
+                                                 "priceRange":  "$1,900 - $2,700 / m2",
+                                                 "bestFor":  "Families, retirees, and longer-stay renters who want calmer daily life.",
+                                                 "rentalProfile":  "Long-stay family and professional demand usually matters more than tourism upside.",
+                                                 "pricePerSqmUsd":  2042,
+                                                 "pricePerSqmCop":  8065900,
+                                                 "characterEs":  "Perfil barrial de Envigado: Family-friendly, upscale suburban feel, strong long-stay demand",
+                                                 "bestForEs":  "Ideal para Families, retirees, and longer-stay renters who want calmer daily life.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Long-stay family and professional demand usually matters more than tourism upside."
+                                             },
+                                             {
+                                                 "name":  "Sabaneta",
+                                                 "character":  "Value-oriented southern submarket with metro access",
+                                                 "priceRange":  "$1,500 - $2,100 / m2",
+                                                 "bestFor":  "Value-focused buyers and local long-stay renters.",
+                                                 "rentalProfile":  "Works best as a price-sensitive long-stay rental corridor with metro-linked demand.",
+                                                 "pricePerSqmUsd":  1828,
+                                                 "pricePerSqmCop":  7220600,
+                                                 "characterEs":  "Perfil barrial de Sabaneta: Value-oriented southern submarket with metro access",
+                                                 "bestForEs":  "Ideal para Value-focused buyers and local long-stay renters.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Works best as a price-sensitive long-stay rental corridor with metro-linked demand."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Confirm the property\u0027s building rules in writing before any rental listing strategy.",
+                                                "Set up utility accounts, internet, and a local banking workflow for tax and HOA payments.",
+                                                "Hire a bilingual accountant or attorney to document foreign investment registration and rental compliance."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.7
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Medellin supports one of the deepest furnished and long-stay rental pools in Colombia, but building-level compliance matters more than city-level hype.",
+                                            "tenantMix":  "Remote workers, returning Colombians, local professionals, health-tourism families, and long-stay expats.",
+                                            "longStayDemand":  "Deep in Laureles, Envigado, and select Poblado towers with service access.",
+                                            "furnishedDemand":  "Strong in El Poblado, Laureles, and premium serviced corridors.",
+                                            "shortStayReality":  "Only after building rules and tourism permissions are confirmed in writing.",
+                                            "landlordWatchouts":  "HOA rules, furnished wear-and-tear, and towers priced for international narratives rather than clean yield.",
+                                            "headlineEs":  "El arriendo en Medellin se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "City of Eternal Spring en Colombia",
+                       "shortTaglineEs":  "Medellin: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Medellin con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Medellin que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Medellin evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Medellin se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Medellin la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Medellin no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Medellin suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "bogota",
+                       "name":  "Bogota",
+                       "nameEs":  "Bogotá",
+                       "tagline":  "Capital Scale With Institutional Demand",
+                       "shortTagline":  "Deep rental demand, business travel, and Colombia\u0027s largest white-collar market.",
+                       "region":  "Andean Capital",
+                       "regionEs":  "Capital andina",
+                       "heroImage":  "assets/cities/bogota.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  4.711,
+                       "lon":  -74.0721,
+                       "pricePerSqm":  2280,
+                       "roiRange":  "6.2% - 8.4%",
+                       "rentalYield":  6.9,
+                       "appreciationTrend":  "+6.4% year-over-year",
+                       "closingCostPercent":  4.3,
+                       "climate":  "Cooler mountain climate with more layering, rain planning, and longer indoor seasons.",
+                       "pace":  "Large, ambitious, and useful for people who want the deepest services ecosystem in the country.",
+                       "explorerTags":  [
+                                            "capital",
+                                            "healthcare",
+                                            "families",
+                                            "executive-rentals"
+                                        ],
+                       "walkability":  {
+                                           "score":  7,
+                                           "label":  "Pocket-dependent",
+                                           "summary":  "Chico, Chapinero, and selected northern districts are walkable enough for daily life, but commute planning is a major quality-of-life variable.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  10,
+                                          "label":  "Deepest specialist network",
+                                          "summary":  "The broadest private healthcare and specialist base in Colombia, plus embassies, international schools, and corporate support services.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  6,
+                                          "label":  "Strong services, heavier city friction",
+                                          "summary":  "Best for retirees who prioritize access, specialists, and family connectivity more than warm-weather ease.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Moderate to high",
+                                             "summary":  "Older stock can bring insulation, moisture, elevator, and reserve-fund questions that deserve real diligence.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Families, executives, healthcare-priority relocators, and buyers who want scale and liquidity.",
+                                                  "monthlyComfort":  "$2,200 - $3,600 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "El Dorado is Colombia\u0027s strongest connectivity hub.",
+                                                  "englishSupport":  "Best overall service depth and international support in the country.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Museums, dining, and nonstop domestic connectivity",
+                                                     "The broadest school and specialist ecosystem in Colombia",
+                                                     "Strong base for executives and long-stay families"
+                                                 ],
+                       "watchouts":  [
+                                         "Traffic and commute time can decide whether a location feels livable.",
+                                         "Altitude and cooler weather are not for everyone.",
+                                         "Do not underwrite the city from a single northern neighborhood visit."
+                                     ],
+                       "historicalContext":  "Bogota is Colombia\u0027s political and financial center, layered with colonial history, major universities, and a dense concentration of corporate and diplomatic activity.",
+                       "investorAppeal":  "Investors favor Bogota for depth of market, liquidity, and more stable long-term leasing demand across executive, student, and family segments.",
+                       "lifestyleHighlights":  "Expats gain access to top hospitals, international schools, diverse dining, and nonstop flight connectivity, balanced against traffic and cooler weather.",
+                       "introText":  [
+                                         "Bogota is the country\u0027s largest and most liquid residential market, which makes it attractive for investors who prioritize scale and year-round occupancy over resort-style positioning. Demand is driven by professional relocation, university enrollment, embassies, healthcare, and domestic migration.",
+                                         "The city rewards submarket selection. Prime northern districts can preserve capital and support executive rentals, while emerging areas may offer better yield if transportation, safety, and tenant profile line up.",
+                                         "For expatriates, Bogota is often the most functional base in Colombia. It offers the broadest service ecosystem and strongest international connectivity, but buyers should underwrite time-to-commute, micro-location walkability, and building age carefully."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals exist in Bogota, but condominium rules and local licensing requirements materially affect legality and operating risk. Professional operators usually focus on buildings already structured for hospitality use.",
+                                           "airbnbDetails":  "Before purchase, confirm tourism registration requirements, HOA restrictions, and whether the building has a track record of allowing transient occupancy. A residential zoning assumption alone is not enough.",
+                                           "sourceLabel":  "Bogota tourism and accommodation guidance",
+                                           "sourceUrl":  "https://www.bogota.gov.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Urban property ownership is generally open to foreigners on the same basis as Colombian nationals. Buyers should ensure purchase funds are properly registered and conduct title review through local counsel.",
+                       "mortgageNote":  "Local bank financing is possible but usually document-heavy for non-residents, with conservative leverage compared with U.S. standards.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Chico",
+                                                 "character":  "Corporate demand, premium stock, strong executive rental profile",
+                                                 "priceRange":  "$2,800 - $3,600 / m2",
+                                                 "bestFor":  "Executives, diplomats, and buyers prioritizing service depth.",
+                                                 "rentalProfile":  "Strong executive lease profile with stable higher-budget demand.",
+                                                 "pricePerSqmUsd":  2622,
+                                                 "pricePerSqmCop":  10356900,
+                                                 "characterEs":  "Perfil barrial de Chico: Corporate demand, premium stock, strong executive rental profile",
+                                                 "bestForEs":  "Ideal para Executives, diplomats, and buyers prioritizing service depth.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Strong executive lease profile with stable higher-budget demand."
+                                             },
+                                             {
+                                                 "name":  "Zona G",
+                                                 "character":  "Dining district with boutique residential appeal",
+                                                 "priceRange":  "$2,500 - $3,200 / m2",
+                                                 "bestFor":  "Professionals who want food, walkability, and central positioning.",
+                                                 "rentalProfile":  "Good furnished and executive demand where building quality holds up.",
+                                                 "pricePerSqmUsd":  2394,
+                                                 "pricePerSqmCop":  9456300,
+                                                 "characterEs":  "Perfil barrial de Zona G: Dining district with boutique residential appeal",
+                                                 "bestForEs":  "Ideal para Professionals who want food, walkability, and central positioning.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Good furnished and executive demand where building quality holds up."
+                                             },
+                                             {
+                                                 "name":  "Cedritos",
+                                                 "character":  "Upper-middle-income family market with stable long lets",
+                                                 "priceRange":  "$1,700 - $2,300 / m2",
+                                                 "bestFor":  "Families and local end users wanting practical northern living.",
+                                                 "rentalProfile":  "Cleaner long-stay family lease logic than short-stay experimentation.",
+                                                 "pricePerSqmUsd":  2166,
+                                                 "pricePerSqmCop":  8555700,
+                                                 "characterEs":  "Perfil barrial de Cedritos: Upper-middle-income family market with stable long lets",
+                                                 "bestForEs":  "Ideal para Families and local end users wanting practical northern living.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Cleaner long-stay family lease logic than short-stay experimentation."
+                                             },
+                                             {
+                                                 "name":  "Chapinero Alto",
+                                                 "character":  "Young professional demand, mixed new-build and legacy stock",
+                                                 "priceRange":  "$2,000 - $2,800 / m2",
+                                                 "bestFor":  "Urban professionals, students, and relocation-minded renters.",
+                                                 "rentalProfile":  "Flexible long-stay demand with some furnished upside in the right buildings.",
+                                                 "pricePerSqmUsd":  1938,
+                                                 "pricePerSqmCop":  7655100,
+                                                 "characterEs":  "Perfil barrial de Chapinero Alto: Young professional demand, mixed new-build and legacy stock",
+                                                 "bestForEs":  "Ideal para Urban professionals, students, and relocation-minded renters.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Flexible long-stay demand with some furnished upside in the right buildings."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Obtain a building administration contact and review reserve fund, fees, and pending assessments.",
+                                                "Prioritize heating, insulation, and water-pressure checks due to climate and building-age variation.",
+                                                "Set up a local property manager if you do not plan to be in-country for lease-up."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.8
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Bogota is usually a long-stay and executive-rental market first, with strong demand from professionals, diplomats, and families who value service depth.",
+                                            "tenantMix":  "Executives, embassy staff, local professionals, students, and family relocators.",
+                                            "longStayDemand":  "Best in service-rich northern and central districts with school and office access.",
+                                            "furnishedDemand":  "Selective but healthy in Chico, Zona G, and upper Chapinero corridors.",
+                                            "shortStayReality":  "Less central to the thesis than in Medellin or Cartagena.",
+                                            "landlordWatchouts":  "Traffic friction, higher carrying costs, and tenants who scrutinize heating, acoustics, and building management.",
+                                            "headlineEs":  "El arriendo en Bogota se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Capital Scale With Institutional Demand en Colombia",
+                       "shortTaglineEs":  "Bogota: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Bogota con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Bogota que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Bogota evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Bogota se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Bogota la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Bogota no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Bogota suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "cartagena",
+                       "name":  "Cartagena",
+                       "nameEs":  "Cartagena",
+                       "tagline":  "Colonial Charm And Caribbean Tourism",
+                       "shortTagline":  "A globally recognized resort market with premium nightly-rate upside.",
+                       "region":  "Caribbean Coast",
+                       "regionEs":  "Costa Caribe",
+                       "heroImage":  "assets/cities/cartagena.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  10.391,
+                       "lon":  -75.4794,
+                       "pricePerSqm":  2640,
+                       "roiRange":  "8.0% - 11.5%",
+                       "rentalYield":  8.6,
+                       "appreciationTrend":  "+9.3% year-over-year",
+                       "closingCostPercent":  4.5,
+                       "climate":  "Hot, humid, and distinctly Caribbean year-round.",
+                       "pace":  "Sensory, social, and tourism-forward with premium pockets and visible seasonality.",
+                       "explorerTags":  [
+                                            "coastal",
+                                            "tourism",
+                                            "luxury",
+                                            "forever-young"
+                                        ],
+                       "walkability":  {
+                                           "score":  7,
+                                           "label":  "Excellent in the historic core, mixed elsewhere",
+                                           "summary":  "Centro Historico and parts of Bocagrande are walkable, but heat, humidity, and tower-to-tower driving are real.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  7,
+                                          "label":  "Good routine private care",
+                                          "summary":  "Routine and mid-level private care is available, though some buyers still prefer Bogota or Medellin for complex specialist planning.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  7,
+                                          "label":  "Lifestyle-first retirees",
+                                          "summary":  "Works best for retirees who value sea air, social energy, and hospitality over lower humidity or lower operating cost.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Hands-on coastal maintenance",
+                                             "summary":  "Salt air, corrosion, HVAC wear, waterproofing, and reserve-fund quality are central underwriting items, not footnotes.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Lifestyle buyers, second-home owners, tourism operators, and long-stay retirees who want a social coastal base.",
+                                                  "monthlyComfort":  "$2,200 - $4,000 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Rafael Nunez makes short-stay access easy.",
+                                                  "englishSupport":  "High tourism familiarity, though serious transaction work still needs strong local professionals.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "UNESCO old city, Caribbean sea access, and major tourism recognition",
+                                                     "Beach clubs, rooftop dining, and strong hospitality infrastructure",
+                                                     "A global lifestyle story that is easy to market and easy to overpay for"
+                                                 ],
+                       "watchouts":  [
+                                         "Never buy a coastal tower without reviewing maintenance reality.",
+                                         "Airbnb assumptions must be checked building by building.",
+                                         "High headline rates can hide high operating friction."
+                                     ],
+                       "historicalContext":  "Cartagena\u0027s walled city and port history make it one of the Caribbean\u0027s most iconic destinations, with UNESCO heritage value and year-round tourism visibility.",
+                       "investorAppeal":  "Investors pursue Cartagena for hospitality-driven income, luxury positioning, and global brand recognition, especially where tourism permissions are clear.",
+                       "lifestyleHighlights":  "Expats enjoy sea access, vibrant culture, and resort amenities, but must balance humidity, seasonality, and building maintenance in coastal conditions.",
+                       "introText":  [
+                                         "Cartagena is Colombia\u0027s most internationally legible leisure market. Buyers are typically underwriting either tourism cash flow, lifestyle usage with partial rental offset, or long-term capital preservation in historically limited neighborhoods.",
+                                         "The market can be highly profitable when licensing, HOA permissions, and property operations are aligned, but it is unforgiving when those assumptions are wrong. Coastal wear, management quality, and building rules have a direct impact on net returns.",
+                                         "For expatriates and second-home owners, Cartagena offers beach proximity, strong hospitality infrastructure, and an active cultural calendar. The tradeoff is that entry pricing and operating complexity are generally higher than inland Colombian cities."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Cartagena has some of the country\u0027s most scrutinized short-term rental inventory. HOA permission, tourism registration, and local enforcement trends are critical, particularly in Bocagrande and the historic center.",
+                                           "airbnbDetails":  "Do not assume every condo can be used as an Airbnb. Confirm the building\u0027s official rules, tourism-use status, and whether operators have been active without sanctions. Coastal and historic areas may face tighter controls or preservation-linked restrictions.",
+                                           "sourceLabel":  "Cartagena tourism authority guidance",
+                                           "sourceUrl":  "https://www.cartagena.gov.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign ownership is broadly permitted, but buyers in coastal environments should verify any project-specific or zone-specific conditions with counsel, especially for beachfront or historic assets.",
+                       "mortgageNote":  "Financing exists selectively; many foreign buyers in Cartagena transact in cash due to approval timelines and coastal project complexity.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Bocagrande",
+                                                 "character":  "High-rise beachfront, tourism-heavy, premium condo stock",
+                                                 "priceRange":  "$2,900 - $4,200 / m2",
+                                                 "bestFor":  "Second-home buyers, affluent renters, and beach-facing inventory.",
+                                                 "rentalProfile":  "Furnished demand can be strong, but maintenance and building policy need constant attention.",
+                                                 "pricePerSqmUsd":  3036,
+                                                 "pricePerSqmCop":  11992200,
+                                                 "characterEs":  "Perfil barrial de Bocagrande: High-rise beachfront, tourism-heavy, premium condo stock",
+                                                 "bestForEs":  "Ideal para Second-home buyers, affluent renters, and beach-facing inventory.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Furnished demand can be strong, but maintenance and building policy need constant attention."
+                                             },
+                                             {
+                                                 "name":  "Centro Historico",
+                                                 "character":  "Colonial trophy assets, ultra-premium pricing",
+                                                 "priceRange":  "$4,200 - $6,500 / m2",
+                                                 "bestFor":  "Hospitality-led buyers and prestige-driven owners.",
+                                                 "rentalProfile":  "Short-stay and luxury furnished demand exist, but permissions and operations are everything.",
+                                                 "pricePerSqmUsd":  2772,
+                                                 "pricePerSqmCop":  10949400,
+                                                 "characterEs":  "Perfil barrial de Centro Historico: Colonial trophy assets, ultra-premium pricing",
+                                                 "bestForEs":  "Ideal para Hospitality-led buyers and prestige-driven owners.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Short-stay and luxury furnished demand exist, but permissions and operations are everything."
+                                             },
+                                             {
+                                                 "name":  "Cabrero",
+                                                 "character":  "Near old city with mixed residential-tourism profile",
+                                                 "priceRange":  "$2,400 - $3,400 / m2",
+                                                 "bestFor":  "Buyers wanting proximity to the old city with slightly calmer living.",
+                                                 "rentalProfile":  "Balanced between lifestyle long-stay demand and selective tourism demand.",
+                                                 "pricePerSqmUsd":  2508,
+                                                 "pricePerSqmCop":  9906600,
+                                                 "characterEs":  "Perfil barrial de Cabrero: Near old city with mixed residential-tourism profile",
+                                                 "bestForEs":  "Ideal para Buyers wanting proximity to the old city with slightly calmer living.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Balanced between lifestyle long-stay demand and selective tourism demand."
+                                             },
+                                             {
+                                                 "name":  "Manga",
+                                                 "character":  "More residential, marina adjacency, family appeal",
+                                                 "priceRange":  "$2,000 - $2,900 / m2",
+                                                 "bestFor":  "Families, professionals, and calmer long-stay users.",
+                                                 "rentalProfile":  "More dependable long-stay profile than nightlife or tourism-heavy corridors.",
+                                                 "pricePerSqmUsd":  2244,
+                                                 "pricePerSqmCop":  8863800,
+                                                 "characterEs":  "Perfil barrial de Manga: More residential, marina adjacency, family appeal",
+                                                 "bestForEs":  "Ideal para Families, professionals, and calmer long-stay users.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: More dependable long-stay profile than nightlife or tourism-heavy corridors."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Inspect HVAC, waterproofing, and corrosion exposure immediately after closing.",
+                                                "Register any permitted tourism use before accepting short-stay bookings.",
+                                                "Benchmark HOA fees and reserve spending because coastal towers often carry higher maintenance costs."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  1
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Cartagena can outperform on furnished and tourism-led rentals, but maintenance, building permissions, and seasonality need to be underwritten aggressively.",
+                                            "tenantMix":  "Vacationers, second-home users, domestic tourism, affluent long-stay tenants, and hospitality operators.",
+                                            "longStayDemand":  "Most stable in Manga, Cabrero, and selected family-oriented buildings.",
+                                            "furnishedDemand":  "Very strong in Bocagrande and the historic core for the right product.",
+                                            "shortStayReality":  "Potentially strong but impossible to treat casually; rules and building stance come first.",
+                                            "landlordWatchouts":  "Salt-air exposure, staffing, turnover costs, and compliance drift.",
+                                            "headlineEs":  "El arriendo en Cartagena se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Colonial Charm And Caribbean Tourism en Colombia",
+                       "shortTaglineEs":  "Cartagena: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Cartagena con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Cartagena que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Cartagena evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Cartagena se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Cartagena la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Cartagena no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Cartagena suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "cali",
+                       "name":  "Cali",
+                       "nameEs":  "Cali",
+                       "tagline":  "Value Entry In Colombia\u0027s Salsa Capital",
+                       "shortTagline":  "Lower entry pricing with improving professional and lifestyle demand.",
+                       "region":  "Valle del Cauca",
+                       "regionEs":  "Valle del Cauca",
+                       "heroImage":  "assets/cities/cali.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  3.4516,
+                       "lon":  -76.532,
+                       "pricePerSqm":  1480,
+                       "roiRange":  "7.4% - 10.1%",
+                       "rentalYield":  8.1,
+                       "appreciationTrend":  "+5.8% year-over-year",
+                       "closingCostPercent":  4.1,
+                       "climate":  "Warm, tropical, and energetic without the coastal salt-air burden.",
+                       "pace":  "Cultural, dance-driven, and neighborhood-sensitive.",
+                       "explorerTags":  [
+                                            "value",
+                                            "forever-young",
+                                            "healthcare",
+                                            "warm-weather"
+                                        ],
+                       "walkability":  {
+                                           "score":  6,
+                                           "label":  "Mixed by district",
+                                           "summary":  "Selected districts such as Granada or parts of the west side are workable on foot, but many residents still rely on car trips or ride-hailing.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  8,
+                                          "label":  "Strong clinical base",
+                                          "summary":  "Cali has a serious healthcare and university ecosystem, which helps long-stay demand and practical livability.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  6,
+                                          "label":  "Better for socially active retirees",
+                                          "summary":  "Good value and warm weather can work well, but neighborhood screening matters and some retirees will prefer calmer cities.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Moderate",
+                                             "summary":  "Security hardware, older electrical systems, and building-by-building maintenance discipline vary widely, so comparables and inspections matter.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Value-focused buyers, healthcare-adjacent investors, and long-stay residents who want culture more than polish.",
+                                                  "monthlyComfort":  "$1,500 - $2,500 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Alfonso Bonilla Aragon connects the city well to domestic routes.",
+                                                  "englishSupport":  "Less bilingual than Medellin or Bogota, but still workable with the right local team.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Salsa culture, easier daily costs, and warm evenings",
+                                                     "Lower price basis than Medellin, Bogota, or Cartagena",
+                                                     "Useful healthcare and university demand anchors"
+                                                 ],
+                       "watchouts":  [
+                                         "Cali is a city of micro-markets; do not generalize from one district.",
+                                         "Some buildings trade cheaply for a reason.",
+                                         "Traffic, security, and nighttime comfort vary more than first-time visitors expect."
+                                     ],
+                       "historicalContext":  "Cali blends industrial roots with Afro-Colombian cultural influence and a global salsa identity, giving the city a distinctive social and artistic profile.",
+                       "investorAppeal":  "Investors look to Cali for lower basis pricing, healthcare and university demand, and selected neighborhoods with strong owner-occupier fundamentals.",
+                       "lifestyleHighlights":  "Expats find a warmer climate, vibrant nightlife, and easier day-to-day costs than Bogota, with careful neighborhood selection remaining essential.",
+                       "introText":  [
+                                         "Cali can offer a more favorable entry point than Medellin, Bogota, or Cartagena, which makes it relevant for investors targeting cash flow and room for neighborhood-driven appreciation. Pricing dispersion is meaningful, so working with local comparables matters.",
+                                         "Demand tends to be steadier in zones anchored by healthcare, universities, and established residential amenities. Trophy pricing is less common, which can help disciplined buyers avoid overpaying for narrative rather than fundamentals.",
+                                         "For expatriates, Cali offers a lower-cost urban lifestyle, strong food and dance culture, and access to the Pacific region. The city requires a practical approach to mobility and safety, with hyperlocal due diligence doing most of the risk work."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals are possible in selected buildings, but HOA rules and registration requirements still control legality. The city is generally less tourism-dependent than Cartagena, so many investors favor mid-term or traditional leases.",
+                                           "airbnbDetails":  "Verify whether the target building allows stays under 30 days and whether the operator must complete national tourism registration. Compliance is easier in projects designed for transient use than in family-oriented towers.",
+                                           "sourceLabel":  "Colombia tourism registry overview",
+                                           "sourceUrl":  "https://www.rues.org.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign buyers can purchase residential property on the same basis as locals in ordinary urban zones, subject to standard title, tax, and currency-registration procedures.",
+                       "mortgageNote":  "Mortgage options for foreigners are limited but possible with strong documentation, local income support, or a Colombian banking relationship.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Ciudad Jardin",
+                                                 "character":  "Upscale residential district near universities and retail",
+                                                 "priceRange":  "$1,700 - $2,400 / m2",
+                                                 "bestFor":  "Families, students, and buyers who want south-side services.",
+                                                 "rentalProfile":  "Strong local long-stay demand with family and education-linked tenant pools.",
+                                                 "pricePerSqmUsd":  1702,
+                                                 "pricePerSqmCop":  6722900,
+                                                 "characterEs":  "Perfil barrial de Ciudad Jardin: Upscale residential district near universities and retail",
+                                                 "bestForEs":  "Ideal para Families, students, and buyers who want south-side services.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Strong local long-stay demand with family and education-linked tenant pools."
+                                             },
+                                             {
+                                                 "name":  "Granada",
+                                                 "character":  "Dining and nightlife area with boutique apartment demand",
+                                                 "priceRange":  "$1,600 - $2,200 / m2",
+                                                 "bestFor":  "Professionals who want dining, walkability, and centrality.",
+                                                 "rentalProfile":  "One of the better furnished micro-markets in Cali, but still long-stay led.",
+                                                 "pricePerSqmUsd":  1554,
+                                                 "pricePerSqmCop":  6138300,
+                                                 "characterEs":  "Perfil barrial de Granada: Dining and nightlife area with boutique apartment demand",
+                                                 "bestForEs":  "Ideal para Professionals who want dining, walkability, and centrality.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: One of the better furnished micro-markets in Cali, but still long-stay led."
+                                             },
+                                             {
+                                                 "name":  "Santa Teresita",
+                                                 "character":  "Established west-side neighborhood with premium pockets",
+                                                 "priceRange":  "$1,500 - $2,100 / m2",
+                                                 "bestFor":  "Calmer upscale living with river access and residential appeal.",
+                                                 "rentalProfile":  "Better for stable household demand than high-turnover strategies.",
+                                                 "pricePerSqmUsd":  1406,
+                                                 "pricePerSqmCop":  5553700,
+                                                 "characterEs":  "Perfil barrial de Santa Teresita: Established west-side neighborhood with premium pockets",
+                                                 "bestForEs":  "Ideal para Calmer upscale living with river access and residential appeal.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Better for stable household demand than high-turnover strategies."
+                                             },
+                                             {
+                                                 "name":  "Valle del Lili",
+                                                 "character":  "Newer residential stock and value-oriented family demand",
+                                                 "priceRange":  "$1,200 - $1,700 / m2",
+                                                 "bestFor":  "Families and healthcare-adjacent demand near the south.",
+                                                 "rentalProfile":  "Reliable long-stay family market with practical renter demand.",
+                                                 "pricePerSqmUsd":  1258,
+                                                 "pricePerSqmCop":  4969100,
+                                                 "characterEs":  "Perfil barrial de Valle del Lili: Newer residential stock and value-oriented family demand",
+                                                 "bestForEs":  "Ideal para Families and healthcare-adjacent demand near the south.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Reliable long-stay family market with practical renter demand."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Stress-test comparables with a local broker because asking prices can be aspirational.",
+                                                "Document building security and parking access if targeting professional tenants.",
+                                                "Review the city\u0027s property tax timing and administration process before first payment deadlines."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.6
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Cali usually works better as a local and executive long-stay rental market than as a pure tourism play.",
+                                            "tenantMix":  "Local professionals, families, health-related visitors, and returning Colombians.",
+                                            "longStayDemand":  "Good in Ciudad Jardin, Granada, Valle del Lili, and stable residential corridors.",
+                                            "furnishedDemand":  "Moderate, strongest where business travel and health access overlap.",
+                                            "shortStayReality":  "Secondary to long-stay underwriting.",
+                                            "landlordWatchouts":  "Tenant screening discipline and realistic rent expectations by micro-location.",
+                                            "headlineEs":  "El arriendo en Cali se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Value Entry In Colombia\u0027s Salsa Capital en Colombia",
+                       "shortTaglineEs":  "Cali: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Cali con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Cali que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Cali evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Cali se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Cali la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Cali no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Cali suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "barranquilla",
+                       "name":  "Barranquilla",
+                       "nameEs":  "Barranquilla",
+                       "tagline":  "Business Growth On The Caribbean Corridor",
+                       "shortTagline":  "Corporate growth, port logistics, and improving north-side residential stock.",
+                       "region":  "Caribbean Business Corridor",
+                       "regionEs":  "Corredor empresarial del Caribe",
+                       "heroImage":  "assets/cities/barranquilla.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  10.9639,
+                       "lon":  -74.7964,
+                       "pricePerSqm":  1620,
+                       "roiRange":  "7.1% - 9.2%",
+                       "rentalYield":  7.5,
+                       "appreciationTrend":  "+6.9% year-over-year",
+                       "closingCostPercent":  4,
+                       "climate":  "Hot Caribbean weather with a more local, business-first character than Cartagena.",
+                       "pace":  "Functional, growing, and easier to underwrite from local demand than from tourism hype.",
+                       "explorerTags":  [
+                                            "coastal",
+                                            "value",
+                                            "executive-rentals"
+                                        ],
+                       "walkability":  {
+                                           "score":  5,
+                                           "label":  "Car-light only in pockets",
+                                           "summary":  "North-side nodes can work for errands and dining, but much of daily life still leans on short drives.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  7,
+                                          "label":  "Solid private options",
+                                          "summary":  "Routine private care is improving and supports long-stay living, though not with the same specialist depth as Bogota or Medellin.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  6,
+                                          "label":  "Better for warm-weather pragmatists",
+                                          "summary":  "Can suit retirees who want coast access without Cartagena pricing and who are comfortable with a more local rhythm.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Moderate coastal wear",
+                                             "summary":  "Humidity, storm drainage, generator support, and facade maintenance deserve close review in the north-corridor tower stock.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Corporate renters, practical long-stay coastal residents, and buyers who want lower-profile Caribbean exposure.",
+                                                  "monthlyComfort":  "$1,600 - $2,600 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Ernesto Cortissoz keeps the city tied to major domestic routes.",
+                                                  "englishSupport":  "Modest but improving in north-side business and healthcare corridors.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Carnival energy, Caribbean food, and port-driven growth",
+                                                     "North-side towers with better value than Cartagena",
+                                                     "A more local coastal story with less headline noise"
+                                                 ],
+                       "watchouts":  [
+                                         "Flood resilience and drainage are not small details.",
+                                         "This is not a tourism-led market first.",
+                                         "Some buyers confuse warm weather with easy walkability; that is not always true here."
+                                     ],
+                       "historicalContext":  "Barranquilla developed as a major port and industrial gateway, and its commercial role continues to shape population growth and housing demand.",
+                       "investorAppeal":  "Investors watch Barranquilla for north-corridor development, relatively affordable entry points, and demand tied to logistics, healthcare, and formal employment.",
+                       "lifestyleHighlights":  "Expats gain warm weather, Carnival culture, improving retail infrastructure, and easier coastal access than inland cities.",
+                       "introText":  [
+                                         "Barranquilla is often overlooked by first-time foreign buyers, but it has developed into a credible investment market with business-driven housing demand and improving upper-income residential product. It tends to be more functional than glamorous, which can be a strength for underwriting stability.",
+                                         "The north of the city captures most premium demand, while broader metropolitan growth supports a wide middle-income tenant base. Investors focused on steady occupancy rather than tourism narrative may find the city compelling.",
+                                         "For expatriates, Barranquilla offers a practical Caribbean lifestyle with lower profile and less volatility than Cartagena. The key is selecting neighborhoods with strong infrastructure, flood resilience, and building quality."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals exist but are less central to the city\u0027s real estate story than long-stay demand. Building rules and tourism registration still determine whether nightly rentals are viable.",
+                                           "airbnbDetails":  "If pursuing Airbnb-style income, verify building permissions first. Many investors instead underwrite executive or family leases where Barranquilla\u0027s corporate economy provides a steadier tenant base.",
+                                           "sourceLabel":  "Tourism registry reference",
+                                           "sourceUrl":  "https://www.mincit.gov.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign ownership is generally unrestricted in urban residential markets. As with other Colombian cities, document the inbound funds correctly and confirm title history with counsel.",
+                       "mortgageNote":  "Foreign financing is possible in limited cases but cash or low-leverage structures remain more common for cross-border buyers.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Alto Prado",
+                                                 "character":  "Established prestige district with larger apartments",
+                                                 "priceRange":  "$1,800 - $2,400 / m2",
+                                                 "bestFor":  "Executives and established family households.",
+                                                 "rentalProfile":  "Long-stay professional demand is usually the cleanest use case here.",
+                                                 "pricePerSqmUsd":  1863,
+                                                 "pricePerSqmCop":  7358850,
+                                                 "characterEs":  "Perfil barrial de Alto Prado: Established prestige district with larger apartments",
+                                                 "bestForEs":  "Ideal para Executives and established family households.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Long-stay professional demand is usually the cleanest use case here."
+                                             },
+                                             {
+                                                 "name":  "Riomar",
+                                                 "character":  "Popular north-side zone with modern towers",
+                                                 "priceRange":  "$1,700 - $2,300 / m2",
+                                                 "bestFor":  "Upper-income families and service-oriented living.",
+                                                 "rentalProfile":  "Stable family leasing with humidity-aware maintenance planning.",
+                                                 "pricePerSqmUsd":  1701,
+                                                 "pricePerSqmCop":  6718950,
+                                                 "characterEs":  "Perfil barrial de Riomar: Popular north-side zone with modern towers",
+                                                 "bestForEs":  "Ideal para Upper-income families and service-oriented living.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Stable family leasing with humidity-aware maintenance planning."
+                                             },
+                                             {
+                                                 "name":  "Villa Santos",
+                                                 "character":  "Family-oriented, newer inventory, retail access",
+                                                 "priceRange":  "$1,500 - $2,100 / m2",
+                                                 "bestFor":  "Families who want newer stock and northern amenities.",
+                                                 "rentalProfile":  "Good long-stay fit for local professionals and relocating households.",
+                                                 "pricePerSqmUsd":  1539,
+                                                 "pricePerSqmCop":  6079050,
+                                                 "characterEs":  "Perfil barrial de Villa Santos: Family-oriented, newer inventory, retail access",
+                                                 "bestForEs":  "Ideal para Families who want newer stock and northern amenities.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Good long-stay fit for local professionals and relocating households."
+                                             },
+                                             {
+                                                 "name":  "Buenavista",
+                                                 "character":  "Mixed-use growth corridor with upper-middle demand",
+                                                 "priceRange":  "$1,600 - $2,200 / m2",
+                                                 "bestFor":  "Buyers who want mall access and newer towers.",
+                                                 "rentalProfile":  "Executive and family demand usually matter more than tourism assumptions.",
+                                                 "pricePerSqmUsd":  1377,
+                                                 "pricePerSqmCop":  5439150,
+                                                 "characterEs":  "Perfil barrial de Buenavista: Mixed-use growth corridor with upper-middle demand",
+                                                 "bestForEs":  "Ideal para Buyers who want mall access and newer towers.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Executive and family demand usually matter more than tourism assumptions."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Check drainage, generator backup, and building maintenance protocols during handover.",
+                                                "Map tenant demand against nearby hospitals, offices, and schools before setting rent.",
+                                                "If self-managing remotely, lock in a local maintenance contact due to climate-related wear."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.5
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Barranquilla is usually an operations-heavy, long-stay market with executive and family demand rather than a pure nightly-rental story.",
+                                            "tenantMix":  "Executives, port/logistics professionals, local families, and domestic relocators.",
+                                            "longStayDemand":  "Solid in Alto Prado, Riomar, Villa Santos, and service-rich northern districts.",
+                                            "furnishedDemand":  "Moderate in executive corridors and newer towers.",
+                                            "shortStayReality":  "Limited compared with Cartagena or Santa Marta.",
+                                            "landlordWatchouts":  "Humidity, building upkeep, and rents that need to be tied to real tenant profiles rather than coastal optimism.",
+                                            "headlineEs":  "El arriendo en Barranquilla se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Business Growth On The Caribbean Corridor en Colombia",
+                       "shortTaglineEs":  "Barranquilla: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Barranquilla con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Barranquilla que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Barranquilla evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Barranquilla se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Barranquilla la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Barranquilla no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Barranquilla suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "santa-marta",
+                       "name":  "Santa Marta",
+                       "nameEs":  "Santa Marta",
+                       "tagline":  "Beach Access With Lower Coastal Entry Pricing",
+                       "shortTagline":  "Tourism potential and lifestyle appeal below Cartagena price points.",
+                       "region":  "Caribbean Coast",
+                       "regionEs":  "Costa Caribe",
+                       "heroImage":  "assets/cities/santa-marta.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  11.2408,
+                       "lon":  -74.199,
+                       "pricePerSqm":  1760,
+                       "roiRange":  "7.8% - 10.8%",
+                       "rentalYield":  8.3,
+                       "appreciationTrend":  "+8.7% year-over-year",
+                       "closingCostPercent":  4.2,
+                       "climate":  "Hot coastal weather with strong beach and nature access.",
+                       "pace":  "Slower and more outdoors-focused than Cartagena, with wider infrastructure variation.",
+                       "explorerTags":  [
+                                            "coastal",
+                                            "retiree-friendly",
+                                            "nature",
+                                            "value"
+                                        ],
+                       "walkability":  {
+                                           "score":  6,
+                                           "label":  "Walkable in tourism zones",
+                                           "summary":  "Centro, parts of Rodadero, and some beach corridors are walkable, but day-to-day quality varies by project and heat tolerance.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  6,
+                                          "label":  "Adequate for routine needs",
+                                          "summary":  "Routine care works better than complex specialist planning, so some long-stay residents prefer a backup relationship in Barranquilla or Medellin.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  8,
+                                          "label":  "Strong for beach retirees",
+                                          "summary":  "Works well for buyers who want ocean access, slower daily rhythm, and lower coastal entry pricing than Cartagena.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Coastal maintenance heavy",
+                                             "summary":  "Water systems, humidity, corrosion, generators, and HOA maintenance discipline should be screened carefully.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Beach retirees, second-home owners, and buyers who want sea access plus Tayrona proximity.",
+                                                  "monthlyComfort":  "$1,600 - $3,000 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Simon Bolivar keeps airport access simple for domestic routes.",
+                                                  "englishSupport":  "Better in beach-project zones than in the broader local market.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Beach living with Tayrona and mountain access nearby",
+                                                     "Lower-basis coastal pricing than Cartagena",
+                                                     "Relaxed rhythm that appeals to seasonal residents"
+                                                 ],
+                       "watchouts":  [
+                                         "Project quality varies sharply.",
+                                         "Water reliability and backup systems matter.",
+                                         "Coastal wear and tourism assumptions can distort underwriting quickly."
+                                     ],
+                       "historicalContext":  "Santa Marta is one of South America\u0027s oldest cities, combining Caribbean waterfront living with access to Tayrona, mountain ecosystems, and a growing domestic tourism base.",
+                       "investorAppeal":  "Investors view Santa Marta as a lower-basis coastal market with increasing resort and second-home demand, especially in beach-adjacent submarkets.",
+                       "lifestyleHighlights":  "Expats are drawn by ocean access, a slower pace, and proximity to nature, with infrastructure quality varying significantly by neighborhood and project.",
+                       "introText":  [
+                                         "Santa Marta sits in a useful middle ground for foreign buyers who want Caribbean exposure without Cartagena\u0027s top-tier pricing. That can create attractive yield potential, especially where the asset is operationally suited for tourism or hybrid personal-use strategies.",
+                                         "The city is not uniform. Beachfront projects, El Rodadero towers, and more local residential pockets serve different tenant and guest profiles, and performance depends heavily on management quality and building rules.",
+                                         "For expatriates and seasonal residents, Santa Marta offers a more relaxed setting with strong access to beaches and outdoor destinations. Buyers should prioritize project quality, water reliability, and neighborhood-level infrastructure before stretching on headline sea-view pricing."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals are common in tourism-oriented zones, but condo restrictions and national tourism registration still apply. Operational compliance should be checked building by building.",
+                                           "airbnbDetails":  "Ask specifically whether nightly or weekly stays are permitted under the property\u0027s regime and whether current operators have formal registration. Tourism-heavy branding does not guarantee legal short-stay use.",
+                                           "sourceLabel":  "National tourism registry",
+                                           "sourceUrl":  "https://www.rues.org.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign buyers can acquire property in ordinary urban areas, but coastal due diligence should include project licensing, title review, and any zone-specific environmental or concession issues.",
+                       "mortgageNote":  "Some foreign buyers structure purchases with larger cash down payments due to narrower bank appetite for second-home coastal assets.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "El Rodadero",
+                                                 "character":  "Tourism-heavy beachfront towers with active rental demand",
+                                                 "priceRange":  "$1,900 - $2,800 / m2",
+                                                 "bestFor":  "Tourism-led owners and beach-near furnished strategies.",
+                                                 "rentalProfile":  "High furnished interest, but seasonality and building operations should never be ignored.",
+                                                 "pricePerSqmUsd":  2024,
+                                                 "pricePerSqmCop":  7994800,
+                                                 "characterEs":  "Perfil barrial de El Rodadero: Tourism-heavy beachfront towers with active rental demand",
+                                                 "bestForEs":  "Ideal para Tourism-led owners and beach-near furnished strategies.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: High furnished interest, but seasonality and building operations should never be ignored."
+                                             },
+                                             {
+                                                 "name":  "Bello Horizonte",
+                                                 "character":  "Newer resort-style inventory near the airport",
+                                                 "priceRange":  "$2,000 - $3,000 / m2",
+                                                 "bestFor":  "Buyers wanting a calmer beach corridor with resort-style stock.",
+                                                 "rentalProfile":  "Works for vacation-driven furnished demand plus selected longer stays.",
+                                                 "pricePerSqmUsd":  1848,
+                                                 "pricePerSqmCop":  7299600,
+                                                 "characterEs":  "Perfil barrial de Bello Horizonte: Newer resort-style inventory near the airport",
+                                                 "bestForEs":  "Ideal para Buyers wanting a calmer beach corridor with resort-style stock.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Works for vacation-driven furnished demand plus selected longer stays."
+                                             },
+                                             {
+                                                 "name":  "Centro Historico",
+                                                 "character":  "Walkable historic core with boutique hospitality appeal",
+                                                 "priceRange":  "$1,700 - $2,500 / m2",
+                                                 "bestFor":  "Lifestyle buyers wanting character and visitor traffic.",
+                                                 "rentalProfile":  "Hospitality upside exists, but historic-building realities and turnover costs matter.",
+                                                 "pricePerSqmUsd":  1672,
+                                                 "pricePerSqmCop":  6604400,
+                                                 "characterEs":  "Perfil barrial de Centro Historico: Walkable historic core with boutique hospitality appeal",
+                                                 "bestForEs":  "Ideal para Lifestyle buyers wanting character and visitor traffic.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Hospitality upside exists, but historic-building realities and turnover costs matter."
+                                             },
+                                             {
+                                                 "name":  "Pozos Colorados",
+                                                 "character":  "Higher-end beachfront growth corridor",
+                                                 "priceRange":  "$2,200 - $3,300 / m2",
+                                                 "bestFor":  "Second-home buyers and newer coastal product seekers.",
+                                                 "rentalProfile":  "Furnished and seasonal demand can be strong in the right managed buildings.",
+                                                 "pricePerSqmUsd":  1496,
+                                                 "pricePerSqmCop":  5909200,
+                                                 "characterEs":  "Perfil barrial de Pozos Colorados: Higher-end beachfront growth corridor",
+                                                 "bestForEs":  "Ideal para Second-home buyers and newer coastal product seekers.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Furnished and seasonal demand can be strong in the right managed buildings."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Inspect water systems, generator coverage, and salt-air exposure items at takeover.",
+                                                "Confirm beach-rental or tourism permissions before any furnishing spend.",
+                                                "Set seasonal pricing assumptions conservatively to avoid over-underwriting occupancy."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.7
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Santa Marta blends lifestyle and tourism demand with second-home behavior, so rent strategy should be neighborhood-specific from day one.",
+                                            "tenantMix":  "Vacationers, second-home users, seasonal domestic visitors, and selected long-stay lifestyle renters.",
+                                            "longStayDemand":  "Best in quieter beachfront zones and practical year-round corridors.",
+                                            "furnishedDemand":  "Strong in beach-facing stock with good management and backup systems.",
+                                            "shortStayReality":  "Can work, but seasonality and operations are central to the story.",
+                                            "landlordWatchouts":  "Humidity, water systems, generator expectations, and higher turnover wear.",
+                                            "headlineEs":  "El arriendo en Santa Marta se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Beach Access With Lower Coastal Entry Pricing en Colombia",
+                       "shortTaglineEs":  "Santa Marta: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Santa Marta con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Santa Marta que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Santa Marta evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Santa Marta se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Santa Marta la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Santa Marta no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Santa Marta suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "pereira",
+                       "name":  "Pereira",
+                       "nameEs":  "Pereira",
+                       "tagline":  "Coffee Region Gateway With Expanding Expat Appeal",
+                       "shortTagline":  "Milder pricing, lifestyle demand, and access to the eje cafetero.",
+                       "region":  "Coffee Region",
+                       "regionEs":  "Eje cafetero",
+                       "heroImage":  "assets/cities/pereira.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  4.8143,
+                       "lon":  -75.6946,
+                       "pricePerSqm":  1540,
+                       "roiRange":  "7.0% - 9.0%",
+                       "rentalYield":  7.4,
+                       "appreciationTrend":  "+7.2% year-over-year",
+                       "closingCostPercent":  4,
+                       "climate":  "Spring-like mountain climate with easy access to countryside escapes.",
+                       "pace":  "Manageable, greener, and softer than the larger metros.",
+                       "explorerTags":  [
+                                            "coffee-region",
+                                            "retiree-friendly",
+                                            "expat-friendly",
+                                            "low-key",
+                                            "healthcare"
+                                        ],
+                       "walkability":  {
+                                           "score":  7,
+                                           "label":  "Compact and manageable",
+                                           "summary":  "Pinares, Alamos, and central pockets can support easier daily movement than many first-time visitors expect.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  8,
+                                          "label":  "Strong for a mid-sized city",
+                                          "summary":  "Pereira has a credible healthcare base for long-stay living and benefits from its role as a regional services center.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  9,
+                                          "label":  "One of the strongest retirement fits",
+                                          "summary":  "Climate, scale, cost base, and access to the coffee axis make Pereira especially attractive for retirees and slower relocations.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Manageable",
+                                             "summary":  "Rain and hillside conditions still matter, but the city generally offers lower maintenance drama than the coast.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Retirees, first-time expats, coffee-country lifestyle buyers, and people who want a softer Colombian landing.",
+                                                  "monthlyComfort":  "$1,500 - $2,400 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Matecana gives the region useful domestic connectivity.",
+                                                  "englishSupport":  "Lower than Medellin, but increasingly workable in expat-facing neighborhoods and services.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Coffee region access and lower-pressure urban scale",
+                                                     "Useful healthcare, services, and domestic migration support",
+                                                     "Strong fit for slower living without giving up city basics"
+                                                 ],
+                       "watchouts":  [
+                                         "Do not confuse smaller scale with zero due diligence.",
+                                         "Semi-rural and low-density assets require different insurance thinking.",
+                                         "Some buyers overestimate tourism upside in markets better suited to long stays."
+                                     ],
+                       "historicalContext":  "Pereira sits in Colombia\u0027s coffee region and has grown as a service, logistics, and healthcare center connecting smaller regional markets.",
+                       "investorAppeal":  "Investors are drawn by improving infrastructure, domestic migration, and rising foreign interest in coffee-country lifestyle markets.",
+                       "lifestyleHighlights":  "Expats appreciate the spring climate, mountain access, lower cost base, and proximity to Armenia, Manizales, and boutique rural retreats.",
+                       "introText":  [
+                                         "Pereira offers a strong information advantage because it remains less saturated by foreign capital than Medellin or Cartagena while still benefiting from a recognizable regional identity. Buyers often find a more rational relationship between pricing and local incomes here.",
+                                         "The investment case is tied to domestic demand, healthcare services, and increasing lifestyle migration into the coffee axis. That tends to support a more balanced rental profile rather than an exclusively tourism-led one.",
+                                         "For expatriates, Pereira is appealing as a softer landing into Colombia. It delivers manageable city scale, a comfortable climate, and access to countryside living without giving up urban basics."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Short-term rentals are available in selected condo and tourism-oriented properties, but long-stay rentals and hybrid stays are more common investment strategies than pure nightly rental plays.",
+                                           "airbnbDetails":  "As elsewhere in Colombia, verify HOA restrictions, tourism registration obligations, and neighborhood suitability before treating the asset as an Airbnb property.",
+                                           "sourceLabel":  "National business and tourism registry",
+                                           "sourceUrl":  "https://www.rues.org.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreigners can generally own urban residential property freely, with typical legal diligence, banking registration of funds, and tax compliance applying.",
+                       "mortgageNote":  "Regional banks may be open to well-documented foreign borrowers, but leverage is usually modest and approval standards vary meaningfully.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Pinares",
+                                                 "character":  "Upper-income zone near medical and retail services",
+                                                 "priceRange":  "$1,700 - $2,300 / m2",
+                                                 "bestFor":  "Retirees, professionals, and healthcare-focused relocators.",
+                                                 "rentalProfile":  "One of the cleaner long-stay corridors for comfortable, service-rich living.",
+                                                 "pricePerSqmUsd":  1771,
+                                                 "pricePerSqmCop":  6995450,
+                                                 "characterEs":  "Perfil barrial de Pinares: Upper-income zone near medical and retail services",
+                                                 "bestForEs":  "Ideal para Retirees, professionals, and healthcare-focused relocators.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: One of the cleaner long-stay corridors for comfortable, service-rich living."
+                                             },
+                                             {
+                                                 "name":  "Alamos",
+                                                 "character":  "Central and established with professional tenant appeal",
+                                                 "priceRange":  "$1,500 - $2,000 / m2",
+                                                 "bestFor":  "Locals and relocators wanting central practicality.",
+                                                 "rentalProfile":  "Steady long-stay demand with moderate furnished upside.",
+                                                 "pricePerSqmUsd":  1617,
+                                                 "pricePerSqmCop":  6387150,
+                                                 "characterEs":  "Perfil barrial de Alamos: Central and established with professional tenant appeal",
+                                                 "bestForEs":  "Ideal para Locals and relocators wanting central practicality.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Steady long-stay demand with moderate furnished upside."
+                                             },
+                                             {
+                                                 "name":  "Cerritos",
+                                                 "character":  "Low-density suburban luxury and country-club feel",
+                                                 "priceRange":  "$1,800 - $2,600 / m2",
+                                                 "bestFor":  "Lifestyle families and buyers wanting larger formats.",
+                                                 "rentalProfile":  "Works better for family and relocation rentals than quick-turn inventory.",
+                                                 "pricePerSqmUsd":  1463,
+                                                 "pricePerSqmCop":  5778850,
+                                                 "characterEs":  "Perfil barrial de Cerritos: Low-density suburban luxury and country-club feel",
+                                                 "bestForEs":  "Ideal para Lifestyle families and buyers wanting larger formats.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Works better for family and relocation rentals than quick-turn inventory."
+                                             },
+                                             {
+                                                 "name":  "Dosquebradas",
+                                                 "character":  "Value-oriented metro area with workforce demand",
+                                                 "priceRange":  "$1,000 - $1,500 / m2",
+                                                 "bestFor":  "Value-oriented owners and local workforce demand.",
+                                                 "rentalProfile":  "More price-sensitive long-stay demand than premium furnished demand.",
+                                                 "pricePerSqmUsd":  1309,
+                                                 "pricePerSqmCop":  5170550,
+                                                 "characterEs":  "Perfil barrial de Dosquebradas: Value-oriented metro area with workforce demand",
+                                                 "bestForEs":  "Ideal para Value-oriented owners and local workforce demand.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: More price-sensitive long-stay demand than premium furnished demand."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Verify transport links and tenant commute patterns between Pereira and surrounding municipalities.",
+                                                "Assess whether the asset is best positioned for local professionals, retirees, or short leisure stays.",
+                                                "Line up insurance early if the property sits in a semi-rural or lower-density corridor."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.5
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Pereira is often a calmer long-stay rental market tied to retirees, returning Colombians, and coffee-region professionals.",
+                                            "tenantMix":  "Retirees, local professionals, coffee-region families, and lifestyle relocators.",
+                                            "longStayDemand":  "Steady in Pinares, Alamos, and well-located Cerritos stock.",
+                                            "furnishedDemand":  "Selective but improving as more relocators test the market before buying.",
+                                            "shortStayReality":  "Not the core thesis outside targeted lifestyle inventory.",
+                                            "landlordWatchouts":  "Overpricing based on Medellin comparisons and underestimating commute patterns.",
+                                            "headlineEs":  "El arriendo en Pereira se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Coffee Region Gateway With Expanding Expat Appeal en Colombia",
+                       "shortTaglineEs":  "Pereira: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Pereira con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Pereira que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Pereira evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Pereira se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Pereira la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Pereira no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Pereira suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   },
+                   {
+                       "slug":  "bucaramanga",
+                       "name":  "Bucaramanga",
+                       "nameEs":  "Bucaramanga",
+                       "tagline":  "Orderly Mid-Sized City With Quality-Of-Life Appeal",
+                       "shortTagline":  "Safety, livability, and stable local demand in a disciplined market.",
+                       "region":  "Santander",
+                       "regionEs":  "Santander",
+                       "heroImage":  "assets/cities/bucaramanga.svg",
+                       "imageCredit":  "CasaClaro Studio",
+                       "lat":  7.1193,
+                       "lon":  -73.1227,
+                       "pricePerSqm":  1495,
+                       "roiRange":  "6.8% - 8.7%",
+                       "rentalYield":  7.1,
+                       "appreciationTrend":  "+5.9% year-over-year",
+                       "closingCostPercent":  4,
+                       "climate":  "Spring-like to warm, with a reputation for parks and easier daily logistics.",
+                       "pace":  "Orderly, local, and far less performative than the big-name foreign-buyer cities.",
+                       "explorerTags":  [
+                                            "retiree-friendly",
+                                            "healthcare",
+                                            "families",
+                                            "low-maintenance"
+                                        ],
+                       "walkability":  {
+                                           "score":  7,
+                                           "label":  "Good for daily errands",
+                                           "summary":  "Cabecera and surrounding zones can feel pleasantly practical on foot, especially compared with larger metros.",
+                                           "summaryEs":  "La caminabilidad depende del barrio, topografía y acceso a servicios de rutina."
+                                       },
+                       "healthcare":  {
+                                          "score":  8,
+                                          "label":  "Strong private care reputation",
+                                          "summary":  "One of the better mid-sized healthcare stories in Colombia, which matters for retirees and long-stay owners.",
+                                          "summaryEs":  "La cobertura médica varía por ciudad y corredor urbano; confirma red privada útil para tu perfil."
+                                      },
+                       "retireeFit":  {
+                                          "score":  9,
+                                          "label":  "Excellent for calm retirement living",
+                                          "summary":  "Good medical access, manageable scale, and lower noise make Bucaramanga one of the most underrated retirement fits.",
+                                          "summaryEs":  "Para retiro, el ajuste real mezcla salud, ruido, movilidad, seguridad percibida y costo operativo."
+                                      },
+                       "repairReality":  {
+                                             "label":  "Manageable",
+                                             "summary":  "Traditional long-stay buildings and lower coastal exposure usually mean fewer maintenance surprises than beach markets.",
+                                             "summaryEs":  "La carga de reparaciones cambia por edad del edificio, humedad, administración y calidad histórica de mantenimiento."
+                                         },
+                       "relocationSnapshot":  {
+                                                  "bestFor":  "Retirees, families, and buyers who want daily livability without major-city chaos.",
+                                                  "monthlyComfort":  "$1,500 - $2,400 per month for many singles or couples before purchase costs.",
+                                                  "airport":  "Palonegro supports regional and domestic movement.",
+                                                  "englishSupport":  "Less international than Medellin or Bogota, but very workable with a strong local team.",
+                                                  "bestForEs":  "Útil para perfiles que priorizan vida diaria funcional y lectura de barrio antes de comprar.",
+                                                  "monthlyComfortEs":  "El presupuesto de confort depende de zona, estándar de vivienda y nivel de servicios esperados.",
+                                                  "airportEs":  "Conectividad aérea suficiente para operación local y desplazamientos nacionales.",
+                                                  "englishSupportEs":  "El soporte en inglés existe, pero conviene operar con base legal y comercial en español local."
+                                              },
+                       "destinationHighlights":  [
+                                                     "Parks, strong quality-of-life reputation, and practical daily living",
+                                                     "Useful healthcare and service depth for a mid-sized city",
+                                                     "A disciplined market for buyers who want substance over spectacle"
+                                                 ],
+                       "watchouts":  [
+                                         "Short-term rental upside is not the main story here.",
+                                         "This market rewards patience more than hype-chasing.",
+                                         "Foreign buyers should build a local support bench early because English coverage is thinner."
+                                     ],
+                       "historicalContext":  "Bucaramanga has a long-standing reputation for orderliness, education, and entrepreneurship, functioning as a regional services hub for Santander.",
+                       "investorAppeal":  "Investors like Bucaramanga for steady local demand, lower speculative pressure, and quality-of-life fundamentals that support owner-occupier stability.",
+                       "lifestyleHighlights":  "Expats find a manageable city, spring-like weather, good medical services, and easier daily logistics than larger metros.",
+                       "introText":  [
+                                         "Bucaramanga is not the loudest market in Colombia, which is precisely why some investors like it. The city tends to be driven by local end users, professionals, and families rather than hype cycles, which can make pricing more disciplined.",
+                                         "Yield expectations are usually moderate rather than explosive, but the city can suit buyers who want a livable environment and less tourism dependence. Strong micro-location analysis still matters, especially around newer development corridors.",
+                                         "For expatriates, Bucaramanga offers a practical lifestyle with good healthcare, shopping, and regional access. It is often best suited to long-stay living or traditional rental strategies rather than aggressive short-term rental underwriting."
+                                     ],
+                       "regulations":  {
+                                           "airbnbSummary":  "Nightly rentals are not the city\u0027s dominant strategy and should be treated cautiously. Building approval and registration still matter, and many investors prefer conventional leases.",
+                                           "airbnbDetails":  "If short-term rentals are part of the plan, confirm building policy in writing and review whether the target area genuinely supports visitor demand rather than assuming a tourism premium that may not exist.",
+                                           "sourceLabel":  "Colombia tourism and commerce registry",
+                                           "sourceUrl":  "https://www.rues.org.co/",
+                                           "airbnbSummaryEs":  "La corta estancia depende de reglamento del edificio y cumplimiento regulatorio local; no se debe asumir por demanda.",
+                                           "airbnbDetailsEs":  "Antes de comprar, valida licencias, régimen de propiedad horizontal y política de administración para evitar fricciones operativas."
+                                       },
+                       "foreignOwnership":  "Foreign buyers face no general nationality-based restriction on urban property ownership in Bucaramanga. Standard title diligence and foreign investment registration still apply.",
+                       "mortgageNote":  "Foreign mortgage access is possible but limited; lower-leverage structures remain the prudent assumption in underwriting.",
+                       "neighborhoods":  [
+                                             {
+                                                 "name":  "Cabecera del Llano",
+                                                 "character":  "Retail-rich central district with steady apartment demand",
+                                                 "priceRange":  "$1,500 - $2,100 / m2",
+                                                 "bestFor":  "Walkable local life, healthcare access, and daily services.",
+                                                 "rentalProfile":  "One of the better long-stay and transition-rental districts in the city.",
+                                                 "pricePerSqmUsd":  1719,
+                                                 "pricePerSqmCop":  6790050,
+                                                 "characterEs":  "Perfil barrial de Cabecera del Llano: Retail-rich central district with steady apartment demand",
+                                                 "bestForEs":  "Ideal para Walkable local life, healthcare access, and daily services.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: One of the better long-stay and transition-rental districts in the city."
+                                             },
+                                             {
+                                                 "name":  "Cacique",
+                                                 "character":  "Modern residential stock near major shopping",
+                                                 "priceRange":  "$1,600 - $2,200 / m2",
+                                                 "bestFor":  "Families and buyers wanting newer stock with amenity access.",
+                                                 "rentalProfile":  "Stable family and professional leasing profile.",
+                                                 "pricePerSqmUsd":  1570,
+                                                 "pricePerSqmCop":  6201500,
+                                                 "characterEs":  "Perfil barrial de Cacique: Modern residential stock near major shopping",
+                                                 "bestForEs":  "Ideal para Families and buyers wanting newer stock with amenity access.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Stable family and professional leasing profile."
+                                             },
+                                             {
+                                                 "name":  "Sotomayor",
+                                                 "character":  "Established mixed-use area with professional demand",
+                                                 "priceRange":  "$1,300 - $1,900 / m2",
+                                                 "bestFor":  "Traditional residential living with central convenience.",
+                                                 "rentalProfile":  "Long-stay local demand dominates the case here.",
+                                                 "pricePerSqmUsd":  1420,
+                                                 "pricePerSqmCop":  5609000,
+                                                 "characterEs":  "Perfil barrial de Sotomayor: Established mixed-use area with professional demand",
+                                                 "bestForEs":  "Ideal para Traditional residential living with central convenience.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Long-stay local demand dominates the case here."
+                                             },
+                                             {
+                                                 "name":  "Ruitoque",
+                                                 "character":  "Higher-end suburban hillside living",
+                                                 "priceRange":  "$1,700 - $2,500 / m2",
+                                                 "bestFor":  "Lifestyle buyers seeking larger-format or golf-adjacent living.",
+                                                 "rentalProfile":  "Best treated as a niche lifestyle rental rather than a mass-market leasing story.",
+                                                 "pricePerSqmUsd":  1271,
+                                                 "pricePerSqmCop":  5020450,
+                                                 "characterEs":  "Perfil barrial de Ruitoque: Higher-end suburban hillside living",
+                                                 "bestForEs":  "Ideal para Lifestyle buyers seeking larger-format or golf-adjacent living.",
+                                                 "rentalProfileEs":  "Enfoque de arriendo: Best treated as a niche lifestyle rental rather than a mass-market leasing story."
+                                             }
+                                         ],
+                       "first30DaysGuide":  [
+                                                "Benchmark local long-term rents rather than importing Medellin or Cartagena assumptions.",
+                                                "Review HOA rules, parking allocations, and elevator maintenance before tenant marketing.",
+                                                "Build a local legal and accounting contact list early because the market is less turnkey for foreigners."
+                                            ],
+                       "closingCostBreakdown":  {
+                                                    "notary":  1,
+                                                    "registration":  1.5,
+                                                    "propertyTax":  1,
+                                                    "legal":  0.5
+                                                },
+                       "rentalMarket":  {
+                                            "headline":  "Bucaramanga is usually a local long-stay and family market with strong healthcare-related appeal and lighter speculation risk.",
+                                            "tenantMix":  "Families, healthcare users, professionals, retirees, and returning Colombians.",
+                                            "longStayDemand":  "Stable in Cabecera, Cacique, Sotomayor, and established service corridors.",
+                                            "furnishedDemand":  "Selective, strongest for medical, executive, or transition rentals.",
+                                            "shortStayReality":  "Usually a weak primary thesis compared with cleaner long-stay demand.",
+                                            "landlordWatchouts":  "Do not import Medellin or coastal rent assumptions into a more local market.",
+                                            "headlineEs":  "El arriendo en Bucaramanga se explica mejor por barrio, perfil de inquilino y reglas del edificio que por un titular de rentabilidad.",
+                                            "longStayDemandEs":  "La larga estancia suele dar la base más estable de ocupación y caja.",
+                                            "furnishedDemandEs":  "La demanda amoblada existe, pero su profundidad cambia por microzona y ticket mensual.",
+                                            "shortStayRealityEs":  "La corta estancia exige verificación estricta de reglas, operación y estacionalidad.",
+                                            "tenantMixEs":  "Mezcla de demanda local, ejecutiva, expatriada y de retorno colombiano según barrio.",
+                                            "landlordWatchoutsEs":  "Controla vacancia, mantenimiento y costos ocultos para proteger flujo neto real."
+                                        },
+                       "taglineEs":  "Orderly Mid-Sized City With Quality-Of-Life Appeal en Colombia",
+                       "shortTaglineEs":  "Bucaramanga: mercado activo, lectura por barrios y decisiones con datos locales.",
+                       "climateEs":  "Clima de Bucaramanga con variaciones de microzona que conviene validar durante visitas de mañana y tarde.",
+                       "paceEs":  "Ritmo urbano de Bucaramanga que cambia por barrio, movilidad diaria y tipo de comprador.",
+                       "historicalContextEs":  "Bucaramanga evolucionó con identidad regional propia y hoy combina capas históricas, servicios urbanos y submercados residenciales con comportamientos distintos por zona.",
+                       "investorAppealEs":  "El atractivo inversionista de Bucaramanga se apoya en demanda de arriendo segmentada, profundidad operativa y posibilidad de entrar por barrio con disciplina de precio por m2.",
+                       "lifestyleHighlightsEs":  "Compradores y familias valoran en Bucaramanga la combinación entre servicios, conectividad, salud y estilo de vida, siempre que la selección de barrio sea precisa.",
+                       "introTextEs":  [
+                                           "Bucaramanga no se entiende solo con promedios de ciudad. La lectura correcta empieza por microzonas, caminabilidad real y calidad de servicios cotidianos.",
+                                           "Para compradores internacionales, locales y brokers, este mercado premia la disciplina en precio por m2, revisión de reglamentos y análisis de costos de mantenimiento antes de negociar.",
+                                           "La decisión más fuerte en Bucaramanga suele venir de combinar narrativa de vida diaria con números: salud, movilidad, carga de reparaciones y demanda de arriendo por barrio."
+                                       ],
+                       "destinationHighlightsEs":  [
+                                                       "Escena local y ritmo urbano con identidad propia.",
+                                                       "Submercados por barrio con perfiles de comprador diferentes.",
+                                                       "Conectividad y servicios que impactan la calidad de vida diaria."
+                                                   ],
+                       "watchoutsEs":  [
+                                           "Nunca extrapoles un barrio al resto de la ciudad.",
+                                           "Verifica reglamento de propiedad horizontal antes de modelar corta estancia.",
+                                           "Incluye mantenimiento y administración en la proyección desde el inicio."
+                                       ],
+                       "first30DaysGuideEs":  [
+                                                  "Camina el barrio en distintos horarios antes de comprometerte.",
+                                                  "Valida reglamentos del edificio, reservas y estado de áreas comunes.",
+                                                  "Alinea estrategia legal, migratoria y tributaria antes de cerrar."
+                                              ],
+                       "foreignOwnershipEs":  "La propiedad por extranjeros es posible, pero requiere documentación limpia, trazabilidad bancaria y revisión legal local.",
+                       "mortgageNoteEs":  "El apalancamiento para no residentes suele tener condiciones más exigentes; compara costo total y tiempos de aprobación."
+                   }
+               ]
+}

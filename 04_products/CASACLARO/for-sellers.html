@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro For Sellers | List a Home in Colombia</title>
+  <meta name="description" content="Seller education and structured home submission for CasaClaro's Colombia marketplace.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="sellers">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="sellers-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">For Sellers</p>
+        <h1>List a home with pricing that reflects what buyers will actually ask</h1>
+        <p class="hero-lede">Give buyers the neighborhood facts, repair details, honest pricing, and timing clarity they will ask for anyway — before the first inquiry, not after.</p>
+      </div>
+    </section>
+
+    <section id="sellers-before-you-list" class="section-shell">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">Before you list</p>
+          <ul class="check-list">
+            <li>Collect title, tax, HOA, and occupancy information before a buyer asks for it.</li>
+            <li>Write down known repairs instead of waiting for them to emerge during due diligence.</li>
+            <li>Be honest about whether the property is turnkey, lightly dated, or heading for a heavier renovation.</li>
+            <li>For coastal homes, assume buyers will ask about corrosion, waterproofing, generators, and reserve quality.</li>
+          </ul>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">What happens after you submit</p>
+          <ul class="check-list">
+            <li>CasaClaro reviews fit, market, price framing, and documentation gaps within one business day.</li>
+            <li>If the home fits the current network, it can be routed to a local agent, broker, or buyer flow.</li>
+            <li>Attachments and notes are already structured for future CRM and upload endpoints.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="sellers-market-lens" class="section-shell">
+      <div class="container">
+        <p class="section-kicker">Seller Market Lens</p>
+        <h2>Representative city briefs for owners</h2>
+        <p class="hero-lede">These city notes help owners understand how condition, realistic pricing, and buyer expectations shift from market to market.</p>
+        <div id="seller-market-grid"></div>
+      </div>
+    </section>
+
+    <section id="sellers-intake" class="section-cream">
+      <div class="container two-column">
+        <form class="panel-card" data-form-type="seller-page">
+          <p class="section-kicker">Seller Intake</p>
+          <h2>Submit a home for review</h2>
+          <label>Owner name<input type="text" name="name" autocomplete="name" required></label>
+          <label>Email<input type="email" name="email" autocomplete="email" spellcheck="false" required></label>
+          <label>City<select name="city" id="seller-page-city"></select></label>
+          <label>Neighborhood<input type="text" name="neighborhood" autocomplete="address-level2" required></label>
+          <label>Property type
+            <select name="propertyType" id="seller-page-property-type" required>
+              <option value="Apartment">Apartment</option>
+              <option value="House">House</option>
+              <option value="Penthouse">Penthouse</option>
+              <option value="Lot">Lot</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+          <label>Asking price (USD)<input type="number" name="askingPrice" min="0" step="1000" required></label>
+          <label>Bedrooms (if residential)<input type="number" name="bedrooms" id="seller-page-bedrooms" min="0" step="1"></label>
+          <label>Condition<input type="text" name="condition" autocomplete="off" placeholder="Turnkey, light updates, full renovation…" required></label>
+          <label>Main repair notes<textarea name="repairs" rows="4" placeholder="Humidity, roof, plumbing, facade, HVAC, windows, elevator, drainage…"></textarea></label>
+          <label>Timeline<input type="text" name="timeline" autocomplete="off" placeholder="30 days, 90 days, inherited asset, testing price…" required></label>
+          <label>Attachments<input type="file" name="attachments" accept=".jpg,.jpeg,.png,.pdf" multiple></label>
+          <label>Notes<textarea name="notes" rows="5" placeholder="Occupancy, rental history, upgrades, HOA rules, closing constraints…"></textarea></label>
+          <button class="btn btn-primary" type="submit">Submit Seller Intake</button>
+          <p class="form-feedback" aria-live="polite"></p>
+        </form>
+        <article class="panel-card">
+          <p class="section-kicker">Repairs Matter</p>
+          <h2>Why repair disclosure matters</h2>
+          <p>Repair reality is part of the marketing story whether sellers mention it or not. A calm, clear repair narrative helps with pricing, buyer matching, and closing certainty.</p>
+          <ul class="check-list">
+            <li>Coastal wear should be documented early.</li>
+            <li>Older urban buildings need HOA reserve position and systems history documented.</li>
+            <li>Recent upgrades should be listed clearly so buyers do not assume the worst.</li>
+            <li>Deferred maintenance almost always becomes a pricing conversation, even if it starts as an inspection issue.</li>
+          </ul>
+          <p class="section-kicker">When Uploads Go Live</p>
+          <ul class="check-list">
+            <li>Prioritize tax receipts, HOA statements, title documents, and clear photos of the highest-risk repair items.</li>
+            <li>Include inspection summaries or contractor quotes if you already have them.</li>
+            <li>Use the notes box for occupancy, rental history, or closing constraints that affect timing and buyer fit.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

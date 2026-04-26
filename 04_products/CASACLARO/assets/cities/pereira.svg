@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Pereira hero art</title>
+  <desc id="desc">Coffee hills and low-rise city profile for Pereira.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fefae0"/>
+      <stop offset="50%" stop-color="#dda15e"/>
+      <stop offset="100%" stop-color="#606c38"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <path d="M0 590 C180 470 360 710 560 560 C740 430 930 690 1140 560 C1290 470 1430 560 1600 500 L1600 900 L0 900 Z" fill="#6a994e"/>
+  <path d="M0 700 C160 620 300 760 470 700 C620 646 820 760 980 690 C1150 620 1340 760 1600 670 L1600 900 L0 900 Z" fill="#386641"/>
+  <path d="M260 500 C320 430 420 430 480 500" stroke="#bc6c25" stroke-width="18" fill="none"/><path d="M560 460 C620 390 720 390 780 460" stroke="#bc6c25" stroke-width="18" fill="none"/><path d="M860 500 C920 430 1020 430 1080 500" stroke="#bc6c25" stroke-width="18" fill="none"/>
+  <rect x="250" y="470" width="90" height="160" rx="10" fill="#283618"/><rect x="370" y="430" width="74" height="200" rx="10" fill="#283618"/><rect x="470" y="490" width="62" height="140" rx="10" fill="#283618"/><rect x="590" y="420" width="90" height="210" rx="10" fill="#283618"/><rect x="708" y="470" width="70" height="160" rx="10" fill="#283618"/>
+  <rect x="96" y="102" width="470" height="188" rx="28" fill="rgba(255,255,255,0.8)"/>
+  <text x="134" y="178" font-size="34" font-family="Segoe UI, sans-serif" font-weight="700" fill="#283618" letter-spacing="6">CASACLARO</text>
+  <text x="134" y="240" font-size="76" font-family="Georgia, serif" font-weight="700" fill="#283618">Pereira</text>
+  <text x="134" y="284" font-size="28" font-family="Segoe UI, sans-serif" font-weight="700" fill="#606c38">COFFEE HILLS, SOFT CLIMATE, AND DAILY EASE</text>
+</svg>

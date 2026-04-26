@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Map | Colombia Market Map</title>
+  <meta name="description" content="View CasaClaro's Colombian city markets on an interactive map with direct city-guide links.">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="map">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="map-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Map</p>
+        <h1>See the markets on a map</h1>
+        <p class="hero-lede">Use the map to orient yourself geographically, then drop into the city guide for livability, healthcare, repair, and regulation detail.</p>
+      </div>
+    </section>
+
+    <section id="map-main" class="section-shell">
+      <div class="container">
+        <div id="city-map" class="map-shell" aria-label="Map of CasaClaro Colombian cities"></div>
+      </div>
+    </section>
+
+    <section id="map-snapshots" class="section-cream">
+      <div class="container">
+        <p class="section-kicker">City Snapshots</p>
+        <h2>Jump from geography to city brief</h2>
+        <div id="map-city-list"></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand colors */
+  --color-ink: #121212;
+  --color-paper: #F5F0EB;
+  --color-mist: #8A8A8A;
+  --color-accent: #8B1A1A;
+  --color-surface: #1C1C1C;
+  --color-surface-2: #242424;
+  --color-border: #2E2E2E;
+  --color-border-light: rgba(255, 255, 255, 0.08);
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+:root {
+  --background: #121212;
+  --foreground: #F5F0EB;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography scale */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Selection */
+::selection {
+  background: #8B1A1A;
+  color: #F5F0EB;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid #8B1A1A;
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1C1C1C;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2E2E;
+  border-radius: 3px;
+}
+
+/* Print styles for documentation pages */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-friendly {
+    page-break-inside: avoid;
+  }
+}

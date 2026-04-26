@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Shield background -->
+  <path d="M90 10L22 40v52c0 40 30 76 68 84 38-8 68-44 68-84V40L90 10z" fill="#0A1628"/>
+  <!-- Shield outer border -->
+  <path d="M90 10L22 40v52c0 40 30 76 68 84 38-8 68-44 68-84V40L90 10z" fill="none" stroke="#8A9BAD" stroke-width="6"/>
+  <!-- Shield inner border -->
+  <path d="M90 28L36 53v39c0 32 24 60 54 67 30-7 54-35 54-67V53L90 28z" fill="none" stroke="#5A7A9A" stroke-width="3" opacity="0.55"/>
+  <!-- Mountain silhouette -->
+  <path d="M38 118 L60 72 L76 95 L90 76 L104 95 L120 72 L142 118 Z" fill="#1A3A6A" opacity="0.9"/>
+  <!-- Mountain snow caps -->
+  <path d="M90 76 L97 91 L83 91 Z" fill="white" opacity="0.9"/>
+  <path d="M120 72 L127 87 L113 87 Z" fill="white" opacity="0.75"/>
+  <!-- Rising bar chart (right side) -->
+  <rect x="108" y="78" width="12" height="40" rx="2" fill="#1E6FCC" opacity="0.9"/>
+  <rect x="124" y="64" width="12" height="54" rx="2" fill="#2B8AE0" opacity="0.9"/>
+  <!-- Green accent wave -->
+  <path d="M38 124 Q56 116 74 124 Q92 132 110 124 Q128 116 142 124" stroke="#7FD416" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Green candlestick bars bottom -->
+  <rect x="42"  y="130" width="8" height="18" rx="2" fill="#5CB800" opacity="0.85"/>
+  <rect x="56"  y="126" width="8" height="22" rx="2" fill="#7FD416" opacity="0.85"/>
+  <rect x="70"  y="132" width="8" height="16" rx="2" fill="#5CB800" opacity="0.85"/>
+  <rect x="84"  y="128" width="8" height="20" rx="2" fill="#7FD416" opacity="0.85"/>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "name": "casaclaro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static CasaClaro site with reproducible Playwright QA tooling.",
+  "scripts": {
+    "qa:responsive": "node qa-nav-check/responsive-qa.mjs",
+    "qa:responsive:edge": "node qa-nav-check/responsive-qa-edge.mjs",
+    "qa:install-browsers": "playwright install chromium firefox webkit"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

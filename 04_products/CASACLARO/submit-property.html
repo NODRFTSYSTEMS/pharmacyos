@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Your Property | CasaClaro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="currency-engine.js"></script>
+  <style>
+    .form-progress { height: 4px; background: var(--latte); margin-bottom: 2rem; border-radius: 2px; overflow: hidden; }
+    .form-progress-bar { height: 100%; background: var(--terracotta); width: 0%; transition: width 0.3s ease; }
+    .form-section { background: white; padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-sm); }
+    .photo-upload { border: 2px dashed var(--latte); border-radius: var(--radius-md); padding: 3rem; text-align: center; cursor: pointer; transition: all 0.3s; }
+    .photo-upload:hover { border-color: var(--terracotta); background: rgba(212, 98, 42, 0.05); }
+    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .preview-item { aspect-ratio: 1; border-radius: var(--radius-md); overflow: hidden; position: relative; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .price-input-wrapper { position: relative; }
+    .currency-toggle { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: var(--cream); border: 1px solid var(--latte); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; cursor: pointer; }
+  </style>
+</head>
+<body data-page="submit-property">
+  <div id="site-header"></div>
+
+  <main style="padding-top: 2rem; padding-bottom: 4rem;">
+    <div class="container" style="max-width: 800px;">
+      <div class="section-header" style="margin-bottom: 2rem;">
+        <span class="section-tag">For Sellers</span>
+        <h1>List Your Property</h1>
+        <p>Reach serious buyers across North America, Europe, and Latin America. No listing fees.</p>
+      </div>
+
+      <div class="form-progress"><div class="form-progress-bar" id="progressBar"></div></div>
+
+      <form id="propertyForm" onsubmit="handleSubmit(event)">
+        <div class="form-section">
+          <h3 style="margin-bottom: 1.5rem; color: var(--terracotta);"><i class="fas fa-home"></i> Property Details</h3>
+
+          <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Property Type</label>
+              <select name="type" required class="form-select" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+                <option value="">Select type...</option>
+                <option value="apartment">Apartment (Apartamento)</option>
+                <option value="house">House (Casa)</option>
+                <option value="penthouse">Penthouse</option>
+                <option value="land">Land (Lote)</option>
+                <option value="commercial">Commercial</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">City</label>
+                <select name="city" required class="form-select" id="citySelect" onchange="updateNeighborhoods(); updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+                  <option value="">Select city...</option>
+                  <option value="medellin">Medell&iacute;n</option>
+                  <option value="bogota">Bogot&aacute;</option>
+                  <option value="cartagena">Cartagena</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Neighborhood</label>
+                <select name="neighborhood" required class="form-select" id="neighborhoodSelect" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+                  <option value="">Select city first...</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Bedrooms</label>
+                <input type="number" name="bedrooms" min="0" class="form-input" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Bathrooms</label>
+                <input type="number" name="bathrooms" min="0" class="form-input" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Area (m&sup2;)</label>
+                <input type="number" name="area" min="1" class="form-input" required onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Asking Price</label>
+            <div class="price-input-wrapper">
+              <input type="number" name="price" id="priceInput" class="form-input" required placeholder="Enter price..." oninput="convertPrice(); updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md); padding-right: 100px;">
+              <button type="button" class="currency-toggle" id="currencyToggle" onclick="toggleCurrency()">USD</button>
+            </div>
+            <div id="priceConversion" style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--coffee);"></div>
+            <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--emerald);">
+              <i class="fas fa-info-circle"></i> Live rate: <span id="rateDisplay">Loading...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 style="margin-bottom: 1.5rem; color: var(--terracotta);"><i class="fas fa-camera"></i> Photos</h3>
+          <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--terracotta); margin-bottom: 1rem;"></i>
+            <p style="margin: 0; font-weight: 600;">Click to upload photos</p>
+            <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--coffee);">Max 10 photos</p>
+            <input type="file" id="photoInput" multiple accept="image/*" style="display: none;" onchange="handlePhotos(this)">
+          </div>
+          <div class="preview-grid" id="photoPreview"></div>
+        </div>
+
+        <div class="form-section">
+          <h3 style="margin-bottom: 1.5rem; color: var(--terracotta);"><i class="fas fa-user"></i> Contact Information</h3>
+          <div style="display: grid; gap: 1rem;">
+            <div>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Full Name</label>
+              <input type="text" name="contactName" required class="form-input" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Email</label>
+                <input type="email" name="email" required class="form-input" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">WhatsApp/Phone</label>
+                <input type="tel" name="phone" required class="form-input" onchange="updateProgress()" style="width: 100%; padding: 0.75rem; border: 2px solid var(--latte); border-radius: var(--radius-md);">
+              </div>
+            </div>
+            <div>
+              <label style="display: flex; align-items: center; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" name="isAgent" style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                I am a licensed real estate agent
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--cream); border: 1px solid var(--latte); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; font-size: 0.8125rem; color: var(--coffee); line-height: 1.6;">
+          <strong><i class="fas fa-shield-alt" style="color: var(--terracotta);"></i> Data Privacy Notice — Colombian Law 1581 of 2012</strong><br>
+          By submitting this form, you authorize CasaClaro (NoDrft Systems) to collect, store, and process your personal data (name, email, phone number, financial information, and uploaded photos) for the purpose of listing your property and connecting you with prospective buyers. Your data will not be sold to third parties. You have the right to access, rectify, or delete your data at any time by contacting <a href="mailto:privacy@casaclaro.co" style="color: var(--terracotta);">privacy@casaclaro.co</a>. Full policy available in our <a href="terms-of-service.html" style="color: var(--terracotta);">Terms of Service</a>.
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">
+          <i class="fas fa-paper-plane"></i> Submit Listing
+        </button>
+
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--coffee);">
+          By submitting, you agree to our <a href="terms-of-service.html" style="color: var(--terracotta);">Terms</a> and 3% commission structure.
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const neighborhoods = {
+      medellin: ['El Poblado', 'Laureles', 'Envigado', 'Sabaneta', 'Estadio', 'Bel\u00e9n', 'Conquistadores'],
+      bogota: ['Chapinero Alto', 'Zona G', 'Parque 93', 'Cedritos', 'Usaqu\u00e9n', 'Chico'],
+      cartagena: ['Centro Hist\u00f3rico', 'Getseman\u00ed', 'Bocagrande', 'Manga', 'Castillogrande', 'Crespo']
+    };
+
+    let currentCurrency = 'USD';
+    let uploadedPhotos = [];
+
+    function updateNeighborhoods() {
+      const city = document.getElementById('citySelect').value;
+      const select = document.getElementById('neighborhoodSelect');
+      select.innerHTML = '<option value="">Select...</option>';
+
+      if (neighborhoods[city]) {
+        neighborhoods[city].forEach(n => {
+          select.innerHTML += `<option value="${n}">${n}</option>`;
+        });
+      }
+    }
+
+    function toggleCurrency() {
+      currentCurrency = currentCurrency === 'USD' ? 'COP' : 'USD';
+      document.getElementById('currencyToggle').textContent = currentCurrency;
+      convertPrice();
+    }
+
+    function convertPrice() {
+      const input = document.getElementById('priceInput');
+      const display = document.getElementById('priceConversion');
+      const rateDisplay = document.getElementById('rateDisplay');
+
+      if (!window.CurrencyEngine || !CurrencyEngine.state.currentRate) {
+        display.textContent = 'Exchange rate loading...';
+        return;
+      }
+
+      const rate = CurrencyEngine.state.currentRate;
+      rateDisplay.textContent = `1 USD = ${rate.toLocaleString('es-CO')} COP`;
+
+      const val = parseFloat(input.value);
+      if (!val) return;
+
+      if (currentCurrency === 'USD') {
+        const cop = val * rate;
+        display.innerHTML = `\u2248 <strong>${new Intl.NumberFormat('es-CO', {style: 'currency', currency: 'COP'}).format(cop)}</strong> COP`;
+      } else {
+        const usd = val / rate;
+        display.innerHTML = `\u2248 <strong>${new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(usd)}</strong> USD`;
+      }
+    }
+
+    function handlePhotos(input) {
+      const files = Array.from(input.files);
+      const preview = document.getElementById('photoPreview');
+
+      files.slice(0, 10).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = 'preview-item';
+          div.innerHTML = `
+            <img src="${e.target.result}">
+            <button type="button" onclick="this.parentElement.remove()" style="position: absolute; top: 5px; right: 5px; background: rgba(231, 76, 60, 0.9); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function updateProgress() {
+      const form = document.getElementById('propertyForm');
+      const inputs = form.querySelectorAll('input[required], select[required]');
+      const filled = Array.from(inputs).filter(i => i.value).length;
+      const percent = (filled / inputs.length) * 100;
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const priceInput = document.getElementById('priceInput');
+      if (currentCurrency === 'COP' && window.CurrencyEngine) {
+        const rate = CurrencyEngine.state.currentRate;
+        priceInput.value = (parseFloat(priceInput.value) / rate).toFixed(2);
+      }
+
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      data.photos = uploadedPhotos.length;
+      data.timestamp = new Date().toISOString();
+      data.exchangeRate = window.CurrencyEngine ? CurrencyEngine.state.currentRate : 4100;
+
+      console.log('Property submission:', data);
+      alert('Property submitted successfully! Our team will contact you within 2 hours.');
+      e.target.reset();
+      document.getElementById('photoPreview').innerHTML = '';
+      document.getElementById('progressBar').style.width = '0%';
+    }
+
+    setTimeout(convertPrice, 1000);
+  </script>
+
+  <div id="site-footer"></div>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

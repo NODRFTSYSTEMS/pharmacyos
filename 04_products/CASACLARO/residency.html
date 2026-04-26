@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CasaClaro Residency | Current Colombia Visa Guidance</title>
+  <meta name="description" content="Current Colombia residency guidance for investor, retiree, and digital nomad pathways.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body data-page="residency">
+  <div id="site-header"></div>
+  <main id="main-content">
+    <section id="residency-hero" class="page-hero compact-hero">
+      <div class="container">
+        <p class="section-kicker">Residency</p>
+        <h1>Current residency and visa guidance for Colombia</h1>
+        <p class="hero-lede">Visa thresholds are tied to Colombia's minimum wage and may change when regulations update. This guide references official Colombian sources and shows the latest review date. Confirm current fees and requirements before filing.</p>
+        <div class="tag-row">
+          <span class="info-pill" id="legal-review-pill">Legal review date loading</span>
+          <span class="info-pill" id="health-review-pill">Healthcare review date loading</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="residency-main" class="section-shell">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">Official-path overview</p>
+          <h2>Current visa cards</h2>
+          <div id="residency-card-grid"></div>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">Eligibility Snapshot</p>
+          <h2>Quick self-check</h2>
+          <form id="visa-calculator-form">
+            <label>Planned investment amount (COP)
+              <input type="number" name="investmentAmount" min="0" step="1000000" inputmode="numeric" autocomplete="off" value="0">
+            </label>
+            <label>Monthly pension income (COP)
+              <input type="number" name="monthlyPension" min="0" step="100000" inputmode="numeric" autocomplete="off" value="0">
+            </label>
+            <button class="btn btn-primary" type="submit">Check Illustrative Fit</button>
+            <div id="visa-result" class="form-feedback" aria-live="polite"></div>
+          </form>
+          <p class="helper-text">Fees can change and may vary by visa type, nationality, and office. Use the official fee checker before filing: <a href="https://www.cancilleria.gov.co/tramites_servicios/visa/costos-medios-pago-oficinas-atencion" target="_blank" rel="noreferrer">Cancilleria visa fee checker</a>.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="residency-guidance" class="section-cream">
+      <div class="container two-column">
+        <article class="panel-card">
+          <p class="section-kicker">Healthcare</p>
+          <h2>Healthcare coverage is the first thing to resolve — before the move, not after</h2>
+          <ul class="check-list">
+            <li>Many foreigners begin with private, prepaid, or international coverage while confirming longer-term eligibility.</li>
+            <li>The official pensionado path requires health coverage and does not automatically grant access to the Colombian social security health system except where bilateral or multilateral agreements apply.</li>
+            <li>For health-complex or specialist-heavy households, Medellin and Bogota usually offer the deepest private-care bench.</li>
+          </ul>
+        </article>
+        <article class="panel-card">
+          <p class="section-kicker">Common mistakes</p>
+          <ul class="check-list">
+            <li>Buying first and trying to reverse-engineer the visa strategy later.</li>
+            <li>Using blog posts or forum threads from 2021–2023 to verify visa thresholds and category names that have since changed.</li>
+            <li>Treating fee screenshots as durable even though official schedules change.</li>
+            <li>Skipping legal counsel on foreign investment registration when the investor path is part of the plan.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="modal-root"></div>
+  <script src="data/cities-data.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

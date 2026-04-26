@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "lastUpdated": "2026-03-29",
+    "version": "2.1",
+    "currency": "USD",
+    "exchangeRateCOP": 4100,
+    "dataSource": "Colombian Real Estate Market Analysis 2024-2025",
+    "updateFrequency": "Quarterly",
+    "legalVerified": "2026-03-29",
+    "healthcareVerified": "2026-03-29",
+    "nextUpdate": "2026-06-29"
+  },
+  "cities": [
+    {
+      "slug": "medellin",
+      "name": "Medellín",
+      "tagline": "City of Eternal Spring",
+      "heroImage": "https://images.unsplash.com/photo-1584799235813-aaf50775698c?w=1920&q=80",
+      "vibe": "Innovative, cosmopolitan, perfect weather",
+      "coordinates": { "lat": 6.2476, "lon": -75.5658 },
+      "walkability": { "score": 78, "description": "Excellent public transport via Metro and MetroCable.", "transit": "Metro system", "bikeFriendly": true },
+      "metrics": { "pricePerSqm": 1850, "roiRange": "8-12%", "rentalYield": 9.2, "appreciationTrend": "+9.5% year-over-year", "closingCostPercent": 4.2, "propertyTaxAnnual": 0.6 },
+      "retireeProfile": { "suitabilityScore": 9.2, "climate": "Spring-like year-round", "healthcareRank": "Excellent", "costOfLiving": "$1,200-1,800/month", "expatCommunity": "Large", "languageEase": "English widely spoken", "safetyRating": "Good" },
+      "healthcare": { "overview": "World-class healthcare", "insurance": "EPS plans start at $80/month", "specialists": "Full range available", "emergency": "Response time 8-12 minutes", "pharmacies": "24hr common" },
+      "introText": { "history": "Transformed from dangerous to innovative.", "investmentAppeal": "Strong rental market", "lifestyle": "Coffee culture meets innovation" },
+      "neighborhoods": [
+        { "name": "El Poblado", "character": "Upscale expat hub", "walkScore": 85, "pricePerSqm": 2200, "description": "Beverly Hills of Medellín. Luxury high-rises." },
+        { "name": "Laureles", "character": "Traditional", "walkScore": 88, "pricePerSqm": 1650, "description": "Tree-lined streets, authentic experience." },
+        { "name": "Envigado", "character": "Suburban family", "walkScore": 72, "pricePerSqm": 1400, "description": "Quieter, strong community." },
+        { "name": "Sabaneta", "character": "Local affordable", "walkScore": 65, "pricePerSqm": 1100, "description": "Traditional pueblo feel." }
+      ],
+      "regulations": { "lastUpdated": "2026-03-29", "airbnb": "Legal with RNT registration", "foreignOwnership": "No restrictions", "propertyTax": "0.5-1% annually", "mortgages": "40-60% LTV available", "residency": "M-10 Investor Visa: $100k" },
+      "repairs": { "handyman": "$15-25/day", "plumber": "$20-40", "electrician": "$25-50", "renovation": "$300-600/m²" },
+      "first30Days": ["Get SIM card", "Open Bancolombia account", "Apply for Cedula", "Get EPS insurance", "Join expat groups"],
+      "goldenAge": { "activities": "Tango, bridge, hiking", "social": "Active community", "assistance": "$800-1200/month" },
+      "rentalMarket": { "avgMonthly2BR": 850, "avgMonthly3BR": 1200, "depositMonths": 1, "leaseTerm": "12 months standard", "furnishedPremium": "15-20%", "expatAreas": ["El Poblado", "Laureles"], "localRates": { "neighborhood": "Sabaneta", "monthly2BR": 450 }, "shortTermRegulations": "Airbnb legal with RNT. 180-day limit proposed." }
+    },
+    {
+      "slug": "bogota",
+      "name": "Bogotá",
+      "tagline": "The Andean Capital",
+      "heroImage": "https://images.unsplash.com/photo-1566342088293-38de2563818d?w=1920&q=80",
+      "vibe": "Cosmopolitan, cultural, business hub",
+      "coordinates": { "lat": 4.711, "lon": -74.0721 },
+      "walkability": { "score": 82, "description": "Excellent in Zona G, Chapinero.", "transit": "TransMilenio", "bikeFriendly": true },
+      "metrics": { "pricePerSqm": 2100, "roiRange": "7-10%", "rentalYield": 8.1, "appreciationTrend": "+6.8% year-over-year", "closingCostPercent": 4.2, "propertyTaxAnnual": 1.0 },
+      "retireeProfile": { "suitabilityScore": 8.4, "climate": "Cool 55-65°F", "healthcareRank": "Excellent - Best in Latin America", "costOfLiving": "$1,400-2,200/month", "expatCommunity": "Large diplomatic presence", "languageEase": "English in business", "safetyRating": "Good with precautions" },
+      "healthcare": { "overview": "Highest concentration of top hospitals", "insurance": "$100-150/month premium", "specialists": "Every specialty", "emergency": "Multiple 24hr ERs", "pharmacies": "Everywhere" },
+      "introText": { "history": "Political and economic heart at 8,660 feet", "investmentAppeal": "Deepest rental market", "lifestyle": "World-class museums, Ciclovía Sundays" },
+      "neighborhoods": [
+        { "name": "Chapinero Alto", "character": "Trendy", "walkScore": 90, "pricePerSqm": 2400, "description": "Cosmopolitan, boutique shopping" },
+        { "name": "Zona G", "character": "Gastronomic", "walkScore": 88, "pricePerSqm": 2800, "description": "Gourmet Zone, historic luxury" },
+        { "name": "Parque 93", "character": "Business", "walkScore": 85, "pricePerSqm": 2600, "description": "Corporate rentals, parks" },
+        { "name": "Cedritos", "character": "Family", "walkScore": 70, "pricePerSqm": 1500, "description": "Newer construction, better value" }
+      ],
+      "regulations": { "lastUpdated": "2026-03-29", "airbnb": "Strictest in Colombia", "foreignOwnership": "No restrictions", "propertyTax": "0.8-1.2%", "mortgages": "Easiest for foreigners", "residency": "Same national rules" },
+      "repairs": { "handyman": "$20-30/day", "plumber": "$30-50", "electrician": "$35-60", "renovation": "$400-800/m²" },
+      "first30Days": ["Acclimate to altitude", "Get RUT from DIAN", "Explore Ciclovía", "Download TransMiSitp", "Register with embassy"],
+      "goldenAge": { "activities": "Theaters, orchestras", "social": "Cultural scene", "assistance": "$1000-1500/month" },
+      "rentalMarket": { "avgMonthly2BR": 1000, "avgMonthly3BR": 1500, "depositMonths": 1, "leaseTerm": "12 months standard", "furnishedPremium": "15-20%", "expatAreas": ["Chapinero", "Zona G"], "localRates": { "neighborhood": "Cedritos", "monthly2BR": 600 }, "shortTermRegulations": "Strict permits required in Chapinero." }
+    },
+    {
+      "slug": "cartagena",
+      "name": "Cartagena",
+      "tagline": "Jewel of the Caribbean",
+      "heroImage": "https://images.unsplash.com/photo-1583995080768-42657321314e?w=1920&q=80",
+      "vibe": "Romantic, tropical, historic",
+      "coordinates": { "lat": 10.391, "lon": -75.4794 },
+      "walkability": { "score": 75, "description": "Excellent in Walled City", "transit": "Taxis and buses", "bikeFriendly": false },
+      "metrics": { "pricePerSqm": 2400, "roiRange": "6-9%", "rentalYield": 7.5, "appreciationTrend": "+7.2% year-over-year", "closingCostPercent": 4.5, "propertyTaxAnnual": 0.8 },
+      "retireeProfile": { "suitabilityScore": 7.8, "climate": "Hot 85°F+", "healthcareRank": "Good - limited specialists", "costOfLiving": "$1,500-2,500/month", "expatCommunity": "Growing European", "languageEase": "Tourist Spanish", "safetyRating": "Good in tourist areas" },
+      "healthcare": { "overview": "Adequate for routine", "insurance": "$80-120/month", "specialists": "Limited", "emergency": "Hospital Bocagrande", "pharmacies": "Plentiful" },
+      "introText": { "history": "Crown jewel of Spanish Empire", "investmentAppeal": "Tourism growth engine", "lifestyle": "Caribbean romance, salsa" },
+      "neighborhoods": [
+        { "name": "Centro Histórico", "character": "Colonial UNESCO", "walkScore": 95, "pricePerSqm": 3200, "description": "16th-17th century luxury" },
+        { "name": "Getsemaní", "character": "Bohemian", "walkScore": 88, "pricePerSqm": 1900, "description": "Street art, best appreciation" },
+        { "name": "Bocagrande", "character": "Beachfront", "walkScore": 70, "pricePerSqm": 2100, "description": "Miami-style high-rises" },
+        { "name": "Manga", "character": "Local authentic", "walkScore": 75, "pricePerSqm": 1200, "description": "Colorful republican homes" }
+      ],
+      "regulations": { "lastUpdated": "2026-03-29", "airbnb": "Encouraged with RNT", "foreignOwnership": "Historic properties need ICAHN approval", "propertyTax": "0.3-1.5%", "mortgages": "Difficult for foreigners", "residency": "Tourism focus helps visas" },
+      "repairs": { "handyman": "$18-28/day", "plumber": "$25-40", "electrician": "$25-40", "renovation": "$350-700/m²" },
+      "first30Days": ["Get used to heat", "Visit Plaza Trinidad", "Boat to Rosario Islands", "Learn salsa", "Cafe del Mar sunset"],
+      "goldenAge": { "activities": "Beach walks, sailing", "social": "European retirees", "assistance": "$700-1000/month" },
+      "rentalMarket": { "avgMonthly2BR": 1200, "avgMonthly3BR": 1800, "depositMonths": 1, "leaseTerm": "12 months standard", "furnishedPremium": "20-25%", "expatAreas": ["Centro", "Getsemaní"], "localRates": { "neighborhood": "Manga", "monthly2BR": 700 }, "shortTermRegulations": "Tourism taxes 1% nightly mandatory." }
+    }
+  ]
+}

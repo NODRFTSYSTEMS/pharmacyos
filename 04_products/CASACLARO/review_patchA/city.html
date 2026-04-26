@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Guide | CasaClaro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles_v2.css">
+  <script src="currency-engine.js"></script>
+  <style>
+    .city-hero { height: 70vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
+    .city-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(44, 36, 27, 0.9) 0%, transparent 60%); }
+    .city-hero-content { position: relative; z-index: 2; padding: 4rem 2rem; color: white; max-width: 1400px; margin: 0 auto; width: 100%; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0; }
+    .metric-card { background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center; border-top: 4px solid var(--terracotta); }
+    .neighborhood-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+    .neighborhood-card { background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); transition: transform 0.3s; }
+    .neighborhood-card:hover { transform: translateY(-4px); }
+    .neighborhood-header { background: var(--cream-dark); padding: 1.5rem; border-bottom: 2px solid var(--latte); }
+    .rental-indicator { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--caribbean); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-left: 1rem; }
+    .rate-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <a href="index_v2.html" class="logo"><img src="../assets/logo.png" alt="CasaClaro" class="brand-logo"></a>
+      <nav class="nav">
+        <a href="index_v2.html" class="nav-link">Home</a>
+        <a href="relocation.html" class="nav-link">Compare Cities</a>
+        <a href="retiree-guide.html" class="nav-link">Retiree Guide</a>
+        <a href="#" class="nav-link active" id="nav-city-name">City</a>
+      </nav>
+      <div id="live-rate-badge" style="margin-left: auto; margin-right: 1rem;"></div>
+    </div>
+  </header>
+
+  <main id="city-content">
+    <div style="text-align: center; padding: 4rem;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--terracotta);"></i>
+      <p>Loading city data...</p>
+    </div>
+  </main>
+
+  <footer style="background: var(--charcoal); color: white; padding: 3rem 0; margin-top: 4rem; text-align: center;">
+    <div class="container"><p>&copy; 2026 CasaClaro. All rates verified live.</p></div>
+  </footer>
+
+  <script>
+    const CityPage = {
+      data: null,
+      city: null,
+
+      async init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const citySlug = urlParams.get('id');
+
+        if (!citySlug) { this.showError('No city specified'); return; }
+
+        try {
+          const response = await fetch('cities_enhanced.json');
+          this.data = await response.json();
+          this.city = this.data.cities.find(c => c.slug === citySlug);
+
+          if (!this.city) { this.showError('City not found'); return; }
+          this.render();
+        } catch (error) {
+          console.error('Error loading city:', error);
+          this.showError('Failed to load city data');
+        }
+      },
+
+      render() {
+        document.title = `${this.city.name} - CasaClaro Real Estate`;
+        document.getElementById('nav-city-name').textContent = this.city.name;
+
+        const rentalBadge = this.city.rentalMarket ? 
+          `<div class="rental-indicator"><i class="fas fa-home"></i> Rentals Available</div>` : '';
+
+        document.getElementById('city-content').innerHTML = `
+          <section class="city-hero" style="background-image: url('${this.city.heroImage}');">
+            <div class="city-hero-content">
+              <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <span style="background: var(--gold); color: var(--charcoal); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.875rem;">${this.city.tagline}</span>
+                ${rentalBadge}
+              </div>
+              <h1 style="font-size: 4rem; margin-bottom: 1rem; color: white;">${this.city.name}</h1>
+              <p style="font-size: 1.25rem; max-width: 600px; opacity: 0.9;">${this.city.vibe}</p>
+              <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <a href="#neighborhoods" class="btn btn-gold">Explore Neighborhoods</a>
+                ${this.city.rentalMarket ? `<a href="#rentals" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">View Rentals</a>` : ''}
+              </div>
+            </div>
+          </section>
+
+          <section class="section" style="background: var(--cream);">
+            <div class="container">
+              <div class="section-header">
+                <span class="section-tag">Market Data</span>
+                <h2>Investment Metrics <span style="font-size: 0.5em; opacity: 0.6;">(Live Rates)</span></h2>
+              </div>
+
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div style="font-size: 2.5rem; color: var(--terracotta); font-weight: 700;" data-usd-price="${this.city.metrics.pricePerSqm}" class="dual-display">$${this.city.metrics.pricePerSqm}</div>
+                  <div style="color: var(--coffee);">Price per m²</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2.5rem; color: var(--terracotta); font-weight: 700;">${this.city.metrics.rentalYield}%</div>
+                  <div style="color: var(--coffee);">Rental Yield</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2.5rem; color: var(--terracotta); font-weight: 700;">${this.city.retireeProfile.suitabilityScore}</div>
+                  <div style="color: var(--coffee);">Retiree Score</div>
+                </div>
+                <div class="metric-card">
+                  <div style="font-size: 2.5rem; color: var(--terracotta); font-weight: 700;">${this.city.walkability.score}</div>
+                  <div style="color: var(--coffee);">Walkability</div>
+                </div>
+              </div>
+
+              <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); margin-top: 3rem; border-left: 4px solid var(--emerald);">
+                <h3 style="color: var(--emerald); margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> Local Market Insight</h3>
+                <p style="margin: 0; color: var(--coffee);">${this.city.introText.investmentAppeal}</p>
+                <div style="margin-top: 1rem; font-size: 0.875rem; color: var(--coffee); opacity: 0.7;">
+                  <i class="fas fa-sync-alt"></i> Data verified: ${new Date(this.data.metadata.lastUpdated).toLocaleDateString('es-CO')}
+                  | Next update: ${new Date(this.data.metadata.nextUpdate).toLocaleDateString('es-CO')}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="neighborhoods" class="section" style="background: white;">
+            <div class="container">
+              <div class="section-header">
+                <span class="section-tag">Micro-Markets</span>
+                <h2>Neighborhoods & Sectores</h2>
+                <p>Drill down to specific barrios. Prices shown in both USD and COP (live rate).</p>
+              </div>
+
+              <div class="neighborhood-grid">
+                ${this.city.neighborhoods.map(n => `
+                  <div class="neighborhood-card">
+                    <div class="neighborhood-header">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h3 style="margin: 0;">${n.name}</h3>
+                        <span style="background: var(--terracotta); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">Walk ${n.walkScore}</span>
+                      </div>
+                      <div style="font-size: 0.875rem; color: var(--coffee);">${n.character}</div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                      <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--terracotta);" data-usd-price="${n.pricePerSqm}" class="dual-display">$${n.pricePerSqm}/m²</div>
+                        <div style="font-size: 0.875rem; color: var(--coffee);">Average listing price</div>
+                      </div>
+                      <p style="color: var(--coffee); font-size: 0.95rem; margin-bottom: 1.5rem;">${n.description}</p>
+                      <a href="submit-property.html?city=${this.city.slug}&neighborhood=${encodeURIComponent(n.name)}" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-user-tie"></i> Connect with Local Agent
+                      </a>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+
+          ${this.city.rentalMarket ? `
+          <section id="rentals" class="section" style="background: var(--cream);">
+            <div class="container">
+              <div class="section-header">
+                <span class="section-tag">Rental Market</span>
+                <h2>Long-Term Rentals</h2>
+                <p>Monthly rates for unfurnished units. Furnished adds 15-20% premium.</p>
+              </div>
+
+              <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                  <div style="text-align: center; padding: 2rem; background: var(--cream); border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; color: var(--caribbean); margin-bottom: 0.5rem;"><i class="fas fa-bed"></i> 2 BR</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;" data-usd-price="${this.city.rentalMarket.avgMonthly2BR}" class="dual-display">$${this.city.rentalMarket.avgMonthly2BR}/mo</div>
+                    <div style="font-size: 0.875rem; color: var(--coffee);">Unfurnished average</div>
+                  </div>
+                  <div style="text-align: center; padding: 2rem; background: var(--cream); border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; color: var(--caribbean); margin-bottom: 0.5rem;"><i class="fas fa-bed"></i> 3 BR</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;" data-usd-price="${this.city.rentalMarket.avgMonthly3BR}" class="dual-display">$${this.city.rentalMarket.avgMonthly3BR}/mo</div>
+                    <div style="font-size: 0.875rem; color: var(--coffee);">Unfurnished average</div>
+                  </div>
+                </div>
+                <div style="margin-top: 2rem; padding: 1rem; background: rgba(14, 165, 199, 0.1); border-radius: var(--radius-md); border-left: 4px solid var(--caribbean);">
+                  <strong><i class="fas fa-info-circle"></i> Local Note:</strong> ${this.city.rentalMarket.leaseTerm} 
+                  Deposits typically ${this.city.rentalMarket.depositMonths} month(s) rent.
+                  <br><small>${this.city.rentalMarket.shortTermRegulations || ''}</small>
+                </div>
+              </div>
+            </div>
+          </section>
+          ` : ''}
+
+          <section class="section" style="background: var(--terracotta); color: white; text-align: center;">
+            <div class="container">
+              <h2 style="color: white; margin-bottom: 1rem;">Ready to Explore ${this.city.name}?</h2>
+              <p style="color: rgba(255,255,255,0.9); margin-bottom: 2rem; font-size: 1.25rem;">
+                Get personalized listings in ${this.city.name} within 2 hours.
+              </p>
+              <a href="submit-property.html?city=${this.city.slug}" class="btn btn-large" style="background: white; color: var(--terracotta);">
+                <i class="fas fa-paper-plane"></i> Get Listings
+              </a>
+            </div>
+          </section>
+        `;
+
+        if (window.CurrencyEngine) CurrencyEngine.updateAllCalculations();
+      },
+
+      showError(msg) {
+        document.getElementById('city-content').innerHTML = `
+          <div style="text-align: center; padding: 4rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error); margin-bottom: 1rem;"></i>
+            <h2>Error</h2>
+            <p>${msg}</p>
+            <a href="index_v2.html" class="btn btn-primary" style="margin-top: 2rem;">Return Home</a>
+          </div>
+        `;
+      }
+    };
+
+    CityPage.init();
+  </script>
+</body>
+</html>

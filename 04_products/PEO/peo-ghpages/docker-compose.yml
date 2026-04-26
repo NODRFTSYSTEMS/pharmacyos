@@ -1,0 +1,63 @@
+# PEO — Peak Equity Optimizer
+# Docker Compose stack: Next.js app + PostgreSQL + optional PGAdmin
+# Usage: docker compose up --build
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: peo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: peo
+      POSTGRES_PASSWORD: peo_dev_pass
+      POSTGRES_DB: peo
+    volumes:
+      - peo_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peo -d peo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: peo-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://peo:peo_dev_pass@db:5432/peo?schema=public"
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:-pk_test_replace_me}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-sk_test_replace_me}
+      RENTCAST_API_KEY: ${RENTCAST_API_KEY:-}
+      NEXT_PUBLIC_DEV_BYPASS: "true"
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npx prisma migrate deploy && node server.js"
+
+  # Optional: PGAdmin for local database inspection
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: peo-pgadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@nodrftsystems.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - peo_pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  peo_pg_data:
+  peo_pgadmin_data:

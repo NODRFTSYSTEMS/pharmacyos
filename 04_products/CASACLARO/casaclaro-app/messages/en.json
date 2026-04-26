@@ -1,0 +1,108 @@
+{
+  "nav": {
+    "home": "Home",
+    "listings": "Listings",
+    "cities": "Cities",
+    "relocation": "Relocation",
+    "residency": "Residency",
+    "forSellers": "For Sellers",
+    "forAgents": "For Agents",
+    "switchLang": "Español"
+  },
+  "metadata": {
+    "siteName": "CasaClaro",
+    "defaultTitle": "CasaClaro | Colombia Property, Rentals & Relocation Intelligence",
+    "defaultDescription": "Bilingual Colombia property and relocation platform for buyers, renters, sellers, expatriates, retirees, brokers, and families. Compare cities, neighborhoods, and vetted listings — and move from research into practical local action.",
+    "listings": {
+      "title": "Current Listings | CasaClaro Colombia",
+      "description": "Browse vetted Colombia property listings for sale and rent across Medellín, Bogotá, Cartagena, and more — each reviewed for title clarity, legal standing, and market value."
+    }
+  },
+  "listings": {
+    "pageTitle": "Current Listings",
+    "pageSubtitle": "Vetted properties across Colombia — reviewed for title clarity, legal standing, and market value.",
+    "showingCount": "Showing {count} of {total} listings",
+    "resetFilters": "Reset Filters",
+    "filters": {
+      "type": "Listing Type",
+      "city": "City",
+      "propertyType": "Property Type",
+      "priceRange": "Price Range",
+      "badgeLevel": "Vetting Level",
+      "all": "All",
+      "sale": "For Sale",
+      "rental": "For Rent",
+      "longTermRental": "Long-Term Rental",
+      "apartment": "Apartment",
+      "house": "House",
+      "penthouse": "Penthouse",
+      "studio": "Studio",
+      "townhouse": "Townhouse",
+      "fullyVetted": "Fully Vetted",
+      "professionalReview": "Professional Review",
+      "basic": "Basic"
+    },
+    "priceRanges": {
+      "sale": {
+        "under100k": "Under $100,000",
+        "100kTo250k": "$100,000 – $250,000",
+        "250kTo500k": "$250,000 – $500,000",
+        "over500k": "Over $500,000"
+      },
+      "rental": {
+        "under1k": "Under $1,000/mo",
+        "1kTo2k": "$1,000 – $2,000/mo",
+        "over2k": "Over $2,000/mo"
+      }
+    },
+    "card": {
+      "forSale": "For Sale",
+      "forRent": "per month",
+      "longTerm": "Long-Term Rental",
+      "beds": "bd",
+      "baths": "ba",
+      "area": "m²",
+      "parking": "parking",
+      "furnished": "Fully Furnished"
+    },
+    "emptyState": {
+      "headingFiltered": "No listings match your filters.",
+      "headingEmpty": "No listings yet.",
+      "bodyFiltered": "Adjust your filters above, or reset to see all available properties.",
+      "bodyEmpty": "New vetted properties are added regularly across Medellín, Bogotá, Cartagena, and Colombia's top relocation cities.",
+      "cta": "Submit a Property"
+    },
+    "syntheticBanner": "Development data — these listings are synthetic and do not represent real properties for sale or rent."
+  },
+  "badge": {
+    "fullyVetted": {
+      "label": "Fully Vetted",
+      "tooltip": "Title is clear, documents legally reviewed, property physically inspected, and HOA rules confirmed by a CasaClaro professional."
+    },
+    "professionalReview": {
+      "label": "Professional Review",
+      "tooltip": "A licensed professional has reviewed key documents. Full physical inspection and vetting is in progress or partially complete."
+    },
+    "basic": {
+      "label": "Basic",
+      "tooltip": "This listing has passed a completeness review. Legal and physical vetting are not yet included — review all documentation independently before proceeding."
+    }
+  },
+  "footer": {
+    "tagline": "Read Colombia clearly. Buy, rent, move, or list with real context.",
+    "exploreHeading": "Explore",
+    "resourcesHeading": "Resources",
+    "companyHeading": "Company",
+    "cities": "Cities",
+    "listings": "Listings",
+    "relocation": "Relocation",
+    "residency": "Residency",
+    "costSimulator": "Cost Simulator",
+    "map": "Map",
+    "guide": "Property Guide",
+    "forSellers": "For Sellers",
+    "forAgents": "For Agents",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 CasaClaro. All rights reserved."
+  }
+}

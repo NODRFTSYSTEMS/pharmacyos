@@ -1,0 +1,637 @@
+<!-- Idea Brief Form — pages/idea-brief.html
+     Route: #/idea-brief
+     Purpose: INTERNAL — minimum-requirement brief to develop a client's idea/product.
+              Used to feed the NoDrftSystems idea development pipeline and test the system.
+     Audience: NoDrftSystems team use only. NOT linked from public nav.
+     Output: Structured JSON brief logged to console for downstream processing.
+     Brand: NoDrftSystems v3.0 — copper labels, teal accent, geometric clip-path buttons.
+-->
+
+<section class="nd-section" aria-labelledby="brief-heading">
+  <div class="nd-wrap-narrow">
+    <p class="nd-label fade-up"
+      data-en="Internal — Idea Development"
+      data-es="Interno — Desarrollo de Idea">Internal — Idea Development</p>
+    <h1 id="brief-heading" class="nd-h1 fade-up"
+      data-en="What's the idea?"
+      data-es="¿Cuál es la idea?">What's the idea?</h1>
+    <p class="nd-lead fade-up"
+      data-en="A short form to capture the minimum information we need to start developing a client's product or idea. Takes 5–7 minutes."
+      data-es="Formulario breve para capturar la información mínima necesaria para desarrollar la idea o producto de un cliente. Toma 5–7 minutos.">
+      A short form to capture the minimum information we need to start developing a client's product or idea. Takes 5–7 minutes.
+    </p>
+    <!-- Internal-use notice -->
+    <aside class="nd-fit-note fade-up fade-d1" style="border-left-color:var(--copper);background:var(--copper-subtle)" aria-label="Internal use notice">
+      <p style="font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:4px">Internal use only</p>
+      <span style="font-size:13px;color:var(--text-md)">This form is for NoDrftSystems team use. Do not share this URL publicly. Submission data is logged locally for pipeline testing.</span>
+    </aside>
+  </div>
+</section>
+
+<section class="nd-section alt" aria-labelledby="brief-heading">
+  <div class="nd-wrap-narrow">
+
+    <style>
+    /* ── Idea Brief form — .ndrf-brief-wrap
+       NoDrftSystems brand tokens v3.0
+       Three-step form: Client + Idea, Features + Constraints, Context + Brief.
+    ── */
+    .ndrf-brief-wrap *{box-sizing:border-box}
+    .ndrf-brief-wrap{font-family:var(--font-sans);max-width:640px;margin:0 auto}
+
+    /* Progress */
+    .ndrf-brief-progress{display:flex;gap:3px;margin-bottom:2rem}
+    .ndrf-brief-seg{height:2px;flex:1;background:var(--border-light);transition:background var(--transition-slow)}
+    .ndrf-brief-seg.done{background:var(--accent)}
+    .ndrf-brief-seg.active{background:var(--copper)}
+
+    /* Step eyebrow */
+    .ndrf-brief-eye{
+      font-family:var(--font-mono);font-size:10px;font-weight:500;
+      letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:0.75rem;line-height:1.4
+    }
+
+    /* Card */
+    .ndrf-brief-card{background:var(--bg-elevated);border:1px solid var(--border-light);padding:1.75rem;display:none}
+    .ndrf-brief-card.active{display:block}
+    .ndrf-brief-card-title{font-size:22px;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:-0.02em;line-height:1.15}
+    .ndrf-brief-card-desc{font-size:13.5px;color:var(--text-md);margin-bottom:1.75rem;line-height:1.65;max-width:520px}
+
+    /* Fields */
+    .ndrf-brief-field{margin-bottom:1.25rem}
+    .ndrf-brief-field>label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.4}
+    .ndrf-brief-field>label .req{color:var(--copper);margin-left:2px}
+    .ndrf-brief-field>label .hint{font-weight:400;color:var(--text-md);margin-left:6px}
+    .ndrf-brief-input{
+      width:100%;font-family:var(--font-sans);font-size:14px;
+      color:var(--ink);background:var(--bg);border:1px solid var(--border);
+      padding:10px 12px;outline:none;border-radius:0;appearance:none;
+      transition:border-color var(--transition),box-shadow var(--transition)
+    }
+    .ndrf-brief-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+    textarea.ndrf-brief-input{resize:vertical;min-height:88px;line-height:1.65}
+    select.ndrf-brief-input{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A8A7E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 12px center;
+      padding-right:36px;background-color:var(--bg);cursor:pointer
+    }
+
+    /* Feature inputs */
+    .ndrf-brief-features{display:flex;flex-direction:column;gap:8px}
+    .ndrf-brief-feature-row{display:flex;align-items:center;gap:8px}
+    .ndrf-brief-feature-num{
+      font-family:var(--font-mono);font-size:10px;font-weight:500;
+      letter-spacing:0.12em;color:var(--copper);min-width:24px;text-align:right;
+      flex-shrink:0
+    }
+    .ndrf-brief-feature-input{flex:1}
+
+    /* Two-col */
+    .ndrf-brief-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    /* Choice tiles */
+    .ndrf-brief-radio-group,.ndrf-brief-check-group{display:flex;flex-direction:column;gap:6px}
+    .ndrf-brief-choice{
+      display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+      padding:10px 12px;border:1px solid var(--border-light);
+      transition:border-color var(--transition),background var(--transition);
+      font-size:13.5px;color:var(--text);line-height:1.5
+    }
+    .ndrf-brief-choice:hover{border-color:var(--accent-border);background:var(--accent-subtle)}
+    .ndrf-brief-choice input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;margin-top:2px}
+    .ndrf-brief-choice.selected{border-color:var(--accent);background:var(--accent-subtle);border-left:2px solid var(--accent)}
+
+    /* Divider */
+    .ndrf-brief-divider{border:none;border-top:1px solid var(--border-light);margin:1.25rem 0}
+
+    /* Nav */
+    .ndrf-brief-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border-light)}
+
+    /* Primary button */
+    .ndrf-brief-btn-next,.ndrf-brief-btn-submit{
+      display:inline-flex;align-items:center;justify-content:center;
+      font-family:var(--font-sans);font-size:13.5px;font-weight:600;
+      padding:11px 28px;min-height:44px;
+      background:var(--accent);color:var(--white);
+      border:none;cursor:pointer;letter-spacing:0.02em;
+      transition:all var(--transition-fast);
+      clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))
+    }
+    .ndrf-brief-btn-next:hover,.ndrf-brief-btn-submit:hover{
+      background:var(--accent-hover);clip-path:polygon(0 0,100% 0,100% 100%,0 100%)
+    }
+    .ndrf-brief-btn-next:active,.ndrf-brief-btn-submit:active{background:var(--accent-active);transform:translateY(1px)}
+
+    /* Ghost back button */
+    .ndrf-brief-btn-back{
+      display:inline-flex;align-items:center;justify-content:center;
+      font-family:var(--font-sans);font-size:13.5px;font-weight:600;
+      padding:11px 24px;min-height:44px;
+      background:none;color:var(--accent);border:1.5px solid var(--accent-border);
+      cursor:pointer;letter-spacing:0.02em;transition:all var(--transition-fast)
+    }
+    .ndrf-brief-btn-back:hover{background:var(--accent-subtle);border-color:var(--accent);color:var(--accent-hover)}
+
+    /* Error */
+    .ndrf-brief-error{font-size:12px;color:var(--error);margin-top:5px}
+
+    /* Confirmation */
+    .ndrf-brief-confirm{background:var(--bg-elevated);border:1px solid var(--accent-border);padding:2.25rem;text-align:center;display:none}
+    .ndrf-brief-confirm.active{display:block}
+    .ndrf-brief-confirm-mark{width:40px;height:40px;background:var(--accent-subtle);border-left:2px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:18px;color:var(--accent)}
+    .ndrf-brief-confirm h2{font-size:22px;font-weight:600;color:var(--ink);margin-bottom:10px;letter-spacing:-0.02em}
+    .ndrf-brief-confirm>p{font-size:14px;color:var(--text-md);line-height:1.7;max-width:440px;margin:0 auto}
+
+    /* Output panel */
+    .ndrf-brief-output-panel{max-width:560px;margin:1.5rem auto 0;text-align:left;border:1px solid var(--border-light);background:var(--bg-alt);border-left:3px solid var(--copper)}
+    .ndrf-brief-output-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border-light)}
+    .ndrf-brief-output-label{font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper)}
+    .ndrf-brief-output-actions{display:flex;gap:8px}
+    .ndrf-brief-copy-btn,.ndrf-brief-dl-btn{
+      font-family:var(--font-mono);font-size:10px;font-weight:500;
+      letter-spacing:0.1em;text-transform:uppercase;
+      padding:5px 12px;border:1px solid var(--accent-border);
+      background:var(--bg-elevated);color:var(--accent);cursor:pointer;
+      transition:all var(--transition-fast)
+    }
+    .ndrf-brief-copy-btn:hover,.ndrf-brief-dl-btn:hover{background:var(--accent-subtle);border-color:var(--accent)}
+    .ndrf-brief-output-body{padding:14px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-md);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:320px;overflow-y:auto}
+    .ndrf-brief-status{font-size:11px;font-family:var(--font-mono);color:var(--text-subtle);margin-top:6px;text-align:center;letter-spacing:0.04em}
+
+    .ndrf-brief-tagline{margin-top:1.5rem;font-size:11px;font-family:var(--font-mono);color:var(--text-subtle);letter-spacing:0.08em;text-transform:uppercase}
+
+    @media(max-width:520px){.ndrf-brief-two-col{grid-template-columns:1fr}}
+    </style>
+
+    <div class="ndrf-brief-wrap">
+
+      <div class="ndrf-brief-progress" id="brief-progress" aria-hidden="true">
+        <div class="ndrf-brief-seg active" id="brief-seg0"></div>
+        <div class="ndrf-brief-seg" id="brief-seg1"></div>
+        <div class="ndrf-brief-seg" id="brief-seg2"></div>
+      </div>
+
+      <!-- ── Step 1: Client + The Idea ── -->
+      <div class="ndrf-brief-card active" id="brief-step0" role="group" aria-labelledby="brief-lbl0">
+        <div class="ndrf-brief-eye">
+          <span id="brief-lbl0">Client &amp; idea</span>
+          <span>1 / 3</span>
+        </div>
+        <h2 class="ndrf-brief-card-title">The client and the idea</h2>
+        <p class="ndrf-brief-card-desc">Who is this for, and what is the idea they're bringing to us?</p>
+
+        <!-- Client basics -->
+        <div class="ndrf-brief-two-col">
+          <div class="ndrf-brief-field">
+            <label for="brief-clientName">Client name <span class="req">*</span></label>
+            <input class="ndrf-brief-input" type="text" id="brief-clientName" placeholder="Full name" autocomplete="name">
+          </div>
+          <div class="ndrf-brief-field">
+            <label for="brief-clientEmail">Client email <span class="req">*</span></label>
+            <input class="ndrf-brief-input" type="email" id="brief-clientEmail" placeholder="email@company.com" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-clientBusiness">Business or organization <span class="req">*</span></label>
+          <input class="ndrf-brief-input" type="text" id="brief-clientBusiness" placeholder="Company or project name" autocomplete="organization">
+        </div>
+
+        <hr class="ndrf-brief-divider">
+
+        <!-- The idea -->
+        <div class="ndrf-brief-field">
+          <label for="brief-ideaTitle">Idea title or working name <span class="req">*</span></label>
+          <input class="ndrf-brief-input" type="text" id="brief-ideaTitle" placeholder="e.g. Pet-sitter booking app, Bakery loyalty program, Contractor job board">
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-ideaDescription">Describe the idea in plain terms <span class="req">*</span></label>
+          <textarea class="ndrf-brief-input" id="brief-ideaDescription" style="min-height:110px"
+            placeholder="What is it? How does it work? Write it like you'd explain it to someone who has never heard of it before. More detail is better here."></textarea>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-problemSolved">What problem does this idea solve? <span class="req">*</span></label>
+          <textarea class="ndrf-brief-input" id="brief-problemSolved"
+            placeholder="What's frustrating, broken, or missing right now that this idea fixes? Who feels that pain?"></textarea>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-targetAudience">Who is this product for? <span class="req">*</span></label>
+          <textarea class="ndrf-brief-input" id="brief-targetAudience" style="min-height:70px"
+            placeholder="Describe the people who would use this — age, role, situation, habits. The more specific the better."></textarea>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-differentiation">What makes this different from what already exists? <span class="hint">(optional but valuable)</span></label>
+          <textarea class="ndrf-brief-input" id="brief-differentiation" style="min-height:70px"
+            placeholder="Are there similar products? What do they get wrong? Why would someone choose this instead?"></textarea>
+        </div>
+
+        <div id="brief-err0" class="ndrf-brief-error" style="display:none" role="alert"></div>
+        <div class="ndrf-brief-nav">
+          <span></span>
+          <button class="ndrf-brief-btn-next" type="button" onclick="briefNext(0)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 2: Features + Constraints ── -->
+      <div class="ndrf-brief-card" id="brief-step1" role="group" aria-labelledby="brief-lbl1">
+        <div class="ndrf-brief-eye">
+          <span id="brief-lbl1">Features &amp; constraints</span>
+          <span>2 / 3</span>
+        </div>
+        <h2 class="ndrf-brief-card-title">What it needs to do — and what it doesn't</h2>
+        <p class="ndrf-brief-card-desc">Define the non-negotiables and the limits. This shapes the brief more than anything else.</p>
+
+        <!-- Must-have features -->
+        <div class="ndrf-brief-field">
+          <label>Top 3 things this must do <span class="req">*</span> <span class="hint">— list the core functions, not the nice-to-haves</span></label>
+          <div class="ndrf-brief-features">
+            <div class="ndrf-brief-feature-row">
+              <span class="ndrf-brief-feature-num">01</span>
+              <input class="ndrf-brief-input ndrf-brief-feature-input" type="text" id="brief-must1" placeholder="The single most important thing it must do">
+            </div>
+            <div class="ndrf-brief-feature-row">
+              <span class="ndrf-brief-feature-num">02</span>
+              <input class="ndrf-brief-input ndrf-brief-feature-input" type="text" id="brief-must2" placeholder="Second most important">
+            </div>
+            <div class="ndrf-brief-feature-row">
+              <span class="ndrf-brief-feature-num">03</span>
+              <input class="ndrf-brief-input ndrf-brief-feature-input" type="text" id="brief-must3" placeholder="Third most important">
+            </div>
+          </div>
+        </div>
+
+        <!-- Nice-to-haves -->
+        <div class="ndrf-brief-field">
+          <label for="brief-niceToHave">Nice-to-have features <span class="hint">(what would be great but isn't required for launch)</span></label>
+          <textarea class="ndrf-brief-input" id="brief-niceToHave" style="min-height:70px"
+            placeholder="e.g. Dark mode, push notifications, multi-language support, analytics dashboard."></textarea>
+        </div>
+
+        <!-- Must NOT include -->
+        <div class="ndrf-brief-field">
+          <label for="brief-mustNotHave">What should this NOT include or do? <span class="hint">(explicit exclusions avoid scope creep)</span></label>
+          <textarea class="ndrf-brief-input" id="brief-mustNotHave" style="min-height:70px"
+            placeholder="e.g. No payments in v1. No user accounts — guest access only. No iOS app, web only for now."></textarea>
+        </div>
+
+        <hr class="ndrf-brief-divider">
+
+        <!-- Technical constraints -->
+        <div class="ndrf-brief-field">
+          <label>Does the client have any technical requirements or preferences? <span class="hint">(check all that apply)</span></label>
+          <div class="ndrf-brief-check-group" id="brief-techFlags">
+            <label class="ndrf-brief-choice"><input type="checkbox" value="must_integrate_existing"> Must connect to existing tools or systems</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="mobile_first"> Must work perfectly on phones / mobile-first</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="offline_support"> Must work without internet (offline mode)</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="multilingual"> Must support more than one language</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="accessibility"> Must meet accessibility standards (screen readers, etc.)</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="no_subscription_tools"> Client does not want to pay ongoing SaaS/tool fees</label>
+            <label class="ndrf-brief-choice"><input type="checkbox" value="owns_the_code"> Client wants to own the full source code</label>
+          </div>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-techNotes">Any other technical notes or hard requirements?</label>
+          <textarea class="ndrf-brief-input" id="brief-techNotes" style="min-height:60px"
+            placeholder="e.g. Must integrate with their Square POS, must be hosted on their existing server, must not use React."></textarea>
+        </div>
+
+        <div id="brief-err1" class="ndrf-brief-error" style="display:none" role="alert"></div>
+        <div class="ndrf-brief-nav">
+          <button class="ndrf-brief-btn-back" type="button" onclick="briefBack(1)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-brief-btn-next" type="button" onclick="briefNext(1)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 3: Context + Brief Output ── -->
+      <div class="ndrf-brief-card" id="brief-step2" role="group" aria-labelledby="brief-lbl2">
+        <div class="ndrf-brief-eye">
+          <span id="brief-lbl2">Context &amp; brief</span>
+          <span>3 / 3</span>
+        </div>
+        <h2 class="ndrf-brief-card-title">Context and next steps</h2>
+        <p class="ndrf-brief-card-desc">A few final details, then we generate the internal brief.</p>
+
+        <div class="ndrf-brief-two-col">
+          <div class="ndrf-brief-field">
+            <label for="brief-timeline">When does the client need this done? <span class="req">*</span></label>
+            <select class="ndrf-brief-input" id="brief-timeline">
+              <option value="">Choose one</option>
+              <option value="asap">As soon as possible</option>
+              <option value="1_month">Within 1 month</option>
+              <option value="1_3_months">1–3 months</option>
+              <option value="3_6_months">3–6 months</option>
+              <option value="6_plus_months">6+ months</option>
+              <option value="no_deadline">No fixed deadline</option>
+            </select>
+          </div>
+          <div class="ndrf-brief-field">
+            <label for="brief-budget">Budget range <span class="req">*</span></label>
+            <select class="ndrf-brief-input" id="brief-budget">
+              <option value="">Choose one</option>
+              <option value="under_5k">Under $5,000</option>
+              <option value="5k_15k">$5,000 – $15,000</option>
+              <option value="15k_30k">$15,000 – $30,000</option>
+              <option value="30k_50k">$30,000 – $50,000</option>
+              <option value="50k_plus">$50,000+</option>
+              <option value="unknown">Not yet determined</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-inspiration">Examples or inspiration <span class="hint">(products, websites, or apps they like)</span></label>
+          <textarea class="ndrf-brief-input" id="brief-inspiration" style="min-height:70px"
+            placeholder="e.g. Something like Airbnb but for storage units. Or the simplicity of the Cash App home screen."></textarea>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-successCriteria">How will we know this idea worked? <span class="req">*</span></label>
+          <textarea class="ndrf-brief-input" id="brief-successCriteria"
+            placeholder="What does success look like in 3–6 months? e.g. 100 paying users, saves staff 3 hours per day, clients stop calling to book."></textarea>
+        </div>
+
+        <div class="ndrf-brief-field">
+          <label for="brief-additionalContext">Anything else we should know before we start developing this? <span class="hint">(optional)</span></label>
+          <textarea class="ndrf-brief-input" id="brief-additionalContext" style="min-height:60px"
+            placeholder="Industry context, competitors, prior failed attempts, internal politics, or anything that might affect the build."></textarea>
+        </div>
+
+        <div class="ndrf-brief-field" style="margin-top:1.25rem">
+          <label class="ndrf-brief-choice" style="border-color:var(--border)">
+            <input type="checkbox" id="brief-consent">
+            <span>I confirm this brief accurately represents the client's idea and I'm authorized to submit it for development planning. <span class="req">*</span></span>
+          </label>
+        </div>
+
+        <div id="brief-err2" class="ndrf-brief-error" style="display:none" role="alert"></div>
+        <div class="ndrf-brief-nav">
+          <button class="ndrf-brief-btn-back" type="button" onclick="briefBack(2)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-brief-btn-submit" type="button" onclick="briefSubmit()"
+            data-en="Generate brief" data-es="Generar brief">Generate brief</button>
+        </div>
+      </div>
+
+      <!-- ── Confirmation + Brief Output ── -->
+      <div class="ndrf-brief-confirm" id="brief-confirmCard" role="status" aria-live="polite">
+        <div class="ndrf-brief-confirm-mark" aria-hidden="true">&#10003;</div>
+        <h2>Idea brief generated</h2>
+        <p>The structured brief is ready. Copy it into your workflow, paste it into the idea development agent, or download it as JSON.</p>
+
+        <div class="ndrf-brief-output-panel">
+          <div class="ndrf-brief-output-panel-head">
+            <span class="ndrf-brief-output-label">Idea brief — internal</span>
+            <div class="ndrf-brief-output-actions">
+              <button class="ndrf-brief-copy-btn" type="button" onclick="briefCopy()">Copy</button>
+              <button class="ndrf-brief-dl-btn" type="button" onclick="briefDownload()">Download JSON</button>
+            </div>
+          </div>
+          <div class="ndrf-brief-output-body" id="brief-outputBody" aria-label="Generated idea brief"></div>
+          <p class="ndrf-brief-status" id="brief-copyStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <p class="ndrf-brief-tagline">Zero Drift. Zero Compromise. Built to Last.</p>
+      </div>
+
+    </div><!-- /.ndrf-brief-wrap -->
+
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  let briefCur = 0;
+  const TOTAL = 3;
+  let lastBrief = null;
+
+  function briefUpdateProgress(step) {
+    for (let i = 0; i < TOTAL; i++) {
+      const s = document.getElementById('brief-seg' + i);
+      if (!s) continue;
+      s.className = i < step ? 'ndrf-brief-seg done' : i === step ? 'ndrf-brief-seg active' : 'ndrf-brief-seg';
+    }
+  }
+
+  function briefShowStep(n) {
+    for (let i = 0; i < TOTAL; i++) {
+      const el = document.getElementById('brief-step' + i);
+      if (el) el.classList.remove('active');
+    }
+    const target = document.getElementById('brief-step' + n);
+    if (target) {
+      target.classList.add('active');
+      const heading = target.querySelector('h2');
+      if (heading) {
+        if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+        requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+      }
+    }
+    briefUpdateProgress(n);
+    briefCur = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function briefVal(id) { const el = document.getElementById(id); return el && el.value.trim() !== ''; }
+  function briefSafe(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function briefChecked(sel) { return Array.from(document.querySelectorAll(sel + ' input[type="checkbox"]:checked')).map(i => i.value); }
+
+  function briefShowErr(step, msg) {
+    const el = document.getElementById('brief-err' + step);
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  function briefValidate(step) {
+    let msg = '';
+    if (step === 0) {
+      if (!briefVal('brief-clientName')) msg = 'Please enter the client name.';
+      else if (!briefVal('brief-clientEmail')) msg = 'Please enter the client email.';
+      else if (!briefVal('brief-clientBusiness')) msg = 'Please enter the business or organization name.';
+      else if (!briefVal('brief-ideaTitle')) msg = 'Please give the idea a title or working name.';
+      else if (!briefVal('brief-ideaDescription')) msg = 'Please describe the idea.';
+      else if (!briefVal('brief-problemSolved')) msg = 'Please describe the problem this idea solves.';
+      else if (!briefVal('brief-targetAudience')) msg = 'Please describe who this product is for.';
+    } else if (step === 1) {
+      if (!briefVal('brief-must1')) msg = 'Please enter at least the first core feature.';
+    } else if (step === 2) {
+      if (!briefVal('brief-timeline')) msg = 'Please select a timeline.';
+      else if (!briefVal('brief-budget')) msg = 'Please select a budget range.';
+      else if (!briefVal('brief-successCriteria')) msg = 'Please describe how success will be measured.';
+      else if (!document.getElementById('brief-consent')?.checked) msg = 'Please check the confirmation box before generating the brief.';
+    }
+    briefShowErr(step, msg);
+    return msg === '';
+  }
+
+  function briefBuildData() {
+    const mustHaves = [briefSafe('brief-must1'), briefSafe('brief-must2'), briefSafe('brief-must3')].filter(Boolean);
+    return {
+      generated_at: new Date().toISOString(),
+      form_version: 'idea-brief-v1',
+      client: {
+        name: briefSafe('brief-clientName'),
+        email: briefSafe('brief-clientEmail'),
+        business: briefSafe('brief-clientBusiness')
+      },
+      idea: {
+        title: briefSafe('brief-ideaTitle'),
+        description: briefSafe('brief-ideaDescription'),
+        problem_solved: briefSafe('brief-problemSolved'),
+        target_audience: briefSafe('brief-targetAudience'),
+        differentiation: briefSafe('brief-differentiation')
+      },
+      requirements: {
+        must_have: mustHaves,
+        nice_to_have: briefSafe('brief-niceToHave'),
+        must_not_include: briefSafe('brief-mustNotHave'),
+        technical_flags: briefChecked('#brief-techFlags'),
+        technical_notes: briefSafe('brief-techNotes')
+      },
+      context: {
+        timeline: briefSafe('brief-timeline'),
+        budget: briefSafe('brief-budget'),
+        inspiration: briefSafe('brief-inspiration'),
+        success_criteria: briefSafe('brief-successCriteria'),
+        additional_context: briefSafe('brief-additionalContext')
+      }
+    };
+  }
+
+  function briefBuildText(data) {
+    const musts = data.requirements.must_have.map((f, i) => ('0' + (i + 1)).slice(-2) + '. ' + f).join('\n');
+    const flags = data.requirements.technical_flags.length ? data.requirements.technical_flags.join(', ') : 'None';
+    return [
+      'NODRFTSYSTEMS — IDEA BRIEF',
+      'Generated: ' + data.generated_at,
+      '',
+      'CLIENT',
+      'Name: ' + data.client.name,
+      'Email: ' + data.client.email,
+      'Business: ' + data.client.business,
+      '',
+      'IDEA',
+      'Title: ' + data.idea.title,
+      '',
+      'Description:',
+      data.idea.description,
+      '',
+      'Problem solved:',
+      data.idea.problem_solved,
+      '',
+      'Target audience:',
+      data.idea.target_audience,
+      '',
+      'Differentiation:',
+      data.idea.differentiation || '(not provided)',
+      '',
+      'MUST-HAVE FEATURES',
+      musts || '(none listed)',
+      '',
+      'NICE-TO-HAVE',
+      data.requirements.nice_to_have || '(none listed)',
+      '',
+      'MUST NOT INCLUDE',
+      data.requirements.must_not_include || '(none listed)',
+      '',
+      'TECHNICAL FLAGS',
+      flags,
+      '',
+      data.requirements.technical_notes ? 'Technical notes:\n' + data.requirements.technical_notes : '',
+      '',
+      'CONTEXT',
+      'Timeline: ' + data.context.timeline,
+      'Budget: ' + data.context.budget,
+      '',
+      'Inspiration:',
+      data.context.inspiration || '(none provided)',
+      '',
+      'Success criteria:',
+      data.context.success_criteria,
+      '',
+      data.context.additional_context ? 'Additional context:\n' + data.context.additional_context : '',
+      '',
+      '---',
+      'NoDrftSystems — Zero Drift. Zero Compromise. Built to Last.'
+    ].filter(line => line !== undefined).join('\n').replace(/\n{3,}/g, '\n\n');
+  }
+
+  function briefDownloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  }
+
+  function briefSlug(value) {
+    return (value || 'idea-brief').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'idea-brief';
+  }
+
+  window.briefNext = function (step) { if (briefValidate(step)) briefShowStep(step + 1); };
+  window.briefBack = function (step) { briefShowStep(step - 1); };
+
+  window.briefSubmit = function () {
+    if (!briefValidate(2)) return;
+    const data = briefBuildData();
+    const text = briefBuildText(data);
+    lastBrief = { data, text };
+
+    console.log('[NoDrft Idea Brief] Generated:', JSON.stringify(data, null, 2));
+
+    const outputEl = document.getElementById('brief-outputBody');
+    if (outputEl) outputEl.textContent = text;
+
+    document.getElementById('brief-step2').classList.remove('active');
+    document.getElementById('brief-progress').style.display = 'none';
+    const confirm = document.getElementById('brief-confirmCard');
+    if (confirm) {
+      confirm.classList.add('active');
+      if (!confirm.hasAttribute('tabindex')) confirm.setAttribute('tabindex', '-1');
+      requestAnimationFrame(() => confirm.focus({ preventScroll: true }));
+    }
+  };
+
+  window.briefCopy = async function () {
+    if (!lastBrief) return;
+    const status = document.getElementById('brief-copyStatus');
+    try {
+      await navigator.clipboard.writeText(lastBrief.text);
+      if (status) { status.textContent = 'Copied to clipboard.'; setTimeout(() => { if (status) status.textContent = ''; }, 2500); }
+    } catch (e) {
+      const el = document.getElementById('brief-outputBody');
+      if (el) { const sel = window.getSelection(); const range = document.createRange(); range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range); document.execCommand('copy'); }
+      if (status) { status.textContent = 'Selected — use Ctrl+C / Cmd+C to copy.'; }
+    }
+  };
+
+  window.briefDownload = function () {
+    if (!lastBrief) return;
+    const slug = briefSlug(lastBrief.data.idea.title || lastBrief.data.client.business);
+    briefDownloadFile(JSON.stringify(lastBrief.data, null, 2), slug + '-idea-brief.json', 'application/json;charset=utf-8');
+  };
+
+  /* Wire radio/checkbox tiles */
+  document.querySelectorAll('.ndrf-brief-wrap .ndrf-brief-choice input[type="checkbox"]').forEach(c => {
+    c.addEventListener('change', function () {
+      this.closest('.ndrf-brief-choice').classList.toggle('selected', this.checked);
+    });
+  });
+
+}());
+</script>

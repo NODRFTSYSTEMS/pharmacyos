@@ -1,0 +1,151 @@
+/* PATCH A ADDITIONS - Add to existing styles_v2.css */
+
+/* Live Rate Badge Styles */
+.rate-badge { 
+  transition: all 0.3s ease; 
+  animation: fadeIn 0.5s ease; 
+}
+
+.rate-stale { 
+  animation: pulseWarning 2s infinite; 
+}
+
+@keyframes pulseWarning { 
+  0%, 100% { opacity: 1; } 
+  50% { opacity: 0.7; } 
+}
+
+.dual-display .primary-currency { 
+  font-weight: 700; 
+  color: var(--terracotta); 
+}
+
+.dual-display .secondary-currency {
+  font-size: 0.875rem;
+  color: var(--coffee);
+}
+
+/* Rental Indicator Badges */
+.rental-badge {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  background: var(--caribbean);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
+/* Neighborhood Cards */
+.neighborhood-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  border: 1px solid var(--latte);
+}
+
+.neighborhood-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--terracotta);
+}
+
+/* Form Progress Bar */
+.form-progress {
+  height: 4px;
+  background: var(--latte);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.form-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Photo Upload Zone */
+.photo-upload {
+  border: 2px dashed var(--latte);
+  border-radius: var(--radius-md);
+  padding: 3rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.photo-upload:hover {
+  border-color: var(--terracotta);
+  background: rgba(212, 98, 42, 0.05);
+}
+
+/* Currency Toggle Button */
+.currency-toggle {
+  background: var(--cream);
+  border: 1px solid var(--latte);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--charcoal);
+  transition: all 0.2s;
+}
+
+.currency-toggle:hover {
+  background: var(--terracotta);
+  color: white;
+  border-color: var(--terracotta);
+}
+
+/* Table of Contents Sticky */
+.toc {
+  background: var(--cream);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--latte);
+}
+
+.toc a {
+  display: block;
+  padding: 0.75rem 0;
+  color: var(--coffee);
+  text-decoration: none;
+  border-bottom: 1px solid var(--latte);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.toc a:hover {
+  color: var(--terracotta);
+}
+
+.toc a i {
+  margin-right: 0.5rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Mobile Responsive for City Pages */
+@media (max-width: 768px) {
+  .city-hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .neighborhood-grid {
+    grid-template-columns: 1fr;
+  }
+}

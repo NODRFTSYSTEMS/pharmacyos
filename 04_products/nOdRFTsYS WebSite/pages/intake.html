@@ -1,0 +1,983 @@
+<!-- Client Intake Form — pages/intake.html
+     Route: #/intake
+     5 steps: About you → Your project → Visual direction → Timeline & budget → Final details
+-->
+
+<section class="nd-section" aria-labelledby="intake-heading">
+  <div class="nd-wrap-narrow">
+    <p class="nd-label fade-up"
+      data-en="New client form"
+      data-es="Formulario de nuevo cliente">New client form</p>
+    <h1 id="intake-heading" class="nd-h1 fade-up"
+      data-en="Tell us about your project"
+      data-es="Cuéntenos sobre su proyecto">
+      Tell us about your project
+    </h1>
+    <p class="nd-lead fade-up"
+      data-en="Takes about 7 minutes. Answer in plain language — no technical terms needed."
+      data-es="Toma unos 7 minutos. Responda en lenguaje sencillo — sin términos técnicos.">
+      Takes about 7 minutes. Answer in plain language — no technical terms needed.
+    </p>
+  </div>
+</section>
+
+<section class="nd-section alt" aria-labelledby="intake-heading">
+  <div class="nd-wrap-narrow">
+
+    <style>
+    .ndrf-intake-wrap *{box-sizing:border-box}
+    .ndrf-intake-wrap{font-family:var(--font-sans);max-width:640px;margin:0 auto}
+
+    .ndrf-progress{display:flex;gap:3px;margin-bottom:2rem}
+    .ndrf-seg{height:2px;flex:1;background:var(--border-light);transition:background var(--transition-slow)}
+    .ndrf-seg.done{background:var(--accent)}
+    .ndrf-seg.active{background:var(--copper)}
+
+    .ndrf-step-eye{
+      font-family:var(--font-mono);font-size:10px;font-weight:500;
+      letter-spacing:0.16em;text-transform:uppercase;
+      color:var(--copper);display:flex;justify-content:space-between;
+      align-items:center;margin-bottom:0.75rem;line-height:1.4
+    }
+
+    .ndrf-card{background:var(--bg-elevated);border:1px solid var(--border-light);padding:1.75rem;display:none}
+    .ndrf-card.active{display:block}
+    .ndrf-card-title{
+      font-family:var(--font-sans);font-size:22px;font-weight:600;
+      color:var(--ink);margin-bottom:6px;letter-spacing:-0.02em;line-height:1.15
+    }
+    .ndrf-card-desc{font-size:13.5px;color:var(--text-md);margin-bottom:1.75rem;line-height:1.65;max-width:520px}
+
+    .ndrf-field{margin-bottom:1.25rem}
+    .ndrf-field>label{
+      display:block;font-family:var(--font-sans);
+      font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.4
+    }
+    .ndrf-field>label .req{color:var(--copper);margin-left:2px}
+    .ndrf-field>label .hint{font-weight:400;color:var(--text-md);margin-left:6px}
+
+    .ndrf-input{
+      width:100%;font-family:var(--font-sans);font-size:14px;
+      color:var(--ink);background:var(--bg);
+      border:1px solid var(--border);padding:10px 12px;
+      outline:none;transition:border-color var(--transition),box-shadow var(--transition);
+      border-radius:0;appearance:none
+    }
+    .ndrf-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+    textarea.ndrf-input{resize:vertical;min-height:88px;line-height:1.65}
+    select.ndrf-input{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A8A7E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 12px center;
+      padding-right:36px;background-color:var(--bg);cursor:pointer
+    }
+
+    .ndrf-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    .ndrf-radio-group{display:flex;flex-direction:column;gap:6px}
+    .ndrf-choice{
+      display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+      padding:10px 12px;border:1px solid var(--border-light);
+      transition:border-color var(--transition),background var(--transition);
+      font-size:13.5px;color:var(--text);line-height:1.5
+    }
+    .ndrf-choice:hover{border-color:var(--accent-border);background:var(--accent-subtle)}
+    .ndrf-choice input{
+      width:15px;height:15px;accent-color:var(--accent);
+      cursor:pointer;flex-shrink:0;margin-top:2px
+    }
+    .ndrf-choice.selected{
+      border-color:var(--accent);background:var(--accent-subtle);
+      border-left:2px solid var(--accent)
+    }
+
+    .ndrf-divider{border:none;border-top:1px solid var(--border-light);margin:1.25rem 0}
+
+    .ndrf-nav{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border-light)
+    }
+
+    .ndrf-btn-next,.ndrf-btn-submit{
+      display:inline-flex;align-items:center;justify-content:center;
+      font-family:var(--font-sans);font-size:13.5px;font-weight:600;
+      padding:11px 28px;min-height:44px;
+      background:var(--accent);color:var(--white);
+      border:none;cursor:pointer;letter-spacing:0.02em;
+      transition:all var(--transition-fast);
+      clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))
+    }
+    .ndrf-btn-next:hover,.ndrf-btn-submit:hover{
+      background:var(--accent-hover);
+      clip-path:polygon(0 0,100% 0,100% 100%,0 100%)
+    }
+    .ndrf-btn-next:active,.ndrf-btn-submit:active{background:var(--accent-active);transform:translateY(1px)}
+
+    .ndrf-btn-back{
+      display:inline-flex;align-items:center;justify-content:center;
+      font-family:var(--font-sans);font-size:13.5px;font-weight:600;
+      padding:11px 24px;min-height:44px;
+      background:none;color:var(--accent);
+      border:1.5px solid var(--accent-border);cursor:pointer;
+      letter-spacing:0.02em;transition:all var(--transition-fast)
+    }
+    .ndrf-btn-back:hover{background:var(--accent-subtle);border-color:var(--accent);color:var(--accent-hover)}
+
+    .ndrf-error{font-size:12px;color:var(--error);margin-top:5px;font-family:var(--font-sans)}
+
+    .ndrf-confirm{
+      background:var(--bg-elevated);border:1px solid var(--accent-border);
+      padding:2.25rem;text-align:center;display:none
+    }
+    .ndrf-confirm.active{display:block}
+    .ndrf-confirm-mark{
+      width:40px;height:40px;background:var(--accent-subtle);
+      border-left:2px solid var(--accent);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1.25rem;font-size:18px;color:var(--accent)
+    }
+    .ndrf-confirm h2{
+      font-family:var(--font-sans);font-size:22px;font-weight:600;
+      color:var(--ink);margin-bottom:10px;letter-spacing:-0.02em
+    }
+    .ndrf-confirm>p{font-size:14px;color:var(--text-md);line-height:1.7;max-width:400px;margin:0 auto}
+    .ndrf-confirm-next{
+      max-width:520px;margin:1.5rem auto 0;padding:1.25rem;
+      border:1px solid var(--border-light);background:var(--bg-alt);
+      text-align:left;border-left:3px solid var(--copper)
+    }
+    .ndrf-confirm-next-label{
+      font-family:var(--font-mono);font-size:10px;font-weight:500;
+      letter-spacing:0.16em;text-transform:uppercase;
+      color:var(--copper);display:block;margin-bottom:0.6rem
+    }
+    .ndrf-confirm-next ul{padding-left:1.1rem;font-size:13.5px;color:var(--text-md);line-height:1.9;list-style:disc}
+    .ndrf-confirm-contact{margin-top:0.85rem;font-size:12.5px;color:var(--text-lt)}
+    .ndrf-confirm-contact a{color:var(--accent)}
+    .ndrf-tagline{
+      margin-top:1.5rem;font-size:11px;font-family:var(--font-mono);
+      color:var(--text-subtle);letter-spacing:0.08em;text-transform:uppercase
+    }
+
+    @media(max-width:520px){.ndrf-two-col{grid-template-columns:1fr}}
+    </style>
+
+    <div class="ndrf-intake-wrap" id="ndrf-wrap">
+
+      <div class="ndrf-progress" id="ndrf-progress" aria-hidden="true">
+        <div class="ndrf-seg active" id="ndrf-seg0"></div>
+        <div class="ndrf-seg" id="ndrf-seg1"></div>
+        <div class="ndrf-seg" id="ndrf-seg2"></div>
+        <div class="ndrf-seg" id="ndrf-seg3"></div>
+        <div class="ndrf-seg" id="ndrf-seg4"></div>
+      </div>
+
+      <!-- ── Step 1: About you ── -->
+      <div class="ndrf-card active" id="ndrf-step0" role="group" aria-labelledby="ndrf-lbl0">
+        <div class="ndrf-step-eye">
+          <span id="ndrf-lbl0"
+            data-en="About you" data-es="Sobre usted">About you</span>
+          <span data-en="1 of 5" data-es="1 de 5">1 of 5</span>
+        </div>
+        <h2 class="ndrf-card-title"
+          data-en="Let's start with the basics"
+          data-es="Empecemos con lo básico">Let's start with the basics</h2>
+        <p class="ndrf-card-desc"
+          data-en="Who you are and how to reach you."
+          data-es="Quién es usted y cómo contactarle.">Who you are and how to reach you.</p>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label for="ndrf-companyName">
+              <span data-en="Business name" data-es="Nombre del negocio">Business name</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="text" id="ndrf-companyName"
+              data-placeholder-en="e.g. Sunrise Accounting"
+              data-placeholder-es="ej. Contabilidad Amanecer"
+              placeholder="e.g. Sunrise Accounting" autocomplete="organization">
+          </div>
+          <div class="ndrf-field">
+            <label for="ndrf-industry">
+              <span data-en="Type of business" data-es="Tipo de negocio">Type of business</span>
+              <span class="req">*</span>
+            </label>
+            <select class="ndrf-input" id="ndrf-industry">
+              <option value="" data-en="Choose one" data-es="Elija uno">Choose one</option>
+              <option>Technology / Software</option>
+              <option>Professional services (law, consulting, finance)</option>
+              <option>Healthcare</option>
+              <option>Financial services</option>
+              <option>Online shop / retail</option>
+              <option>Real estate</option>
+              <option>Education / training</option>
+              <option>Media / content / publishing</option>
+              <option>Non-profit or charity</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="ndrf-divider">
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label for="ndrf-contactName">
+              <span data-en="Your name" data-es="Su nombre">Your name</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="text" id="ndrf-contactName"
+              placeholder="Jane Smith" autocomplete="name">
+          </div>
+          <div class="ndrf-field">
+            <label for="ndrf-contactRole">
+              <span data-en="Your role" data-es="Su cargo">Your role</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="text" id="ndrf-contactRole"
+              data-placeholder-en="e.g. Owner, CEO, Marketing Manager"
+              data-placeholder-es="ej. Dueño, CEO, Gerente de Marketing"
+              placeholder="e.g. Owner, CEO, Marketing Manager" autocomplete="organization-title">
+          </div>
+        </div>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label for="ndrf-contactEmail">
+              <span data-en="Email address" data-es="Correo electrónico">Email address</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="email" id="ndrf-contactEmail"
+              placeholder="jane@yourbusiness.com" autocomplete="email">
+          </div>
+          <div class="ndrf-field">
+            <label for="ndrf-contactPhone">
+              <span data-en="Phone number" data-es="Teléfono">Phone number</span>
+              <span class="hint" data-en="(optional)" data-es="(opcional)">(optional)</span>
+            </label>
+            <input class="ndrf-input" type="tel" id="ndrf-contactPhone"
+              placeholder="+1 (555) 000-0000" autocomplete="tel">
+          </div>
+        </div>
+
+        <div id="ndrf-err0" class="ndrf-error" style="display:none" role="alert"></div>
+        <div class="ndrf-nav">
+          <span></span>
+          <button class="ndrf-btn-next" type="button" onclick="ndrfNext(0)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 2: Your project ── -->
+      <div class="ndrf-card" id="ndrf-step1" role="group" aria-labelledby="ndrf-lbl1">
+        <div class="ndrf-step-eye">
+          <span id="ndrf-lbl1"
+            data-en="Your project" data-es="Su proyecto">Your project</span>
+          <span data-en="2 of 5" data-es="2 de 5">2 of 5</span>
+        </div>
+        <h2 class="ndrf-card-title"
+          data-en="What are you trying to accomplish?"
+          data-es="¿Qué desea lograr?">What are you trying to accomplish?</h2>
+        <p class="ndrf-card-desc"
+          data-en="Describe the project in your own words. No technical terms needed."
+          data-es="Describa el proyecto con sus propias palabras. Sin términos técnicos.">
+          Describe the project in your own words. No technical terms needed.
+        </p>
+
+        <div class="ndrf-field">
+          <label for="ndrf-projectTitle">
+            <span data-en="Give the project a name or short description"
+              data-es="Dé un nombre o descripción breve al proyecto">Give the project a name or short description</span>
+            <span class="req">*</span>
+          </label>
+          <input class="ndrf-input" type="text" id="ndrf-projectTitle"
+            data-placeholder-en="e.g. New website, Booking app, Brand refresh"
+            data-placeholder-es="ej. Nuevo sitio web, App de citas, Renovación de marca"
+            placeholder="e.g. New website, Booking app, Brand refresh">
+        </div>
+
+        <div class="ndrf-field">
+          <label>
+            <span data-en="What kind of help are you looking for?"
+              data-es="¿Qué tipo de ayuda busca?">What kind of help are you looking for?</span>
+            <span class="req">*</span>
+          </label>
+          <div class="ndrf-radio-group" id="ndrf-engagementType">
+            <label class="ndrf-choice">
+              <input type="radio" name="ndrf-engType" value="Foundation">
+              <span data-en="Build something new — a website, app, or system you don't have yet"
+                data-es="Construir algo nuevo — un sitio web, app o sistema que aún no tiene">Build something new — a website, app, or system you don't have yet</span>
+            </label>
+            <label class="ndrf-choice">
+              <input type="radio" name="ndrf-engType" value="Growth">
+              <span data-en="Grow the business — more customers, more visibility, more sales"
+                data-es="Hacer crecer el negocio — más clientes, visibilidad y ventas">Grow the business — more customers, more visibility, more sales</span>
+            </label>
+            <label class="ndrf-choice">
+              <input type="radio" name="ndrf-engType" value="Scale">
+              <span data-en="Improve or expand what you already have"
+                data-es="Mejorar o expandir lo que ya tiene">Improve or expand what you already have</span>
+            </label>
+            <label class="ndrf-choice">
+              <input type="radio" name="ndrf-engType" value="Diagnostic">
+              <span data-en="Get a review — you want expert eyes on what's working and what isn't"
+                data-es="Obtener una revisión — quiere una evaluación experta">Get a review — you want expert eyes on what's working and what isn't</span>
+            </label>
+            <label class="ndrf-choice">
+              <input type="radio" name="ndrf-engType" value="Retainer">
+              <span data-en="Ongoing support — regular help over time, not a one-time project"
+                data-es="Soporte continuo — ayuda regular en el tiempo, no un proyecto único">Ongoing support — regular help over time, not a one-time project</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="ndrf-field">
+          <label for="ndrf-problemStatement">
+            <span data-en="What's the main problem you're trying to solve?"
+              data-es="¿Cuál es el principal problema que desea resolver?">What's the main problem you're trying to solve?</span>
+            <span class="req">*</span>
+          </label>
+          <textarea class="ndrf-input" id="ndrf-problemStatement"
+            data-placeholder-en="Describe what's not working or what's holding your business back right now."
+            data-placeholder-es="Describa qué no funciona o qué frena a su negocio ahora mismo."
+            placeholder="Describe what's not working or what's holding your business back right now."></textarea>
+        </div>
+
+        <div class="ndrf-field">
+          <label for="ndrf-deliverables">
+            <span data-en="What do you want us to build or deliver?"
+              data-es="¿Qué quiere que construyamos o entreguemos?">What do you want us to build or deliver?</span>
+            <span class="req">*</span>
+          </label>
+          <textarea class="ndrf-input" id="ndrf-deliverables"
+            data-placeholder-en="e.g. A 5-page website with a contact form, an online store, a booking system."
+            data-placeholder-es="ej. Un sitio web de 5 páginas con formulario, tienda en línea, sistema de citas."
+            placeholder="e.g. A 5-page website with a contact form, an online store, a booking system."></textarea>
+        </div>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label>
+              <span data-en="How many pages do you think you'll need?"
+                data-es="¿Cuántas páginas cree que necesitará?">How many pages do you think you'll need?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-pageCount">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-pageCount" value="1">
+                <span data-en="Just 1 page" data-es="Solo 1 página">Just 1 page</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-pageCount" value="2–5">
+                <span data-en="2–5 pages" data-es="2–5 páginas">2–5 pages</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-pageCount" value="6–15">
+                <span data-en="6–15 pages" data-es="6–15 páginas">6–15 pages</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-pageCount" value="15+">
+                <span data-en="More than 15" data-es="Más de 15">More than 15</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-pageCount" value="Not sure">
+                <span data-en="Not sure yet" data-es="No estoy seguro aún">Not sure yet</span></label>
+            </div>
+          </div>
+          <div class="ndrf-field">
+            <label>
+              <span data-en="What do you want visitors to do on your site?"
+                data-es="¿Qué quiere que hagan los visitantes en su sitio?">What do you want visitors to do on your site?</span>
+              <span class="req">*</span>
+              <span class="hint" data-en="(primary goal)" data-es="(objetivo principal)">(primary goal)</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-primaryCta">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Form submission">
+                <span data-en="Fill out a contact or inquiry form" data-es="Completar un formulario de contacto">Fill out a contact or inquiry form</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Phone call">
+                <span data-en="Call us" data-es="Llamarnos">Call us</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Purchase">
+                <span data-en="Buy something" data-es="Comprar algo">Buy something</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Booking">
+                <span data-en="Book an appointment" data-es="Reservar una cita">Book an appointment</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Information only">
+                <span data-en="Read or find information" data-es="Leer o encontrar información">Read or find information</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-primaryCta" value="Not sure">
+                <span data-en="Not sure yet" data-es="No estoy seguro aún">Not sure yet</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div id="ndrf-err1" class="ndrf-error" style="display:none" role="alert"></div>
+        <div class="ndrf-nav">
+          <button class="ndrf-btn-back" type="button" onclick="ndrfBack(1)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-btn-next" type="button" onclick="ndrfNext(1)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 3: Visual direction ── -->
+      <div class="ndrf-card" id="ndrf-step2" role="group" aria-labelledby="ndrf-lbl2">
+        <div class="ndrf-step-eye">
+          <span id="ndrf-lbl2"
+            data-en="Look &amp; feel" data-es="Aspecto y estilo">Look &amp; feel</span>
+          <span data-en="3 of 5" data-es="3 de 5">3 of 5</span>
+        </div>
+        <h2 class="ndrf-card-title"
+          data-en="How should it look and feel?"
+          data-es="¿Cómo debe verse y sentirse?">How should it look and feel?</h2>
+        <p class="ndrf-card-desc"
+          data-en="No design experience needed — just describe what feels right for your business."
+          data-es="No necesita experiencia en diseño — solo describa lo que le parece adecuado para su negocio.">
+          No design experience needed — just describe what feels right for your business.
+        </p>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label>
+              <span data-en="What design style fits your brand?"
+                data-es="¿Qué estilo de diseño encaja con su marca?">What design style fits your brand?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-designStyle">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Minimal">
+                <span data-en="Minimal — clean, lots of white space" data-es="Minimalista — limpio, mucho espacio en blanco">Minimal — clean, lots of white space</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Bold">
+                <span data-en="Bold — strong visuals, high contrast" data-es="Audaz — visuales fuertes, alto contraste">Bold — strong visuals, high contrast</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Corporate">
+                <span data-en="Corporate — polished, structured, trust-first" data-es="Corporativo — pulido, estructurado, transmite confianza">Corporate — polished, structured, trust-first</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Playful">
+                <span data-en="Warm &amp; friendly — approachable, conversational" data-es="Cálido y amigable — accesible, conversacional">Warm &amp; friendly — approachable, conversational</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Luxury">
+                <span data-en="Luxury — elevated, premium, refined" data-es="Lujo — elevado, premium, refinado">Luxury — elevated, premium, refined</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-designStyle" value="Not sure">
+                <span data-en="Not sure — open to recommendation" data-es="No estoy seguro — abierto a recomendación">Not sure — open to recommendation</span></label>
+            </div>
+          </div>
+          <div class="ndrf-field">
+            <label>
+              <span data-en="How much movement do you want on the site?"
+                data-es="¿Cuánto movimiento quiere en el sitio?">How much movement do you want on the site?</span>
+              <span class="req">*</span>
+              <span class="hint" data-en="(animations, scroll effects)" data-es="(animaciones, efectos de desplazamiento)">(animations, scroll effects)</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-animPref">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-animPref" value="None">
+                <span data-en="None — clean and static" data-es="Ninguno — limpio y estático">None — clean and static</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-animPref" value="Subtle">
+                <span data-en="Subtle — light transitions only" data-es="Sutil — solo transiciones ligeras">Subtle — light transitions only</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-animPref" value="Moderate">
+                <span data-en="Moderate — some engaging effects" data-es="Moderado — algunos efectos atractivos">Moderate — some engaging effects</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-animPref" value="Full">
+                <span data-en="Full — dynamic, immersive experience" data-es="Completo — experiencia dinámica e inmersiva">Full — dynamic, immersive experience</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label>
+              <span data-en="Do you have professional photos ready?"
+                data-es="¿Tiene fotos profesionales listas?">Do you have professional photos ready?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-photography">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-photography" value="Have it">
+                <span data-en="Yes — professional photos ready to use" data-es="Sí — fotos profesionales listas para usar">Yes — professional photos ready to use</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-photography" value="Need sourcing">
+                <span data-en="No — I'll need help sourcing or shooting them" data-es="No — necesitaré ayuda para conseguirlas o tomarlas">No — I'll need help sourcing or shooting them</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-photography" value="Stock OK">
+                <span data-en="Stock photography is fine" data-es="La fotografía de banco está bien">Stock photography is fine</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-photography" value="Not sure">
+                <span data-en="Not sure yet" data-es="No estoy seguro aún">Not sure yet</span></label>
+            </div>
+          </div>
+          <div class="ndrf-field">
+            <label>
+              <span data-en="Do you need video on the site?"
+                data-es="¿Necesita video en el sitio?">Do you need video on the site?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-videoNeeded">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-videoNeeded" value="Have it">
+                <span data-en="Yes — I have video ready" data-es="Sí — tengo video listo">Yes — I have video ready</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-videoNeeded" value="Need production">
+                <span data-en="Yes — I need video produced" data-es="Sí — necesito producir video">Yes — I need video produced</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-videoNeeded" value="No">
+                <span data-en="No — no video needed" data-es="No — no necesito video">No — no video needed</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-videoNeeded" value="Not sure">
+                <span data-en="Not sure" data-es="No estoy seguro">Not sure</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label>
+              <span data-en="Do you have a logo and brand materials ready?"
+                data-es="¿Tiene logotipo y materiales de marca listos?">Do you have a logo and brand materials ready?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-brandAssets">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-brandAssets" value="Full guidelines">
+                <span data-en="Yes — full logo and brand guidelines" data-es="Sí — logotipo completo y guía de marca">Yes — full logo and brand guidelines</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-brandAssets" value="Logo only">
+                <span data-en="I have a logo but nothing else" data-es="Tengo logotipo pero nada más">I have a logo but nothing else</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-brandAssets" value="Nothing yet">
+                <span data-en="No — I need these created too" data-es="No — también necesito que se creen">No — I need these created too</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-brandAssets" value="Not sure">
+                <span data-en="Not sure what I have" data-es="No estoy seguro de lo que tengo">Not sure what I have</span></label>
+            </div>
+          </div>
+          <div class="ndrf-field">
+            <label>
+              <span data-en="Is your website text written and ready?"
+                data-es="¿Está escrito y listo el texto de su sitio web?">Is your website text written and ready?</span>
+              <span class="req">*</span>
+            </label>
+            <div class="ndrf-radio-group" id="ndrf-copyStatus">
+              <label class="ndrf-choice"><input type="radio" name="ndrf-copyStatus" value="Fully written">
+                <span data-en="Yes — fully written and approved" data-es="Sí — completamente escrito y aprobado">Yes — fully written and approved</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-copyStatus" value="Partially done">
+                <span data-en="Partially — some is done" data-es="Parcialmente — algo está hecho">Partially — some is done</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-copyStatus" value="Not started">
+                <span data-en="No — I'll write it before we start" data-es="No — lo escribiré antes de comenzar">No — I'll write it before we start</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-copyStatus" value="Needs NoDrft">
+                <span data-en="No — I'd like you to write it for us" data-es="No — me gustaría que ustedes lo escriban">No — I'd like you to write it for us</span></label>
+              <label class="ndrf-choice"><input type="radio" name="ndrf-copyStatus" value="Not sure">
+                <span data-en="Not sure yet" data-es="No estoy seguro aún">Not sure yet</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div id="ndrf-err2" class="ndrf-error" style="display:none" role="alert"></div>
+        <div class="ndrf-nav">
+          <button class="ndrf-btn-back" type="button" onclick="ndrfBack(2)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-btn-next" type="button" onclick="ndrfNext(2)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 4: Timeline & budget ── -->
+      <div class="ndrf-card" id="ndrf-step3" role="group" aria-labelledby="ndrf-lbl3">
+        <div class="ndrf-step-eye">
+          <span id="ndrf-lbl3"
+            data-en="Timeline &amp; budget" data-es="Plazo y presupuesto">Timeline &amp; budget</span>
+          <span data-en="4 of 5" data-es="4 de 5">4 of 5</span>
+        </div>
+        <h2 class="ndrf-card-title"
+          data-en="When and what are you working with?"
+          data-es="¿Cuándo y con qué recursos cuenta?">When and what are you working with?</h2>
+        <p class="ndrf-card-desc"
+          data-en="Best guesses are fine. This helps us make sure we can actually help before we get on a call."
+          data-es="Los estimados están bien. Esto nos ayuda a confirmar que podemos ayudarle antes de hablar.">
+          Best guesses are fine. This helps us make sure we can actually help before we get on a call.
+        </p>
+
+        <div class="ndrf-two-col">
+          <div class="ndrf-field">
+            <label for="ndrf-startDate">
+              <span data-en="When would you like to start?"
+                data-es="¿Cuándo le gustaría comenzar?">When would you like to start?</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="text" id="ndrf-startDate"
+              data-placeholder-en="e.g. As soon as possible, or June 2026"
+              data-placeholder-es="ej. Lo antes posible, o junio 2026"
+              placeholder="e.g. As soon as possible, or June 2026">
+          </div>
+          <div class="ndrf-field">
+            <label for="ndrf-endDate">
+              <span data-en="Target completion date"
+                data-es="Fecha estimada de finalización">Target completion date</span>
+              <span class="req">*</span>
+            </label>
+            <input class="ndrf-input" type="text" id="ndrf-endDate"
+              data-placeholder-en="e.g. End of August 2026, or no fixed date"
+              data-placeholder-es="ej. Finales de agosto 2026, o sin fecha fija"
+              placeholder="e.g. End of August 2026, or no fixed date">
+          </div>
+        </div>
+
+        <div class="ndrf-field">
+          <label>
+            <span data-en="Rough budget for this project"
+              data-es="Presupuesto aproximado para este proyecto">Rough budget for this project</span>
+            <span class="req">*</span>
+          </label>
+          <div class="ndrf-radio-group" id="ndrf-budgetRange">
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="Under $2.5K">
+              <span data-en="Under $2,500" data-es="Menos de $2,500">Under $2,500</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="$2.5K–$5K">
+              <span data-en="$2,500 – $5,000" data-es="$2,500 – $5,000">$2,500 – $5,000</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="$5K–$15K">
+              <span data-en="$5,000 – $15,000" data-es="$5,000 – $15,000">$5,000 – $15,000</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="$15K–$30K">
+              <span data-en="$15,000 – $30,000" data-es="$15,000 – $30,000">$15,000 – $30,000</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="$30K–$50K">
+              <span data-en="$30,000 – $50,000" data-es="$30,000 – $50,000">$30,000 – $50,000</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="$50K+">
+              <span data-en="$50,000 or more" data-es="$50,000 o más">$50,000 or more</span></label>
+            <label class="ndrf-choice"><input type="radio" name="ndrf-budget" value="Not disclosed">
+              <span data-en="I'd rather not say right now" data-es="Prefiero no decirlo por ahora">I'd rather not say right now</span></label>
+          </div>
+        </div>
+
+        <div class="ndrf-field">
+          <label>
+            <span data-en="Is this budget approved and ready to go?"
+              data-es="¿Este presupuesto está aprobado y listo?">Is this budget approved and ready to go?</span>
+            <span class="req">*</span>
+          </label>
+          <div class="ndrf-radio-group" id="ndrf-budgetApproved" style="flex-direction:row;gap:8px;flex-wrap:wrap">
+            <label class="ndrf-choice" style="flex:1;min-width:130px"><input type="radio" name="ndrf-budgApprv" value="Yes">
+              <span data-en="Yes, it's set aside" data-es="Sí, está reservado">Yes, it's set aside</span></label>
+            <label class="ndrf-choice" style="flex:1;min-width:130px"><input type="radio" name="ndrf-budgApprv" value="Pending">
+              <span data-en="Still getting approval" data-es="Aún en aprobación">Still getting approval</span></label>
+            <label class="ndrf-choice" style="flex:1;min-width:130px"><input type="radio" name="ndrf-budgApprv" value="No">
+              <span data-en="Not yet" data-es="Todavía no">Not yet</span></label>
+          </div>
+        </div>
+
+        <div id="ndrf-err3" class="ndrf-error" style="display:none" role="alert"></div>
+        <div class="ndrf-nav">
+          <button class="ndrf-btn-back" type="button" onclick="ndrfBack(3)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-btn-next" type="button" onclick="ndrfNext(3)"
+            data-en="Continue" data-es="Continuar">Continue</button>
+        </div>
+      </div>
+
+      <!-- ── Step 5: Final details ── -->
+      <div class="ndrf-card" id="ndrf-step4" role="group" aria-labelledby="ndrf-lbl4">
+        <div class="ndrf-step-eye">
+          <span id="ndrf-lbl4"
+            data-en="Final details" data-es="Detalles finales">Final details</span>
+          <span data-en="5 of 5" data-es="5 de 5">5 of 5</span>
+        </div>
+        <h2 class="ndrf-card-title"
+          data-en="Almost done"
+          data-es="Casi terminamos">Almost done</h2>
+        <p class="ndrf-card-desc"
+          data-en="Two quick questions, then you're done."
+          data-es="Dos preguntas rápidas y habrá terminado.">Two quick questions, then you're done.</p>
+
+        <div class="ndrf-field">
+          <label for="ndrf-decisionMaker">
+            <span data-en="Who makes the final call on this project?"
+              data-es="¿Quién toma la decisión final sobre este proyecto?">Who makes the final call on this project?</span>
+            <span class="req">*</span>
+          </label>
+          <input class="ndrf-input" type="text" id="ndrf-decisionMaker"
+            data-placeholder-en="e.g. Me (Jane Smith, Owner), or our CEO John Doe"
+            data-placeholder-es="ej. Yo (Jane Smith, Dueña), o nuestro CEO John Doe"
+            placeholder="e.g. Me (Jane Smith, Owner), or our CEO John Doe">
+        </div>
+
+        <div class="ndrf-field">
+          <label for="ndrf-commChannel">
+            <span data-en="How do you prefer we stay in touch?"
+              data-es="¿Cómo prefiere que nos mantengamos en contacto?">How do you prefer we stay in touch?</span>
+            <span class="req">*</span>
+          </label>
+          <select class="ndrf-input" id="ndrf-commChannel">
+            <option value="" data-en="Choose one" data-es="Elija uno">Choose one</option>
+            <option data-en="Email" data-es="Correo electrónico">Email</option>
+            <option data-en="Video calls (Zoom or Google Meet)" data-es="Videollamadas (Zoom o Google Meet)">Video calls (Zoom or Google Meet)</option>
+            <option data-en="Phone" data-es="Teléfono">Phone</option>
+            <option data-en="Slack" data-es="Slack">Slack</option>
+            <option data-en="No preference" data-es="Sin preferencia">No preference</option>
+          </select>
+        </div>
+
+        <div class="ndrf-field">
+          <label for="ndrf-additionalNotes">
+            <span data-en="Anything else we should know before we talk?"
+              data-es="¿Algo más que debamos saber antes de hablar?">Anything else we should know before we talk?</span>
+            <span class="hint" data-en="(optional)" data-es="(opcional)">(optional)</span>
+          </label>
+          <textarea class="ndrf-input" id="ndrf-additionalNotes" style="min-height:72px"
+            data-placeholder-en="About your business, past experiences, or what you're hoping for."
+            data-placeholder-es="Sobre su negocio, experiencias previas o lo que espera lograr."
+            placeholder="About your business, past experiences, or what you're hoping for."></textarea>
+        </div>
+
+        <div class="ndrf-field">
+          <label for="ndrf-referralSource">
+            <span data-en="How did you hear about NoDrftSystems?"
+              data-es="¿Cómo se enteró de NoDrftSystems?">How did you hear about NoDrftSystems?</span>
+            <span class="hint" data-en="(optional)" data-es="(opcional)">(optional)</span>
+          </label>
+          <select class="ndrf-input" id="ndrf-referralSource">
+            <option value="" data-en="Choose one" data-es="Elija uno">Choose one</option>
+            <option>Referral — colleague or client</option>
+            <option>LinkedIn</option>
+            <option>Web search</option>
+            <option>Direct outreach from NoDrft</option>
+            <option>Event or conference</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="ndrf-field" style="margin-top:1.25rem">
+          <label class="ndrf-choice" id="ndrf-consentCheck" style="border-color:var(--border)">
+            <input type="checkbox" id="ndrf-consent">
+            <span data-en="I confirm the information I've shared is accurate and I'm the right person to make decisions about this project."
+              data-es="Confirmo que la información que he proporcionado es precisa y que soy la persona adecuada para tomar decisiones sobre este proyecto.">
+              I confirm the information I've shared is accurate and I'm the right person to make decisions about this project.
+            </span>
+            <span class="req">*</span>
+          </label>
+        </div>
+
+        <div id="ndrf-err4" class="ndrf-error" style="display:none" role="alert"></div>
+        <div class="ndrf-nav">
+          <button class="ndrf-btn-back" type="button" onclick="ndrfBack(4)"
+            data-en="Back" data-es="Atrás">Back</button>
+          <button class="ndrf-btn-submit" type="button" onclick="ndrfSubmit()"
+            data-en="Submit my information" data-es="Enviar mi información">Submit my information</button>
+        </div>
+      </div>
+
+      <!-- ── Confirmation ── -->
+      <div class="ndrf-confirm" id="ndrf-confirmCard" role="status" aria-live="polite">
+        <div class="ndrf-confirm-mark" aria-hidden="true">&#10003;</div>
+        <h2 data-en="Thank you — we've got your information."
+            data-es="Gracias — hemos recibido su información.">
+          Thank you — we've got your information.
+        </h2>
+        <p data-en="We'll review what you've shared and reach out within 1–2 business days to schedule a short call. No commitments yet — just a conversation."
+           data-es="Revisaremos lo que compartió y nos pondremos en contacto en 1–2 días hábiles para agendar una llamada. Sin compromisos aún.">
+          We'll review what you've shared and reach out within 1–2 business days to schedule a short call. No commitments yet — just a conversation.
+        </p>
+        <div class="ndrf-confirm-next">
+          <span class="ndrf-confirm-next-label"
+            data-en="What happens next" data-es="Qué pasa después">What happens next</span>
+          <ul>
+            <li data-en="We review your answers carefully." data-es="Revisamos sus respuestas con atención.">We review your answers carefully.</li>
+            <li data-en="We reach out to schedule a short intro call." data-es="Nos comunicamos para agendar una breve llamada.">We reach out to schedule a short intro call.</li>
+            <li data-en="On the call, we answer your questions and walk through the best path forward." data-es="En la llamada respondemos sus preguntas y trazamos el mejor camino.">On the call, we answer your questions and walk through the best path forward.</li>
+            <li data-en="If it's a good fit, we put together a clear plan and quote — no surprises." data-es="Si hay buen ajuste, preparamos un plan claro y cotización sin sorpresas.">If it's a good fit, we put together a clear plan and quote — no surprises.</li>
+          </ul>
+          <p class="ndrf-confirm-contact"
+            data-en="Questions in the meantime? Email info@nodrftsystems.com"
+            data-es="¿Preguntas mientras tanto? Escriba a info@nodrftsystems.com">
+            Questions in the meantime? Email <a href="mailto:info@nodrftsystems.com">info@nodrftsystems.com</a>
+          </p>
+        </div>
+        <p class="ndrf-tagline"
+          data-en="Zero Drift. Zero Compromise. Built to Last."
+          data-es="Cero Desvíos. Cero Compromisos. Construido para Durar.">
+          Zero Drift. Zero Compromise. Built to Last.
+        </p>
+      </div>
+
+    </div><!-- /.ndrf-intake-wrap -->
+
+    <p class="nd-p-xs nd-section-note" style="margin-top:2rem">
+      <strong data-en="Not ready to fill this out yet?" data-es="¿Aún no está listo?">Not ready to fill this out yet?</strong>
+      <span data-en=" Start with a general " data-es=" Comience con una "> Start with a general </span><a href="#/inquiries" data-en="inquiry" data-es="consulta general">inquiry</a><span data-en=" instead." data-es=" en cambio."> instead.</span>
+    </p>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  const TOTAL = 5;
+
+  function ndrfUpdateProgress(step) {
+    for (let i = 0; i < TOTAL; i++) {
+      const s = document.getElementById('ndrf-seg' + i);
+      if (!s) continue;
+      s.className = i < step ? 'ndrf-seg done' : i === step ? 'ndrf-seg active' : 'ndrf-seg';
+    }
+  }
+
+  function ndrfShowStep(n) {
+    for (let i = 0; i < TOTAL; i++) {
+      const el = document.getElementById('ndrf-step' + i);
+      if (el) el.classList.remove('active');
+    }
+    const target = document.getElementById('ndrf-step' + n);
+    if (target) {
+      target.classList.add('active');
+      const heading = target.querySelector('h2');
+      if (heading) {
+        if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+        requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+      }
+    }
+    ndrfUpdateProgress(n);
+
+    const wrap = document.getElementById('ndrf-wrap');
+    if (wrap) {
+      const top = wrap.getBoundingClientRect().top + window.scrollY - 24;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  }
+
+  function ndrfVal(id) { const el = document.getElementById(id); return el && el.value.trim() !== ''; }
+  function ndrfRadio(name) { const c = document.querySelector('input[name="' + name + '"]:checked'); return c ? c.value : ''; }
+  function ndrfSafe(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  function ndrfShowErr(step, msg) {
+    const el = document.getElementById('ndrf-err' + step);
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  function ndrfValidate(step) {
+    let msg = '';
+    if (step === 0) {
+      if (!ndrfVal('ndrf-companyName')) msg = 'Please enter your business name.';
+      else if (!ndrfVal('ndrf-industry')) msg = 'Please select the type of business.';
+      else if (!ndrfVal('ndrf-contactName')) msg = 'Please enter your name.';
+      else if (!ndrfVal('ndrf-contactRole')) msg = 'Please enter your role.';
+      else if (!ndrfVal('ndrf-contactEmail')) msg = 'Please enter a valid email address.';
+    } else if (step === 1) {
+      if (!ndrfVal('ndrf-projectTitle')) msg = 'Please give the project a name or description.';
+      else if (!ndrfRadio('ndrf-engType')) msg = "Please select the type of help you're looking for.";
+      else if (!ndrfVal('ndrf-problemStatement')) msg = 'Please describe the main challenge.';
+      else if (!ndrfVal('ndrf-deliverables')) msg = "Please describe what you'd like us to build or deliver.";
+      else if (!ndrfRadio('ndrf-pageCount')) msg = 'Please select how many pages you need.';
+      else if (!ndrfRadio('ndrf-primaryCta')) msg = 'Please select the primary goal for your site visitors.';
+    } else if (step === 2) {
+      if (!ndrfRadio('ndrf-designStyle')) msg = 'Please select a design style.';
+      else if (!ndrfRadio('ndrf-animPref')) msg = 'Please select an animation preference.';
+      else if (!ndrfRadio('ndrf-photography')) msg = 'Please let us know about your photography situation.';
+      else if (!ndrfRadio('ndrf-videoNeeded')) msg = 'Please let us know if you need video.';
+      else if (!ndrfRadio('ndrf-brandAssets')) msg = 'Please let us know about your brand materials.';
+      else if (!ndrfRadio('ndrf-copyStatus')) msg = 'Please let us know if your copy is ready.';
+    } else if (step === 3) {
+      if (!ndrfVal('ndrf-startDate')) msg = 'Please give us a start date or timeframe.';
+      else if (!ndrfVal('ndrf-endDate')) msg = 'Please give us a target completion date or timeframe.';
+      else if (!ndrfRadio('ndrf-budget')) msg = 'Please select a budget range.';
+      else if (!ndrfRadio('ndrf-budgApprv')) msg = 'Please let us know if your budget is approved.';
+    } else if (step === 4) {
+      if (!ndrfVal('ndrf-decisionMaker')) msg = 'Please tell us who makes the final decision.';
+      else if (!ndrfVal('ndrf-commChannel')) msg = "Please choose how you'd prefer we stay in touch.";
+      else if (!document.getElementById('ndrf-consent')?.checked) msg = 'Please check the confirmation box before submitting.';
+    }
+    ndrfShowErr(step, msg);
+    return msg === '';
+  }
+
+  function ndrfBuildPacket() {
+    const data = {
+      submitted_at: new Date().toISOString(),
+      form_version: 'site-intake-v3',
+      company: { name: ndrfSafe('ndrf-companyName'), industry: ndrfSafe('ndrf-industry') },
+      contact: { name: ndrfSafe('ndrf-contactName'), role: ndrfSafe('ndrf-contactRole'), email: ndrfSafe('ndrf-contactEmail'), phone: ndrfSafe('ndrf-contactPhone') },
+      project: {
+        title: ndrfSafe('ndrf-projectTitle'),
+        engagement_type: ndrfRadio('ndrf-engType'),
+        business_problem: ndrfSafe('ndrf-problemStatement'),
+        deliverables: ndrfSafe('ndrf-deliverables'),
+        page_count: ndrfRadio('ndrf-pageCount'),
+        primary_cta: ndrfRadio('ndrf-primaryCta')
+      },
+      visual: {
+        design_style: ndrfRadio('ndrf-designStyle'),
+        animation_pref: ndrfRadio('ndrf-animPref'),
+        photography: ndrfRadio('ndrf-photography'),
+        video_needed: ndrfRadio('ndrf-videoNeeded'),
+        brand_assets: ndrfRadio('ndrf-brandAssets'),
+        copy_status: ndrfRadio('ndrf-copyStatus')
+      },
+      timeline: { start_date: ndrfSafe('ndrf-startDate'), target_completion: ndrfSafe('ndrf-endDate') },
+      budget: { range: ndrfRadio('ndrf-budget'), approved: ndrfRadio('ndrf-budgApprv') },
+      stakeholders: { decision_maker: ndrfSafe('ndrf-decisionMaker'), communication_channel: ndrfSafe('ndrf-commChannel') },
+      additional: { notes: ndrfSafe('ndrf-additionalNotes'), referral_source: ndrfSafe('ndrf-referralSource') }
+    };
+
+    const flags = [];
+    let score = 100;
+    let needsDiscovery = false;
+    let needsFounder = false;
+    if (data.project.deliverables.length < 25) { score -= 10; needsDiscovery = true; flags.push('Deliverables vague.'); }
+    if (data.project.business_problem.length < 30) { score -= 10; needsDiscovery = true; flags.push('Business problem underdefined.'); }
+    if (data.budget.range === 'Under $2.5K') { score -= 30; flags.push('Budget below service ladder (under $2,500).'); }
+    if (data.budget.range === '$2.5K–$5K') { score -= 10; flags.push('Budget in T1S range — scope to Static Business Site or Discovery Sprint.'); }
+    if (data.budget.range === 'Not disclosed') { score -= 20; needsDiscovery = true; needsFounder = true; flags.push('Budget not disclosed.'); }
+    if (data.budget.approved === 'Pending') { score -= 10; flags.push('Budget pending approval.'); }
+    if (data.budget.approved === 'No') { score -= 20; flags.push('Budget not in place.'); }
+    if (data.project.engagement_type === 'Diagnostic') needsDiscovery = true;
+    if (data.project.engagement_type === 'Scale') { needsFounder = true; flags.push('Scale engagement.'); }
+    if (data.visual.copy_status === 'Not started') flags.push('Copy not started — timeline clock will not start until delivered.');
+    if (data.visual.copy_status === 'Needs NoDrft') flags.push('Copywriting in scope — must be priced as add-on before SOW is signed.');
+    if (data.visual.brand_assets === 'Nothing yet') flags.push('No brand assets — may need brand sprint before build.');
+    if (data.visual.photography === 'Need sourcing') flags.push('Photography not ready — sourcing or shoot required.');
+    if (data.visual.video_needed === 'Need production') flags.push('Video production required — not included in base build tiers.');
+    score = Math.max(score, 0);
+    let recommendation = 'Proceed to scoped proposal';
+    if (score < 60) recommendation = 'Do not quote yet; resolve fit or decline';
+    else if (needsFounder && needsDiscovery) recommendation = 'Founder review + Discovery Sprint required';
+    else if (needsFounder) recommendation = 'Founder review required';
+    else if (needsDiscovery || score < 80) recommendation = 'Discovery Sprint required';
+    data.analysis = { qualification_score: score, recommendation, risk_flags: flags, founder_review_required: needsFounder, discovery_required: needsDiscovery || score < 80 };
+    return data;
+  }
+
+  window.ndrfNext = function (step) { if (ndrfValidate(step)) ndrfShowStep(step + 1); };
+  window.ndrfBack = function (step) { ndrfShowStep(step - 1); };
+  window.ndrfSubmit = function () {
+    if (!ndrfValidate(4)) return;
+    const packet = ndrfBuildPacket();
+    console.log('[NoDrft Intake] Score:', packet.analysis.qualification_score, '| Route:', packet.analysis.recommendation);
+
+    const endpoint = document.querySelector('meta[name="ndrf-form-intake-endpoint"]')?.getAttribute('content') || '';
+    if (endpoint) {
+      const body = new URLSearchParams();
+      body.set('form-kind', 'intake');
+      body.set('name', packet.contact.name);
+      body.set('email', packet.contact.email);
+      body.set('phone', packet.contact.phone || '');
+      body.set('organization', packet.company.name);
+      body.set('industry', packet.company.industry);
+      body.set('offer', packet.project.engagement_type);
+      body.set('challenge', packet.project.business_problem);
+      body.set('objective', packet.project.deliverables);
+      body.set('page_count', packet.project.page_count);
+      body.set('primary_cta', packet.project.primary_cta);
+      body.set('design_style', packet.visual.design_style);
+      body.set('animation_pref', packet.visual.animation_pref);
+      body.set('photography', packet.visual.photography);
+      body.set('video_needed', packet.visual.video_needed);
+      body.set('brand_assets', packet.visual.brand_assets);
+      body.set('copy_status', packet.visual.copy_status);
+      body.set('primary_cta', packet.project.primary_cta);
+      body.set('investmentRange', packet.budget.range);
+      body.set('timeline', packet.timeline.start_date + ' to ' + packet.timeline.target_completion);
+      body.set('message', packet.additional.notes || '');
+      body.set('role', packet.contact.role);
+      body.set('qualification_score', packet.analysis.qualification_score);
+      body.set('recommendation', packet.analysis.recommendation);
+      fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' }, body })
+        .catch(function (e) { console.error('[NoDrft Intake] Delivery failed:', e); });
+    }
+
+    for (let i = 0; i < TOTAL; i++) {
+      const el = document.getElementById('ndrf-step' + i);
+      if (el) el.classList.remove('active');
+    }
+    document.getElementById('ndrf-progress').style.display = 'none';
+    const confirm = document.getElementById('ndrf-confirmCard');
+    if (confirm) {
+      confirm.classList.add('active');
+      if (!confirm.hasAttribute('tabindex')) confirm.setAttribute('tabindex', '-1');
+      requestAnimationFrame(() => confirm.focus({ preventScroll: true }));
+    }
+    if (window.i18n?.apply) window.i18n.apply();
+  };
+
+  function wireChoices() {
+    document.querySelectorAll('.ndrf-intake-wrap .ndrf-choice input[type="radio"]').forEach(function (r) {
+      r.addEventListener('change', function () {
+        document.querySelectorAll('input[name="' + this.name + '"]').forEach(function (i) {
+          i.closest('.ndrf-choice').classList.toggle('selected', i.checked);
+        });
+      });
+    });
+    document.querySelectorAll('.ndrf-intake-wrap #ndrf-consentCheck input[type="checkbox"]').forEach(function (c) {
+      c.addEventListener('change', function () {
+        this.closest('.ndrf-choice').classList.toggle('selected', this.checked);
+      });
+    });
+  }
+  wireChoices();
+}());
+</script>
