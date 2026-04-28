@@ -53,5 +53,9 @@ export default async function ListingDetailPage({ params }: Props) {
   const listing = SYNTHETIC_LISTINGS.find((l) => l.slug === slug);
   if (!listing) notFound();
 
-  return <ListingDetail listing={listing} />;
+  const similarListings = SYNTHETIC_LISTINGS.filter(
+    (l) => l.slug !== slug && l.city === listing.city
+  ).slice(0, 3);
+
+  return <ListingDetail listing={listing} similarListings={similarListings} />;
 }

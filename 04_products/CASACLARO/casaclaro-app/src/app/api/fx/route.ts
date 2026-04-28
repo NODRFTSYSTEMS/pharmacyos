@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { SITE_CONFIG } from "@/config/site.config";
 
 const FALLBACK_RATES = {
   USD: 1,
@@ -8,7 +9,7 @@ const FALLBACK_RATES = {
   AUD: 1.62,
   MXN: 17.5,
   BRL: 5.86,
-  COP: 4100,
+  COP: SITE_CONFIG.fx_fallback_cop_per_usd,
 };
 
 const FX_API =

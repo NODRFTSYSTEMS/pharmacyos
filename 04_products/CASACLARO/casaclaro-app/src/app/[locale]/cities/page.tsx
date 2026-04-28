@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { CITIES } from "@/data/cities.data";
 import { CurrencyConverter } from "@/components/CurrencyConverter";
 import { EmailCapture } from "@/components/EmailCapture";
+import { WeatherBadge } from "@/components/WeatherBadge";
 import type { City } from "@/types/cities";
 
 const ColombiaMap = dynamic(
@@ -115,12 +116,17 @@ function CityCard({
           </div>
           <div
             style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              flexWrap: "wrap",
               fontSize: "0.78rem",
               color: "var(--muted, #6b7280)",
               fontFamily: "var(--font-body, system-ui)",
             }}
           >
-            {city.department} · {city.elevationM.toLocaleString()} m
+            <span>{city.department} · {city.elevationM.toLocaleString()} m</span>
+            <WeatherBadge lat={city.lat} lng={city.lng} avgTempC={city.avgTempC} locale={loc} />
           </div>
         </div>
       </div>
@@ -560,16 +566,21 @@ export default function CitiesPage() {
               >
                 {selectedCity.name}
               </h2>
-              <p
+              <div
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
                   fontSize: "0.8rem",
                   color: "var(--muted, #6b7280)",
                   margin: "0 0 12px",
                   fontFamily: "var(--font-body, system-ui)",
                 }}
               >
-                {selectedCity.department} · {selectedCity.elevationM.toLocaleString()} m
-              </p>
+                <span>{selectedCity.department} · {selectedCity.elevationM.toLocaleString()} m</span>
+                <WeatherBadge lat={selectedCity.lat} lng={selectedCity.lng} avgTempC={selectedCity.avgTempC} locale={loc} />
+              </div>
               <p
                 style={{
                   fontSize: "0.85rem",

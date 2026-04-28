@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SITE_CONFIG } from "@/config/site.config";
 
 interface FxSnapshot {
   rate: number;
@@ -40,7 +41,7 @@ export function CurrencyWidget({ initial, locale = "en", variant = "footer" }: C
       fetch("/api/fx")
         .then((r) => r.json())
         .then((data: { rate?: number; copRate?: number; source: "live" | "fallback"; updatedAt: string }) => {
-          setFx({ rate: data.copRate ?? data.rate ?? 4100, source: data.source, updatedAt: data.updatedAt });
+          setFx({ rate: data.copRate ?? data.rate ?? SITE_CONFIG.fx_fallback_cop_per_usd, source: data.source, updatedAt: data.updatedAt });
         })
         .catch(() => {/* keep initial */})
         .finally(() => setLoading(false));

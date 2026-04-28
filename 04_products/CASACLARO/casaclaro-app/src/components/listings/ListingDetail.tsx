@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { VettedBadge } from "@/components/listings/VettedBadge";
 import type { Listing } from "@/types/listings";
 
 interface Props {
   listing: Listing;
+  similarListings?: Listing[];
 }
 
 const LISTING_TYPE_LABEL: Record<string, { en: string; es: string }> = {
@@ -22,7 +25,120 @@ const PROPERTY_TYPE_LABEL: Record<string, { en: string; es: string }> = {
   townhouse: { en: "Townhouse", es: "Casa Adosada" },
 };
 
-export function ListingDetail({ listing }: Props) {
+function InquiryForm({ listing, locale }: { listing: Listing; locale: "en" | "es" }) {
+  const isEn = locale === "en";
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.email.includes("@") || !form.name.trim()) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "inquiry",
+          listing_slug: listing.slug,
+          listing_city: listing.city,
+          listing_neighborhood: listing.neighborhood,
+          listing_price_usd: String(listing.price_usd),
+          ...form,
+        }),
+      });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "sent") {
+    return (
+      <div style={{ padding: "20px", background: "rgba(31,143,89,0.08)", borderRadius: "16px", textAlign: "center" }}>
+        <p style={{ fontSize: "0.88rem", color: "var(--emerald-deep, #1f8f59)", fontWeight: 600, margin: "0 0 4px", fontFamily: "var(--font-body, system-ui)" }}>
+          {isEn ? "Inquiry sent." : "Consulta enviada."}
+        </p>
+        <p style={{ fontSize: "0.8rem", color: "rgba(31,58,77,0.6)", margin: 0, fontFamily: "var(--font-body, system-ui)" }}>
+          {isEn ? "We'll respond within 24–48 hours." : "Responderemos en 24–48 horas."}
+        </p>
+      </div>
+    );
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "10px 14px",
+    border: "1px solid rgba(31,58,77,0.15)",
+    borderRadius: "12px",
+    fontSize: "0.85rem",
+    fontFamily: "var(--font-body, system-ui)",
+    color: "var(--ocean, #1f3a4d)",
+    background: "white",
+    boxSizing: "border-box",
+    outline: "none",
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <input
+        type="text"
+        placeholder={isEn ? "Your name" : "Tu nombre"}
+        value={form.name}
+        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+        required
+        style={inputStyle}
+        aria-label={isEn ? "Your name" : "Tu nombre"}
+      />
+      <input
+        type="email"
+        placeholder={isEn ? "Email address" : "Correo electrónico"}
+        value={form.email}
+        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+        required
+        style={inputStyle}
+        aria-label={isEn ? "Email address" : "Correo electrónico"}
+      />
+      <textarea
+        placeholder={isEn ? "Questions about this property…" : "Preguntas sobre esta propiedad…"}
+        value={form.message}
+        onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+        rows={3}
+        style={{ ...inputStyle, resize: "vertical" }}
+        aria-label={isEn ? "Message" : "Mensaje"}
+      />
+      {status === "error" && (
+        <p style={{ fontSize: "0.78rem", color: "#c0392b", margin: 0, fontFamily: "var(--font-body, system-ui)" }}>
+          {isEn ? "Something went wrong. Try again or email hello@casaclaro.co." : "Algo falló. Intenta de nuevo o escribe a hello@casaclaro.co."}
+        </p>
+      )}
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        style={{
+          padding: "13px 20px",
+          background: status === "sending" ? "rgba(230,126,34,0.5)" : "var(--terracotta, #e67e22)",
+          color: "white",
+          border: "none",
+          borderRadius: "999px",
+          fontWeight: 600,
+          fontSize: "0.88rem",
+          cursor: status === "sending" ? "not-allowed" : "pointer",
+          fontFamily: "var(--font-body, system-ui)",
+        }}
+      >
+        {status === "sending"
+          ? (isEn ? "Sending…" : "Enviando…")
+          : (isEn ? "Send Inquiry" : "Enviar Consulta")}
+      </button>
+      <p style={{ fontSize: "0.7rem", color: "rgba(31,58,77,0.35)", textAlign: "center", margin: 0, fontFamily: "var(--font-body, system-ui)" }}>
+        {isEn ? "No spam. Response within 24–48 hours." : "Sin spam. Respuesta en 24–48 horas."}
+      </p>
+    </form>
+  );
+}
+
+export function ListingDetail({ listing, similarListings = [] }: Props) {
   const locale = useLocale() as "en" | "es";
   const isEn = locale === "en";
 
@@ -442,39 +558,8 @@ export function ListingDetail({ listing }: Props) {
               ))}
             </ul>
 
-            {/* CTA */}
-            <a
-              href={`mailto:hello@casaclaro.co?subject=Inquiry: ${listing.slug}&body=I'm interested in ${listing.neighborhood}, ${listing.city} (${listing.slug}).`}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "14px 20px",
-                background: "var(--terracotta, #e67e22)",
-                color: "white",
-                borderRadius: "999px",
-                textAlign: "center",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                textDecoration: "none",
-                fontFamily: "var(--font-body, system-ui)",
-                boxSizing: "border-box",
-                marginBottom: "10px",
-              }}
-            >
-              {isEn ? "Request Information" : "Solicitar Información"}
-            </a>
-
-            <p
-              style={{
-                fontSize: "0.72rem",
-                color: "rgba(31,58,77,0.35)",
-                textAlign: "center",
-                margin: 0,
-                fontFamily: "var(--font-body, system-ui)",
-              }}
-            >
-              {isEn ? "Response within 24–48 hours" : "Respuesta en 24–48 horas"}
-            </p>
+            {/* Inline inquiry form */}
+            <InquiryForm listing={listing} locale={locale} />
           </div>
 
           {/* Explore cities CTA */}
@@ -525,15 +610,129 @@ export function ListingDetail({ listing }: Props) {
         </div>
       </div>
 
+      {/* Similar Listings */}
+      {similarListings.length > 0 && (
+        <div
+          style={{
+            maxWidth: "var(--max, 1240px)",
+            margin: "0 auto",
+            padding: "0 20px 80px",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-display, Georgia, serif)",
+              fontSize: "1.5rem",
+              fontWeight: 400,
+              color: "var(--ocean, #1f3a4d)",
+              margin: "0 0 24px",
+            }}
+          >
+            {isEn ? "Similar Properties" : "Propiedades Similares"}
+          </h2>
+          <div
+            className="similar-listings-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "20px",
+            }}
+          >
+            {similarListings.slice(0, 3).map((s) => {
+              const img = s.images.find((i) => i.is_primary) ?? s.images[0];
+              const sPrice =
+                s.listing_type === "sale"
+                  ? `$${s.price_usd.toLocaleString()} USD`
+                  : `$${s.price_usd.toLocaleString()} / ${isEn ? "mo" : "mes"}`;
+              return (
+                <Link
+                  key={s.slug}
+                  href={`/listings/${s.slug}` as "/"}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div
+                    style={{
+                      background: "white",
+                      borderRadius: "var(--radius, 26px)",
+                      overflow: "hidden",
+                      boxShadow: "0 2px 12px rgba(31,58,77,0.07)",
+                      transition: "transform 0.15s, box-shadow 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = "0 6px 24px rgba(31,58,77,0.13)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.transform = "";
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(31,58,77,0.07)";
+                    }}
+                  >
+                    <div style={{ aspectRatio: "4/3", overflow: "hidden" }}>
+                      <img
+                        src={img.url}
+                        alt={img.alt}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      />
+                    </div>
+                    <div style={{ padding: "16px" }}>
+                      <p
+                        style={{
+                          fontSize: "0.68rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.07em",
+                          textTransform: "uppercase",
+                          color: "rgba(31,58,77,0.4)",
+                          margin: "0 0 4px",
+                          fontFamily: "var(--font-body, system-ui)",
+                        }}
+                      >
+                        {s.neighborhood}, {s.city}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "var(--font-display, Georgia, serif)",
+                          fontSize: "1.1rem",
+                          fontWeight: 400,
+                          color: "var(--ocean, #1f3a4d)",
+                          margin: "0 0 6px",
+                        }}
+                      >
+                        {sPrice}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "0.78rem",
+                          color: "rgba(31,58,77,0.5)",
+                          margin: 0,
+                          fontFamily: "var(--font-body, system-ui)",
+                        }}
+                      >
+                        {s.bedrooms} {isEn ? "bd" : "hab"} · {s.bathrooms} {isEn ? "ba" : "baños"} · {s.area_sqm} m²
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <style>{`
         @media (max-width: 900px) {
           .listing-detail-grid {
             grid-template-columns: 1fr !important;
           }
+          .similar-listings-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
         }
         @media (max-width: 600px) {
           .specs-grid {
             grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .similar-listings-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>

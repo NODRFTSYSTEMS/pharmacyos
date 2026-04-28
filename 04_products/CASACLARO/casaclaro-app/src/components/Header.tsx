@@ -10,7 +10,8 @@ const navLinks = [
   { href: "/cities", labelEn: "Cities", labelEs: "Ciudades" },
   { href: "/relocation", labelEn: "Relocate", labelEs: "Reubicarse" },
   { href: "/partners", labelEn: "Partners", labelEs: "Socios" },
-  { href: "/guide", labelEn: "Property Guide", labelEs: "Guía de Propiedad" },
+  { href: "/guide", labelEn: "Guide", labelEs: "Guía" },
+  { href: "/faq", labelEn: "FAQ", labelEs: "FAQ" },
 ];
 
 interface HeaderProps {

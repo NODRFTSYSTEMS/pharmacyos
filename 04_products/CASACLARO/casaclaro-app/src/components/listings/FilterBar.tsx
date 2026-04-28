@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { DEFAULT_FILTERS } from "@/types/listings";
 import type { ListingFilters } from "@/types/listings";
 
@@ -139,70 +140,47 @@ function encodePriceRange(min: number | null, max: number | null): string {
   return `${min ?? 0}-${max ?? 99999999}`;
 }
 
-export function FilterBar({ filters, cities, onChange, locale = "en" }: FilterBarProps) {
-  const t = labels[locale];
+function activeFilterCount(filters: ListingFilters): number {
+  let n = 0;
+  if (filters.listing_type !== "all") n++;
+  if (filters.city_slug !== "all") n++;
+  if (filters.property_type !== "all") n++;
+  if (filters.price_min !== null || filters.price_max !== null) n++;
+  if (filters.vetting_level !== "all") n++;
+  return n;
+}
 
-  function update(patch: Partial<ListingFilters>) {
-    onChange({ ...filters, ...patch });
-  }
-
+function SelectRow({
+  t,
+  filters,
+  cities,
+  update,
+  onChange,
+}: {
+  t: (typeof labels)["en"];
+  filters: ListingFilters;
+  cities: { slug: string; label: string }[];
+  update: (p: Partial<ListingFilters>) => void;
+  onChange: (f: ListingFilters) => void;
+}) {
   return (
-    <div
-      data-testid="filter-bar"
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "10px",
-        alignItems: "center",
-        padding: "16px 20px",
-        background: "var(--sand, #fff8ef)",
-        borderRadius: "var(--radius, 26px)",
-        border: "1px solid var(--border, rgba(35,49,63,0.08))",
-      }}
-    >
-      {/* Listing type */}
-      <select
-        aria-label={t.listingType}
-        value={filters.listing_type}
-        style={selectStyle}
-        onChange={(e) =>
-          update({
-            listing_type: e.target.value as ListingFilters["listing_type"],
-            price_min: null,
-            price_max: null,
-          })
-        }
-      >
+    <>
+      <select aria-label={t.listingType} value={filters.listing_type} style={selectStyle}
+        onChange={(e) => update({ listing_type: e.target.value as ListingFilters["listing_type"], price_min: null, price_max: null })}>
         <option value="all">{t.allTypes}</option>
         <option value="sale">{t.forSale}</option>
         <option value="rental">{t.forRent}</option>
         <option value="long_term_rental">{t.longTerm}</option>
       </select>
 
-      {/* City */}
-      <select
-        aria-label={t.city}
-        value={filters.city_slug}
-        style={selectStyle}
-        onChange={(e) => update({ city_slug: e.target.value })}
-      >
+      <select aria-label={t.city} value={filters.city_slug} style={selectStyle}
+        onChange={(e) => update({ city_slug: e.target.value })}>
         <option value="all">{t.allCities}</option>
-        {cities.map((c) => (
-          <option key={c.slug} value={c.slug}>
-            {c.label}
-          </option>
-        ))}
+        {cities.map((c) => <option key={c.slug} value={c.slug}>{c.label}</option>)}
       </select>
 
-      {/* Property type */}
-      <select
-        aria-label={t.propertyType}
-        value={filters.property_type}
-        style={selectStyle}
-        onChange={(e) =>
-          update({ property_type: e.target.value as ListingFilters["property_type"] })
-        }
-      >
+      <select aria-label={t.propertyType} value={filters.property_type} style={selectStyle}
+        onChange={(e) => update({ property_type: e.target.value as ListingFilters["property_type"] })}>
         <option value="all">{t.allProperties}</option>
         <option value="apartment">{t.apartment}</option>
         <option value="house">{t.house}</option>
@@ -211,50 +189,140 @@ export function FilterBar({ filters, cities, onChange, locale = "en" }: FilterBa
         <option value="townhouse">{t.townhouse}</option>
       </select>
 
-      {/* Price range */}
-      <select
-        aria-label={t.price}
-        value={encodePriceRange(filters.price_min, filters.price_max)}
-        style={selectStyle}
-        onChange={(e) => update(parsePriceRange(e.target.value))}
-      >
+      <select aria-label={t.price} value={encodePriceRange(filters.price_min, filters.price_max)} style={selectStyle}
+        onChange={(e) => update(parsePriceRange(e.target.value))}>
         {priceOptions(t, filters.listing_type)}
       </select>
 
-      {/* Vetting level */}
-      <select
-        aria-label={t.vettingLevel}
-        value={filters.vetting_level}
-        style={selectStyle}
-        onChange={(e) =>
-          update({ vetting_level: e.target.value as ListingFilters["vetting_level"] })
-        }
-      >
+      <select aria-label={t.vettingLevel} value={filters.vetting_level} style={selectStyle}
+        onChange={(e) => update({ vetting_level: e.target.value as ListingFilters["vetting_level"] })}>
         <option value="all">{t.allLevels}</option>
         <option value="fully_vetted">{t.fullyVetted}</option>
         <option value="professional_review">{t.professionalReview}</option>
         <option value="basic">{t.basic}</option>
       </select>
 
-      {/* Reset */}
-      <button
-        type="button"
-        onClick={() => onChange(DEFAULT_FILTERS)}
-        style={{
-          background: "transparent",
-          border: "1px solid var(--terracotta, #e67e22)",
-          color: "var(--terracotta, #e67e22)",
-          borderRadius: "999px",
-          padding: "8px 16px",
-          fontSize: "0.82rem",
-          fontWeight: 600,
-          cursor: "pointer",
-          fontFamily: "var(--font-body, system-ui)",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <button type="button" onClick={() => onChange(DEFAULT_FILTERS)}
+        style={{ background: "transparent", border: "1px solid var(--terracotta, #e67e22)", color: "var(--terracotta, #e67e22)", borderRadius: "999px", padding: "8px 16px", fontSize: "0.82rem", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body, system-ui)", whiteSpace: "nowrap" }}>
         {t.reset}
       </button>
-    </div>
+    </>
+  );
+}
+
+export function FilterBar({ filters, cities, onChange, locale = "en" }: FilterBarProps) {
+  const t = labels[locale];
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const activeCount = activeFilterCount(filters);
+
+  function update(patch: Partial<ListingFilters>) {
+    onChange({ ...filters, ...patch });
+  }
+
+  return (
+    <>
+      {/* Desktop — inline row */}
+      <div
+        data-testid="filter-bar"
+        className="filter-bar-desktop"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          alignItems: "center",
+          padding: "16px 20px",
+          background: "var(--sand, #fff8ef)",
+          borderRadius: "var(--radius, 26px)",
+          border: "1px solid var(--border, rgba(35,49,63,0.08))",
+        }}
+      >
+        <SelectRow t={t} filters={filters} cities={cities} update={update} onChange={onChange} />
+      </div>
+
+      {/* Mobile — toggle button + drawer */}
+      <div className="filter-bar-mobile">
+        <button
+          type="button"
+          onClick={() => setDrawerOpen((o) => !o)}
+          aria-expanded={drawerOpen}
+          aria-controls="filter-drawer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 18px",
+            background: "var(--sand, #fff8ef)",
+            border: "1px solid var(--border, rgba(35,49,63,0.08))",
+            borderRadius: "999px",
+            fontFamily: "var(--font-body, system-ui)",
+            fontSize: "0.88rem",
+            fontWeight: 600,
+            color: "var(--ocean, #1f3a4d)",
+            cursor: "pointer",
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <line x1="1" y1="4" x2="15" y2="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="3" y1="8" x2="13" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="5" y1="12" x2="11" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          {locale === "en" ? "Filters" : "Filtros"}
+          {activeCount > 0 && (
+            <span style={{ background: "var(--terracotta, #e67e22)", color: "white", borderRadius: "999px", padding: "1px 7px", fontSize: "0.72rem", fontWeight: 700 }}>
+              {activeCount}
+            </span>
+          )}
+        </button>
+
+        {drawerOpen && (
+          <div
+            id="filter-drawer"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 200,
+              background: "rgba(31,58,77,0.4)",
+              display: "flex",
+              alignItems: "flex-end",
+            }}
+            onClick={(e) => { if (e.target === e.currentTarget) setDrawerOpen(false); }}
+          >
+            <div
+              style={{
+                width: "100%",
+                background: "var(--cream, #fdf5e6)",
+                borderRadius: "24px 24px 0 0",
+                padding: "24px 20px 40px",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <p style={{ fontFamily: "var(--font-display, Georgia, serif)", fontSize: "1.1rem", color: "var(--ocean, #1f3a4d)", margin: 0 }}>
+                  {locale === "en" ? "Filter Listings" : "Filtrar Listados"}
+                </p>
+                <button type="button" onClick={() => setDrawerOpen(false)} aria-label="Close filters"
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.4rem", color: "var(--ocean, #1f3a4d)", lineHeight: 1 }}>
+                  ×
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <SelectRow t={t} filters={filters} cities={cities} update={(p) => { update(p); }} onChange={(f) => { onChange(f); }} />
+              </div>
+              <button type="button" onClick={() => setDrawerOpen(false)}
+                style={{ marginTop: "20px", width: "100%", padding: "14px", background: "var(--ocean, #1f3a4d)", color: "white", border: "none", borderRadius: "999px", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", fontFamily: "var(--font-body, system-ui)" }}>
+                {locale === "en" ? "Apply Filters" : "Aplicar Filtros"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        .filter-bar-mobile { display: none; }
+        @media (max-width: 680px) {
+          .filter-bar-desktop { display: none !important; }
+          .filter-bar-mobile { display: block; }
+        }
+      `}</style>
+    </>
   );
 }

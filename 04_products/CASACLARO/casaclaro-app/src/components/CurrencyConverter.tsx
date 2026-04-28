@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { SITE_CONFIG } from "@/config/site.config";
 
 type CurrencyCode = "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "MXN" | "BRL" | "COP";
 
@@ -30,7 +31,7 @@ const FALLBACK_RATES: Record<string, number> = {
   AUD: 1.62,
   MXN: 17.5,
   BRL: 5.86,
-  COP: 4100,
+  COP: SITE_CONFIG.fx_fallback_cop_per_usd,
 };
 
 interface Props {
@@ -69,7 +70,7 @@ export function CurrencyConverter({ locale = "en" }: Props) {
 
   const numAmount = parseFloat(amount) || 0;
   // Cross-rate: COP per unit of `from` = rates.COP / rates[from]
-  const copPerUnit = from === "COP" ? 1 : (rates.COP ?? 4100) / (rates[from] ?? 1);
+  const copPerUnit = from === "COP" ? 1 : (rates.COP ?? SITE_CONFIG.fx_fallback_cop_per_usd) / (rates[from] ?? 1);
   const resultCOP = numAmount * copPerUnit;
 
   const fmtCOP = (n: number) =>

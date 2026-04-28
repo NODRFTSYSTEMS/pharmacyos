@@ -1,3 +1,5 @@
+import { SITE_CONFIG } from "@/config/site.config";
+
 export interface FxData {
   rate: number;
   source: "live" | "fallback";
@@ -5,7 +7,7 @@ export interface FxData {
 }
 
 const FALLBACK: FxData = {
-  rate: 4100,
+  rate: SITE_CONFIG.fx_fallback_cop_per_usd,
   source: "fallback",
   updatedAt: new Date().toISOString(),
 };

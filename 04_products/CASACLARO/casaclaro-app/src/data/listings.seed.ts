@@ -1,4 +1,5 @@
 import type { Listing } from "@/types/listings";
+import { SITE_CONFIG } from "@/config/site.config";
 
 const UNSPLASH = 'https://images.unsplash.com';
 const PHOTOS = {
@@ -44,8 +45,7 @@ function colonialPhotos(): Listing["images"] {
   ];
 }
 
-// Fixed COP/USD rate for seed data consistency
-const COP_RATE = 4100;
+const COP_RATE = SITE_CONFIG.fx_fallback_cop_per_usd;
 
 function cop(usd: number): number {
   return Math.round(usd * COP_RATE);

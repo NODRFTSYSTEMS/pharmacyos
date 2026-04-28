@@ -21,6 +21,7 @@ const footerColumns = {
     links: [
       { href: "/cost-simulator", en: "Property Cost Simulator", es: "Simulador de Costos" },
       { href: "/guide", en: "Property Guide", es: "Guía de Propiedad" },
+      { href: "/faq", en: "FAQ", es: "Preguntas Frecuentes" },
       { href: "/relocation/business", en: "Business Setup", es: "Iniciar Negocio" },
     ],
   },

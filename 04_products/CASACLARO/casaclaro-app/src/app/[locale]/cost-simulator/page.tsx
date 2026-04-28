@@ -3,11 +3,12 @@
 import { useState, useMemo } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { SITE_CONFIG } from "@/config/site.config";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const FX_COP = 4100; // reference rate March 2026
-const VISA_THRESHOLD_USD = 149467; // 350 × SMLMV 2026 at COP 4,100
+const FX_COP = SITE_CONFIG.fx_fallback_cop_per_usd;
+const VISA_THRESHOLD_USD = SITE_CONFIG.investor_visa_min_usd;
 
 const CITY_DATA = {
   medellin: {
@@ -90,11 +91,11 @@ function calculate(
 
   // Closing costs — line-item breakdown
   const closingItems = [
-    { en: "Notary fees", es: "Gastos notariales", amt: purchase * 0.0054 },
-    { en: "Registration tax", es: "Impuesto de registro", amt: purchase * 0.0100 },
+    { en: "Notary fees", es: "Gastos notariales", amt: purchase * SITE_CONFIG.notary_fee_pct },
+    { en: "Registration tax", es: "Impuesto de registro", amt: purchase * SITE_CONFIG.transfer_tax_pct },
     { en: "Retention at source (est.)", es: "Retención en la fuente (est.)", amt: purchase * 0.0150 },
     { en: "Attorney fees (est.)", es: "Honorarios de abogado (est.)", amt: purchase * 0.0150 },
-    { en: "Certifications & misc.", es: "Certificaciones y varios", amt: purchase * 0.0030 },
+    { en: "Certifications & misc.", es: "Certificaciones y varios", amt: purchase * SITE_CONFIG.closing_cost_pct },
     ...(city === "cartagena"
       ? [{ en: "Tourism / municipal fees", es: "Tarifas turísticas / municipales", amt: purchase * 0.0050 }]
       : []),

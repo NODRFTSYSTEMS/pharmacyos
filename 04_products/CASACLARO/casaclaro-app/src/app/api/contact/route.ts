@@ -8,6 +8,8 @@ async function notifyViaResend(payload: Record<string, string>) {
   const subject =
     payload.type === "seller"
       ? `New seller submission — ${payload.city ?? "unknown city"}`
+      : payload.type === "inquiry"
+      ? `Property inquiry — ${payload.listing_slug ?? "unknown listing"}`
       : `New agent/partner application — ${payload.role ?? "unknown role"}`;
 
   const rows = Object.entries(payload)
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     }
 
-    if (!["seller", "agent"].includes(body.type ?? "")) {
+    if (!["seller", "agent", "inquiry"].includes(body.type ?? "")) {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
