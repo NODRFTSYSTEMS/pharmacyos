@@ -73,7 +73,7 @@ export async function Footer({ locale = "en" }: FooterProps) {
                 alt="CasaClaro"
                 width={995}
                 height={1024}
-                style={{ objectFit: "contain", width: "176px", height: "auto", filter: "brightness(0) invert(1)" }}
+                style={{ objectFit: "contain", width: "176px", height: "auto" }}
               />
             </a>
             <p
