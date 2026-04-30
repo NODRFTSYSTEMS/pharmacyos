@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Gauge } from "@/components/charts/Gauge";
+import { Skeleton } from "@/components/Skeleton";
 
 interface Deal {
   id: string;
@@ -48,7 +49,25 @@ export default function SavedDealsPage() {
       </h1>
 
       {loading ? (
-        <p style={{ color: "var(--text-muted)" }}>{t("loadingDeals")}</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="card" style={{ display: "flex", alignItems: "center", gap: 20, justifyContent: "space-between", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div>
+                  <Skeleton width={200} height={14} style={{ marginBottom: 6 }} />
+                  <Skeleton width={80} height={10} />
+                </div>
+                <Skeleton width={44} height={44} style={{ borderRadius: "50%" }} />
+                <Skeleton width={40} height={24} style={{ borderRadius: 6 }} />
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                <Skeleton width={64} height={32} />
+                <Skeleton width={64} height={32} />
+                <Skeleton width={36} height={14} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : deals.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: 48 }}>
           <p style={{ color: "var(--text-muted)", marginBottom: 16 }}>{t("noSavedDeals")}</p>

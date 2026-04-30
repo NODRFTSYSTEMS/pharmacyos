@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { BarChart } from "@/components/charts/BarChart";
 import { LineChart } from "@/components/charts/LineChart";
+import { Skeleton, SkeletonCard, SkeletonRow } from "@/components/Skeleton";
 
 /* ------------------------------------------------------------------
  * Seller Market Position — Live analysis with print support
@@ -159,6 +160,27 @@ export default function SellerMarketPage() {
       {!hasData && !loading && (
         <div className="card" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-muted)" }}>
           <p style={{ fontSize: "0.875rem" }}>Enter a property address above to generate a live market position analysis.</p>
+        </div>
+      )}
+
+      {!hasData && loading && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SkeletonCard height={88} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+            <SkeletonCard height={220} />
+            <SkeletonCard height={220} />
+            <SkeletonCard height={220} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+            <SkeletonCard height={160} />
+            <SkeletonCard height={160} />
+          </div>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)" }}>
+              <Skeleton width={150} height={12} />
+            </div>
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} cols={7} />)}
+          </div>
         </div>
       )}
 

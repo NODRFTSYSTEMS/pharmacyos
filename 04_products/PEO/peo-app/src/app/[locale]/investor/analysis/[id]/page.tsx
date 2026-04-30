@@ -220,13 +220,20 @@ export default function InvestorAnalysisDetailPage() {
         <div className="container">
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
             <div>
+              <Link
+                href="/app/investor"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.8rem", color: "var(--text-muted)", textDecoration: "none", marginBottom: "16px" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Dashboard
+              </Link>
               <div className="eyebrow" style={{ marginBottom: "10px" }}>{t("eyebrow")}</div>
               <h1 style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "var(--text)", letterSpacing: "-0.02em" }}>
                 {t("detailTitle")}
               </h1>
             </div>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              <Link href={`/${locale}/investor/analysis/${id}/report`} className="button button-secondary" style={{ fontSize: "0.82rem" }}>
+              <Link href={`/investor/analysis/${id}/report`} className="button button-secondary" style={{ fontSize: "0.82rem" }}>
                 Print Report
               </Link>
               {isAdvanced && (

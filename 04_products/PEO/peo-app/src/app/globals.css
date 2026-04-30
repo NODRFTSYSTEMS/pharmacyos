@@ -1025,6 +1025,23 @@ details[open] .faq-summary::after { content: "−"; }
   }
 }
 
+/* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-strong) 0%,
+    var(--surface-elevated) 50%,
+    var(--surface-strong) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm, 8px);
+}
+
 /* ─── Responsive additions ────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -1037,4 +1054,16 @@ details[open] .faq-summary::after { content: "−"; }
   .process-connector { width: 1px; height: 32px; margin: 0 0 0 22px; align-self: auto; }
   .cred-badge { padding: 8px 16px; }
   .cred-badge:nth-child(2n) { border-right: none; }
+}
+
+/* ─── App Shell layout responsive ──────────────────────────────────────────── */
+.app-sidebar-mobile-toggle { display: none; }
+
+@media (max-width: 768px) {
+  .app-sidebar-desktop { display: none !important; }
+  .app-sidebar-mobile-toggle { display: flex !important; }
+  .app-shell-main { margin-left: 0 !important; }
+}
+@media (min-width: 769px) {
+  .app-sidebar-mobile { display: none !important; }
 }

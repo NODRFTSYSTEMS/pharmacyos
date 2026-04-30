@@ -8,6 +8,7 @@ import { LineChart } from "@/components/charts/LineChart";
 import { PieChart } from "@/components/charts/PieChart";
 import { Gauge } from "@/components/charts/Gauge";
 import { RadarChart } from "@/components/charts/RadarChart";
+import { Skeleton, SkeletonCard, SkeletonRow } from "@/components/Skeleton";
 
 /* ------------------------------------------------------------------
  * Investor Portfolio Dashboard — Surpasses Deal Underwriter Pro v4.2
@@ -180,8 +181,23 @@ export default function InvestorPortfolioPage() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "50vh" }}>
-        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{t("loading")}</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: 1200 }}>
+        <div>
+          <Skeleton width={80} height={10} style={{ marginBottom: 8 }} />
+          <Skeleton width={240} height={28} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px" }}>
+          {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} height={88} />)}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
+          {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} height={280} />)}
+        </div>
+        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)" }}>
+            <Skeleton width={120} height={12} />
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={5} />)}
+        </div>
       </div>
     );
   }
@@ -196,13 +212,21 @@ export default function InvestorPortfolioPage() {
       </div>
 
       {/* KPI Row */}
-      {stats && (
+      {stats ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px" }}>
           <KpiCard label={t("totalProfit")} value={`$${stats.totalProfit.toLocaleString()}`} color="var(--gold)" />
           <KpiCard label={t("avgRoi")} value={`${stats.avgRoi.toFixed(1)}%`} color={stats.avgRoi > 15 ? "var(--green)" : stats.avgRoi > 10 ? "var(--gold)" : "var(--amber)"} />
           <KpiCard label={t("dealCount")} value={String(stats.dealCount)} color="var(--text)" />
           <KpiCard label={t("avgScore")} value={stats.avgScore.toFixed(0)} color={gradeColor(stats.avgScore >= 80 ? "A" : stats.avgScore >= 60 ? "B" : stats.avgScore >= 40 ? "C" : "D")} />
           <KpiCard label={t("winRate")} value={`${stats.winRate.toFixed(0)}%`} color="var(--green)" />
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px" }}>
+          <KpiCard label={t("totalProfit")} value="—" color="var(--text-soft)" />
+          <KpiCard label={t("avgRoi")} value="—" color="var(--text-soft)" />
+          <KpiCard label={t("dealCount")} value="0" color="var(--text-soft)" />
+          <KpiCard label={t("avgScore")} value="—" color="var(--text-soft)" />
+          <KpiCard label={t("winRate")} value="—" color="var(--text-soft)" />
         </div>
       )}
 
@@ -254,7 +278,12 @@ export default function InvestorPortfolioPage() {
           </Link>
         </div>
         {deals.length === 0 ? (
-          <div style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)", fontSize: "0.875rem" }}>{t("noDeals")}</div>
+          <div style={{ padding: "64px 48px", textAlign: "center" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "20px" }}>{t("noDeals")}</p>
+            <Link href="/investor/analyze" className="button button-primary" style={{ padding: "10px 20px", fontSize: "0.82rem", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              {t("newAnalysis")} →
+            </Link>
+          </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>

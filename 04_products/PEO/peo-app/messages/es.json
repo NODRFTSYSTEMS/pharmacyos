@@ -390,7 +390,14 @@
     "address": "Dirección",
     "confidenceTier": "Confianza",
     "date": "Fecha",
-    "view": "Ver"
+    "view": "Ver",
+    "savedDealsTitle": "Negocios guardados",
+    "noSavedDeals": "Aún no hay negocios guardados.",
+    "runFirstAnalysis": "Ejecutar primer análisis",
+    "dealComparisonTitle": "Comparación de negocios",
+    "noDealsToCompare": "No hay negocios para comparar. Ejecuta un análisis primero.",
+    "selectDeals": "Selecciona hasta 4 negocios para comparar:",
+    "compareInstruction": "Selecciona 2–4 negocios de arriba para compararlos uno al lado del otro."
   },
   "investorAnalysis": {
     "newTitle": "Nuevo análisis de trato",
@@ -448,7 +455,20 @@
     "scenarioDownside": "Baja",
     "compQuality": "Calidad de comparable",
     "marketVelocity": "Velocidad de mercado",
-    "dealScoreLabel": "Puntuación del trato"
+    "dealScoreLabel": "Puntuación del trato",
+    "fieldRequired": "Este campo es obligatorio",
+    "fieldInvalidNumber": "Ingrese un número válido",
+    "killSwitchSectionTitle": "Indicadores de Condición de la Propiedad (Kill Switches)",
+    "killSwitchSectionDesc": "Marque cualquier problema de condición presente. Estos ajustan el MAO a la baja antes de aplicar la regla del 70%.",
+    "killSwitchFoundation": "Problemas de Cimientos",
+    "killSwitchKnobTube": "Cableado Knob-and-Tube",
+    "killSwitchGalvanizedPlumbing": "Plomería Galvanizada",
+    "killSwitchActiveRoofLeak": "Filtración Activa en Techo",
+    "killSwitchLeadPaint": "Pintura con Plomo",
+    "killSwitchMoistureMold": "Humedad / Moho",
+    "killSwitchUnpermittedWork": "Trabajo Sin Permiso",
+    "killSwitchFailedSeptic": "Sistema Séptico Defectuoso",
+    "killSwitchHvacReplacement": "Reemplazo de HVAC"
   },
   "sellerDashboard": {
     "eyebrow": "Plataforma de Vendedor",
@@ -517,7 +537,8 @@
     "beds": "hab",
     "baths": "baños",
     "analysisReady": "Análisis listo",
-    "noData": "—"
+    "noData": "—",
+    "fieldRequired": "Este campo es obligatorio"
   },
   "footer": {
     "rights": "© 2026 Peak Equity Optimizer. Todos los derechos reservados.",
@@ -978,7 +999,9 @@
     "myDeals": "Mis Tratos",
     "newListing": "Nueva Propiedad",
     "marketPosition": "Posición de Mercado",
-    "readinessPlan": "Plan de Preparación"
+    "readinessPlan": "Plan de Preparación",
+    "vendor": "Proveedor",
+    "vendorPortal": "Portal de Proveedor"
   },
   "investorPortfolio": {
     "eyebrow": "Plataforma de Inversor",
@@ -1040,13 +1063,49 @@
     "revenueMtd": "Ingresos (MTD)",
     "churnRate": "Tasa de Cancelación",
     "comingSoonTitle": "Herramientas de Admin Próximamente",
-    "comingSoonBody": "El panel de administración está en construcción para la Fase 6. Las funciones incluirán gestión de usuarios, asignación de roles, revisión de registros de auditoría, verificación de proveedores y análisis de ingresos."
+    "comingSoonBody": "El panel de administración está en construcción para la Fase 6. Las funciones incluirán gestión de usuarios, asignación de roles, revisión de registros de auditoría, verificación de proveedores y análisis de ingresos.",
+    "usersSection": "Gestión de Usuarios",
+    "applicationsSection": "Solicitudes",
+    "email": "Correo",
+    "role": "Rol",
+    "joined": "Registrado",
+    "assignRole": "Asignar Rol",
+    "searchUsers": "Buscar usuarios…",
+    "filterRole": "Todos los Roles",
+    "noUsers": "No se encontraron usuarios.",
+    "addressCol": "Dirección",
+    "typeCol": "Tipo",
+    "userCol": "Usuario",
+    "dateCol": "Fecha",
+    "noApplications": "No se encontraron solicitudes.",
+    "roleSaved": "Guardado",
+    "roleError": "Error"
   },
   "vendorDashboard": {
     "eyebrow": "Mercado",
     "title": "Directorio de Proveedores",
     "loading": "Cargando proveedores…",
     "comingSoonTitle": "Mercado Próximamente",
-    "comingSoonBody": "El mercado de proveedores está en construcción para la Fase 6. Contratistas, prestamistas, inspectores y administradores de propiedades verificados serán listados aquí."
+    "comingSoonBody": "El mercado de proveedores está en construcción para la Fase 6. Contratistas, prestamistas, inspectores y administradores de propiedades verificados serán listados aquí.",
+    "profileEyebrow": "Panel de Proveedor",
+    "profileTitle": "Mi Perfil de Proveedor",
+    "statsLeads": "Prospectos Totales",
+    "statsReviews": "Reseñas",
+    "services": "Servicios",
+    "markets": "Mercados Atendidos",
+    "website": "Sitio Web",
+    "leadsTitle": "Prospectos",
+    "noLeads": "Aún no hay prospectos. Tu perfil está activo y aceptando consultas.",
+    "leadSource": "Fuente",
+    "leadReceived": "Recibido",
+    "leadStatus": "Estado",
+    "markContacted": "Marcar Contactado",
+    "contacted": "Contactado",
+    "pendingTitle": "Solicitud en Revisión",
+    "pendingBody": "Tu solicitud como proveedor ha sido enviada y está pendiente de verificación. Activaremos tu perfil una vez revisado.",
+    "applyTitle": "Conviértete en Proveedor Verificado",
+    "applyBody": "Lista tus servicios en el mercado de Peak Equity Optimizer para conectar con inversionistas y vendedores.",
+    "applyButton": "Solicitar Ahora",
+    "applyCompanyNameLabel": "Nombre de la empresa"
   }
 }

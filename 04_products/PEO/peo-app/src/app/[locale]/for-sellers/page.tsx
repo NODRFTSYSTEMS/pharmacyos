@@ -87,7 +87,7 @@ export default async function ForSellersPage({
               </p>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                 <Link href="/pricing" className="button button-primary">{t("heroCtaPrimary")}</Link>
-                <Link href="/seller" className="button button-secondary">{t("heroCtaSecondary")}</Link>
+                <Link href="/sign-up" className="button button-secondary">{t("heroCtaSecondary")}</Link>
               </div>
             </div>
 
@@ -313,7 +313,7 @@ export default async function ForSellersPage({
               </ul>
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                 <Link href="/pricing" className="button button-primary" style={{ fontSize: "0.82rem", minHeight: "40px", padding: "9px 18px" }}>{t("ctaPrimary")}</Link>
-                <Link href="/seller" className="button button-secondary" style={{ fontSize: "0.82rem", minHeight: "40px", padding: "9px 18px" }}>{t("ctaSecondary")}</Link>
+                <Link href="/sign-up" className="button button-secondary" style={{ fontSize: "0.82rem", minHeight: "40px", padding: "9px 18px" }}>{t("ctaSecondary")}</Link>
               </div>
             </div>
           </div>

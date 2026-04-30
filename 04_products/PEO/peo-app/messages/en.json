@@ -390,7 +390,14 @@
     "address": "Address",
     "confidenceTier": "Confidence",
     "date": "Date",
-    "view": "View"
+    "view": "View",
+    "savedDealsTitle": "Saved Deals",
+    "noSavedDeals": "No saved deals yet.",
+    "runFirstAnalysis": "Run First Analysis",
+    "dealComparisonTitle": "Deal Comparison",
+    "noDealsToCompare": "No deals to compare. Run an analysis first.",
+    "selectDeals": "Select up to 4 deals to compare:",
+    "compareInstruction": "Select 2–4 deals above to compare them side by side."
   },
   "investorAnalysis": {
     "newTitle": "New Deal Analysis",
@@ -448,7 +455,20 @@
     "scenarioDownside": "Downside",
     "compQuality": "Comp quality",
     "marketVelocity": "Market velocity",
-    "dealScoreLabel": "Deal score"
+    "dealScoreLabel": "Deal score",
+    "fieldRequired": "This field is required",
+    "fieldInvalidNumber": "Enter a valid number",
+    "killSwitchSectionTitle": "Property Condition Flags (Kill Switches)",
+    "killSwitchSectionDesc": "Check any condition issues present. These adjust the MAO downward before the 70% rule is applied.",
+    "killSwitchFoundation": "Foundation Issues",
+    "killSwitchKnobTube": "Knob-and-Tube Wiring",
+    "killSwitchGalvanizedPlumbing": "Galvanized Plumbing",
+    "killSwitchActiveRoofLeak": "Active Roof Leak",
+    "killSwitchLeadPaint": "Lead Paint",
+    "killSwitchMoistureMold": "Moisture / Mold",
+    "killSwitchUnpermittedWork": "Unpermitted Work",
+    "killSwitchFailedSeptic": "Failed Septic System",
+    "killSwitchHvacReplacement": "HVAC Replacement"
   },
   "sellerDashboard": {
     "eyebrow": "Seller Platform",
@@ -518,7 +538,8 @@
     "beds": "bd",
     "baths": "ba",
     "analysisReady": "Analysis Ready",
-    "noData": "—"
+    "noData": "—",
+    "fieldRequired": "This field is required"
   },
   "footer": {
     "rights": "© 2026 Peak Equity Optimizer. All rights reserved.",
@@ -979,7 +1000,9 @@
     "myDeals": "My Deals",
     "newListing": "New Listing",
     "marketPosition": "Market Position",
-    "readinessPlan": "Readiness Plan"
+    "readinessPlan": "Readiness Plan",
+    "vendor": "Vendor",
+    "vendorPortal": "Vendor Portal"
   },
   "investorPortfolio": {
     "eyebrow": "Investor Platform",
@@ -1041,13 +1064,49 @@
     "revenueMtd": "Revenue (MTD)",
     "churnRate": "Churn Rate",
     "comingSoonTitle": "Admin Tools Coming Soon",
-    "comingSoonBody": "The admin panel is under construction for Phase 6. Features will include user management, role assignment, audit log review, vendor verification, and revenue analytics."
+    "comingSoonBody": "The admin panel is under construction for Phase 6. Features will include user management, role assignment, audit log review, vendor verification, and revenue analytics.",
+    "usersSection": "User Management",
+    "applicationsSection": "Applications",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined",
+    "assignRole": "Assign Role",
+    "searchUsers": "Search users…",
+    "filterRole": "All Roles",
+    "noUsers": "No users found.",
+    "addressCol": "Address",
+    "typeCol": "Type",
+    "userCol": "User",
+    "dateCol": "Date",
+    "noApplications": "No applications found.",
+    "roleSaved": "Saved",
+    "roleError": "Error"
   },
   "vendorDashboard": {
     "eyebrow": "Marketplace",
     "title": "Vendor Directory",
     "loading": "Loading vendors…",
     "comingSoonTitle": "Marketplace Coming Soon",
-    "comingSoonBody": "The vendor marketplace is under construction for Phase 6. Verified contractors, lenders, inspectors, and property managers will be listed here."
+    "comingSoonBody": "The vendor marketplace is under construction for Phase 6. Verified contractors, lenders, inspectors, and property managers will be listed here.",
+    "profileEyebrow": "Vendor Dashboard",
+    "profileTitle": "My Vendor Profile",
+    "statsLeads": "Total Leads",
+    "statsReviews": "Reviews",
+    "services": "Services",
+    "markets": "Markets Served",
+    "website": "Website",
+    "leadsTitle": "Leads",
+    "noLeads": "No leads yet. Your profile is live and accepting inquiries.",
+    "leadSource": "Source",
+    "leadReceived": "Received",
+    "leadStatus": "Status",
+    "markContacted": "Mark Contacted",
+    "contacted": "Contacted",
+    "pendingTitle": "Application Under Review",
+    "pendingBody": "Your vendor application has been submitted and is pending verification. We'll activate your profile once reviewed.",
+    "applyTitle": "Become a Verified Vendor",
+    "applyBody": "List your services in the Peak Equity Optimizer marketplace to connect with investors and sellers.",
+    "applyButton": "Apply Now",
+    "applyCompanyNameLabel": "Company Name"
   }
 }

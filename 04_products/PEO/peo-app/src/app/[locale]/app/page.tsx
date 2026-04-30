@@ -2,26 +2,25 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUserRole } from "@/hooks/useUserRole";
 
 /* ------------------------------------------------------------------
- * App Shell Entry — Persona-aware redirect
- * ------------------------------------------------------------------
- * In production, this resolves the user's primary role from Clerk/
- * session and redirects to the appropriate dashboard.
- * For now, defaults to investor dashboard (highest-engagement path).
+ * App Shell Entry — Role-aware redirect
+ * Sellers go to /app/seller; all others go to /app/investor.
  * ------------------------------------------------------------------ */
 
 export default function AppEntryPage() {
   const router = useRouter();
+  const { role, loading } = useUserRole();
 
   useEffect(() => {
-    // TODO: Resolve user role from auth context
-    // const role = await getUserRole();
-    // if (role.startsWith("seller")) router.replace("/app/seller");
-    // else if (role.startsWith("investor")) router.replace("/app/investor");
-    // else router.replace("/app/investor");
-    router.replace("/app/investor");
-  }, [router]);
+    if (loading) return;
+    if (role === "seller") {
+      router.replace("/app/seller");
+    } else {
+      router.replace("/app/investor");
+    }
+  }, [router, role, loading]);
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>

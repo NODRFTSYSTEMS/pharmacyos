@@ -46,7 +46,7 @@ export default async function ForInvestorsPage({
       featured: true,
       features: [t("tierBasicFeature1"), t("tierBasicFeature2"), t("tierBasicFeature3")],
       cta: t("tierBasicCta"),
-      href: "/investor",
+      href: "/sign-up",
       btnClass: "button-primary",
     },
     {
@@ -57,7 +57,7 @@ export default async function ForInvestorsPage({
       featured: false,
       features: [t("tierAdvancedFeature1"), t("tierAdvancedFeature2"), t("tierAdvancedFeature3")],
       cta: t("tierAdvancedCta"),
-      href: "/investor",
+      href: "/pricing",
       btnClass: "button-secondary",
     },
   ];

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
+import { UserButton } from "@clerk/nextjs";
 
 /* ------------------------------------------------------------------
  * Unified App Shell — Persona-aware navigation
@@ -88,17 +89,26 @@ function SidebarNav({ items, collapsed }: { items: NavItem[]; collapsed: boolean
 
 export default function AppShellLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("appShell");
-  const locale = useLocale();
   const pathname = usePathname();
   const { role, loading } = useUserRole();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [savedDealCount, setSavedDealCount] = useState<number | null>(null);
 
   const userRole = role ?? "anonymous_visitor";
   const isAdmin = userRole === "admin_internal";
   const isSeller = userRole === "seller" || isAdmin;
   const isInvestor = userRole.startsWith("investor") || isAdmin || userRole === "free_user";
+  const isVendor = userRole === "vendor" || isAdmin;
   const activePersona = pathname.startsWith("/app/seller") ? "seller" : "investor";
+
+  useEffect(() => {
+    if (loading || !isInvestor) return;
+    fetch("/api/investor/analysis")
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d.analyses)) setSavedDealCount(d.analyses.length); })
+      .catch(() => {});
+  }, [loading, isInvestor]);
 
   const investorNav: NavItem[] = [
     {
@@ -115,7 +125,7 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
       href: "/app/investor/deals",
       label: t("savedDeals"),
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>,
-      badge: "20",
+      badge: savedDealCount != null && savedDealCount > 0 ? String(savedDealCount) : undefined,
     },
     {
       href: "/app/investor/compare",
@@ -154,6 +164,14 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
       href: "/app/seller/readiness",
       label: t("readinessPlan"),
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>,
+    },
+  ];
+
+  const vendorNav: NavItem[] = [
+    {
+      href: "/app/vendor",
+      label: t("vendorPortal"),
+      icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>,
     },
   ];
 
@@ -256,6 +274,18 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
           </>
         )}
 
+        {/* Vendor nav */}
+        {isVendor && (
+          <>
+            {!collapsed && (
+              <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-soft)", padding: "0 14px", marginBottom: "8px", marginTop: isInvestor ? "16px" : "0" }}>
+                {t("vendor")}
+              </div>
+            )}
+            <SidebarNav items={vendorNav} collapsed={collapsed} />
+          </>
+        )}
+
         <div style={{ flex: 1 }} />
 
         {/* Seller nav */}
@@ -351,12 +381,14 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
           </button>
         </div>
         {isInvestor && <SidebarNav items={investorNav} collapsed={false} />}
+        {isVendor && <div style={{ marginTop: isInvestor ? 16 : 0 }}><SidebarNav items={vendorNav} collapsed={false} /></div>}
         {isSeller && <div style={{ marginTop: 16 }}><SidebarNav items={sellerNav} collapsed={false} /></div>}
         {isAdmin && <div style={{ marginTop: 16 }}><SidebarNav items={adminNav} collapsed={false} /></div>}
       </aside>
 
       {/* Main content area */}
       <main
+        className="app-shell-main"
         style={{
           marginLeft: sidebarWidth,
           flex: 1,
@@ -384,7 +416,6 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
               className="app-sidebar-mobile-toggle"
               onClick={() => setMobileOpen(true)}
               style={{
-                display: "none",
                 background: "none",
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
@@ -415,6 +446,9 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
                 {tierBadge}
               </span>
             )}
+            <UserButton
+              appearance={{ elements: { avatarBox: { width: "30px", height: "30px" } } }}
+            />
           </div>
         </div>
 
@@ -423,16 +457,6 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
         </div>
       </main>
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .app-sidebar-desktop { display: none !important; }
-          .app-sidebar-mobile-toggle { display: flex !important; }
-          main { margin-left: 0 !important; }
-        }
-        @media (min-width: 769px) {
-          .app-sidebar-mobile { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 }

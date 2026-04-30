@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { RadarChart } from "@/components/charts/RadarChart";
+import { Skeleton, SkeletonCard } from "@/components/Skeleton";
 
 interface Deal {
   id: string;
@@ -70,7 +71,17 @@ export default function CompareDealsPage() {
       </h1>
 
       {loading ? (
-        <p style={{ color: "var(--text-muted)" }}>{t("loadingDeals")}</p>
+        <div>
+          <div className="card" style={{ marginBottom: 24 }}>
+            <Skeleton width={100} height={11} style={{ marginBottom: 14 }} />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} width={160} height={38} style={{ borderRadius: 8 }} />
+              ))}
+            </div>
+          </div>
+          <SkeletonCard height={380} />
+        </div>
       ) : deals.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: 48 }}>
           <p style={{ color: "var(--text-muted)" }}>{t("noDealsToCompare")}</p>
@@ -101,6 +112,24 @@ export default function CompareDealsPage() {
               ))}
             </div>
           </div>
+
+          {compared.length === 0 && (
+            <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "48px 24px", textAlign: "center" }}>
+              <div style={{ width: 72, height: 72, borderRadius: "50%", border: "2px dashed var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-soft)", maxWidth: "32ch", lineHeight: 1.6, margin: 0 }}>
+                {t("compareInstruction")}
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+                {["MAO", "Profit", "ROI", "Score", "ARV"].map((m) => (
+                  <span key={m} style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", padding: "2px 10px", borderRadius: 4, background: "var(--bg-alt)", border: "1px solid var(--border)" }}>{m}</span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {compared.length > 0 && (
             <div className="card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>

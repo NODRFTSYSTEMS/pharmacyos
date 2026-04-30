@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { track } from "@/lib/events/track";
 
 interface PropertyPreview {
@@ -29,6 +30,7 @@ export default function NewApplicationPage() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [preview, setPreview] = useState<PropertyPreview | null>(null);
   const [previewMissed, setPreviewMissed] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState({
     address: "",
@@ -39,7 +41,17 @@ export default function NewApplicationPage() {
 
   const isDevBypass = process.env.NEXT_PUBLIC_DEV_BYPASS === "true";
 
+  function validateAddressField() {
+    const val = form.address.trim();
+    if (!val) {
+      setFieldErrors((p) => ({ ...p, address: t("fieldRequired") }));
+    } else {
+      setFieldErrors((p) => { const n = { ...p }; delete n.address; return n; });
+    }
+  }
+
   async function handleAddressBlur() {
+    validateAddressField();
     if (form.address.length < 8) return;
     setLookupLoading(true);
     setPreview(null);
@@ -122,6 +134,13 @@ export default function NewApplicationPage() {
     <div style={{ position: "relative", zIndex: 1 }}>
       <section style={{ padding: "64px 0 48px" }}>
         <div className="container" style={{ maxWidth: "640px" }}>
+          <Link
+            href="/app/seller"
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.8rem", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
+          </Link>
           <div className="eyebrow" style={{ marginBottom: "10px" }}>{t("eyebrow")}</div>
           <h1 style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "var(--text)", letterSpacing: "-0.02em" }}>
             {t("formTitle")}
@@ -149,17 +168,25 @@ export default function NewApplicationPage() {
                   id="seller-address"
                   type="text"
                   required
+                  aria-invalid={!!fieldErrors.address}
+                  aria-describedby={fieldErrors.address ? "seller-address-error" : undefined}
                   value={form.address}
                   onChange={(e) => {
                     setForm((f) => ({ ...f, address: e.target.value }));
                     setPreview(null);
                     setPreviewMissed(false);
+                    if (fieldErrors.address) setFieldErrors((p) => { const n = { ...p }; delete n.address; return n; });
                   }}
                   onBlur={handleAddressBlur}
                   placeholder="123 Main St, City, ST 12345"
-                  style={inputStyle}
+                  style={{ ...inputStyle, ...(fieldErrors.address ? { borderColor: "var(--red)" } : {}) }}
                   onFocus={(e) => (e.target.style.borderColor = "var(--gold)")}
                 />
+                {fieldErrors.address && (
+                  <p id="seller-address-error" role="alert" style={{ fontSize: "0.72rem", color: "var(--red)", marginTop: "4px" }}>
+                    {fieldErrors.address}
+                  </p>
+                )}
                 {lookupLoading && (
                   <p style={hintStyle}>{t("lookupLoading")}</p>
                 )}

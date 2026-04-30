@@ -20,6 +20,7 @@ export default function EstimatorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Record<string, number> | null>(null);
   const [resultMode, setResultMode] = useState<string | null>(null);
+  const [showBuyHoldModal, setShowBuyHoldModal] = useState(false);
 
   const [sellerInputs, setSellerInputs] = useState({
     expectedSalePrice: "",
@@ -148,17 +149,20 @@ export default function EstimatorPage() {
           const active = strategy === s.key;
           if (s.locked) {
             return (
-              <Link
+              <button
                 key={s.key}
-                href="/pricing"
+                type="button"
+                onClick={() => setShowBuyHoldModal(true)}
                 style={{
                   padding: "8px 18px",
                   borderRadius: "999px",
                   fontSize: "0.8rem",
                   fontWeight: 500,
-                  textDecoration: "none",
-                  color: "var(--text-soft)",
+                  border: "none",
+                  cursor: "pointer",
                   background: "transparent",
+                  color: "var(--text-soft)",
+                  fontFamily: "var(--sans)",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
@@ -167,7 +171,7 @@ export default function EstimatorPage() {
               >
                 {s.label}
                 <span style={{ fontSize: "0.65rem" }}>🔒</span>
-              </Link>
+              </button>
             );
           }
           return (
@@ -461,6 +465,51 @@ export default function EstimatorPage() {
           {t("disclaimer")}
         </p>
       </div>
+
+      {showBuyHoldModal && (
+        <div
+          onClick={() => setShowBuyHoldModal(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card"
+            style={{ maxWidth: 440, width: "100%", padding: "36px 32px", position: "relative", textAlign: "center" }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowBuyHoldModal(false)}
+              aria-label="Close"
+              style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "1.4rem", lineHeight: 1, padding: 0 }}
+            >
+              ×
+            </button>
+            <div className="eyebrow" style={{ marginBottom: 12 }}>Investor Basic</div>
+            <h2 style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: "1.2rem", color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 12 }}>
+              {tg("headline")}
+            </h2>
+            <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", lineHeight: 1.65, maxWidth: "38ch", margin: "0 auto 24px" }}>
+              {tg("body")}
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, textAlign: "left" }}>
+              {["Rental cash flow projection", "DSCR calculation", "Cap rate analysis", "Live property data", "Verified ARV with live comps"].map((feat) => (
+                <div key={feat} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.82rem", color: "var(--text-soft)" }}>
+                  <span style={{ color: "var(--green)", flexShrink: 0, fontWeight: 700 }}>✓</span>
+                  {feat}
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/pricing"
+              className="button button-primary"
+              style={{ fontSize: "0.85rem", width: "100%", justifyContent: "center" }}
+              onClick={() => setShowBuyHoldModal(false)}
+            >
+              {tg("cta")}
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

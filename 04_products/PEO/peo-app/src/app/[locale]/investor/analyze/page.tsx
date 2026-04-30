@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { TermTooltip } from "@/components/TermTooltip";
 
 type KillSwitchId =
@@ -11,16 +12,16 @@ type KillSwitchId =
 
 type KillSwitchSeverity = "CRITICAL" | "HIGH" | "MEDIUM";
 
-const KILL_SWITCHES: { id: KillSwitchId; label: string; severity: KillSwitchSeverity; costRange: string }[] = [
-  { id: "foundation",          label: "Foundation Issues",       severity: "CRITICAL", costRange: "$18k–$45k" },
-  { id: "knob-tube",           label: "Knob-and-Tube Wiring",    severity: "HIGH",     costRange: "$8k–$18k"  },
-  { id: "galvanized-plumbing", label: "Galvanized Plumbing",     severity: "HIGH",     costRange: "$6k–$14k"  },
-  { id: "active-roof-leak",    label: "Active Roof Leak",        severity: "HIGH",     costRange: "$5k–$13k"  },
-  { id: "lead-paint",          label: "Lead Paint",              severity: "MEDIUM",   costRange: "$1.5k–$7k" },
-  { id: "moisture-mold",       label: "Moisture / Mold",         severity: "HIGH",     costRange: "$3k–$12k"  },
-  { id: "unpermitted-work",    label: "Unpermitted Work",        severity: "MEDIUM",   costRange: "$2k–$10k"  },
-  { id: "failed-septic",       label: "Failed Septic System",    severity: "CRITICAL", costRange: "$15k–$35k" },
-  { id: "hvac-replacement",    label: "HVAC Replacement",        severity: "MEDIUM",   costRange: "$5k–$12k"  },
+const KILL_SWITCH_DEFS: { id: KillSwitchId; severity: KillSwitchSeverity; costRange: string }[] = [
+  { id: "foundation",          severity: "CRITICAL", costRange: "$18k–$45k" },
+  { id: "knob-tube",           severity: "HIGH",     costRange: "$8k–$18k"  },
+  { id: "galvanized-plumbing", severity: "HIGH",     costRange: "$6k–$14k"  },
+  { id: "active-roof-leak",    severity: "HIGH",     costRange: "$5k–$13k"  },
+  { id: "lead-paint",          severity: "MEDIUM",   costRange: "$1.5k–$7k" },
+  { id: "moisture-mold",       severity: "HIGH",     costRange: "$3k–$12k"  },
+  { id: "unpermitted-work",    severity: "MEDIUM",   costRange: "$2k–$10k"  },
+  { id: "failed-septic",       severity: "CRITICAL", costRange: "$15k–$35k" },
+  { id: "hvac-replacement",    severity: "MEDIUM",   costRange: "$5k–$12k"  },
 ];
 
 const SEVERITY_COLORS: Record<KillSwitchSeverity, string> = {
@@ -38,6 +39,29 @@ export default function InvestorAnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showKillSwitches, setShowKillSwitches] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const killSwitchLabels: Record<KillSwitchId, string> = {
+    foundation:           t("killSwitchFoundation"),
+    "knob-tube":          t("killSwitchKnobTube"),
+    "galvanized-plumbing":t("killSwitchGalvanizedPlumbing"),
+    "active-roof-leak":   t("killSwitchActiveRoofLeak"),
+    "lead-paint":         t("killSwitchLeadPaint"),
+    "moisture-mold":      t("killSwitchMoistureMold"),
+    "unpermitted-work":   t("killSwitchUnpermittedWork"),
+    "failed-septic":      t("killSwitchFailedSeptic"),
+    "hvac-replacement":   t("killSwitchHvacReplacement"),
+  };
+
+  function validateField(id: string, value: string, isNumeric = false) {
+    const trimmed = value.trim();
+    if (!trimmed) { setFieldErrors((p) => ({ ...p, [id]: t("fieldRequired") })); return; }
+    if (isNumeric && (isNaN(Number(trimmed)) || Number(trimmed) < 0)) {
+      setFieldErrors((p) => ({ ...p, [id]: t("fieldInvalidNumber") }));
+      return;
+    }
+    setFieldErrors((p) => { const next = { ...p }; delete next[id]; return next; });
+  }
 
   const [activeKillSwitches, setActiveKillSwitches] = useState<Set<KillSwitchId>>(new Set());
   const [investorProfile, setInvestorProfile] = useState<"conservative" | "balanced" | "aggressive">("balanced");
@@ -159,6 +183,13 @@ export default function InvestorAnalyzePage() {
     <div style={{ position: "relative", zIndex: 1 }}>
       <section style={{ padding: "64px 0 48px" }}>
         <div className="container" style={{ maxWidth: "760px" }}>
+          <Link
+            href="/app/investor"
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.8rem", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
+          </Link>
           <div className="eyebrow" style={{ marginBottom: "10px" }}>{t("eyebrow")}</div>
           <h1 style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "var(--text)", letterSpacing: "-0.02em", marginBottom: "8px" }}>
             {t("newTitle")}
@@ -179,12 +210,16 @@ export default function InvestorAnalyzePage() {
               {/* Address */}
               <InputField id="inv-address" label={t("address")} value={form.address}
                 onChange={(v) => setForm((f) => ({ ...f, address: v }))} required
+                onBlur={() => validateField("inv-address", form.address)}
+                error={fieldErrors["inv-address"]}
                 inputStyle={inputStyle} labelStyle={labelStyle} />
 
               {/* Core fields */}
               <div style={grid2}>
                 <InputField id="inv-purchase-price" label={t("purchasePrice")} value={form.purchasePrice}
                   onChange={(v) => setForm((f) => ({ ...f, purchasePrice: v }))} inputMode="decimal" required
+                  onBlur={() => validateField("inv-purchase-price", form.purchasePrice, true)}
+                  error={fieldErrors["inv-purchase-price"]}
                   inputStyle={inputStyle} labelStyle={labelStyle} />
                 <InputField id="inv-arv" label={
                   <TermTooltip term={t("arv")} definition={tg("arv.short")} detailHref="/academy/glossary#term-arv">
@@ -192,12 +227,16 @@ export default function InvestorAnalyzePage() {
                   </TermTooltip>
                 } value={form.arv}
                   onChange={(v) => setForm((f) => ({ ...f, arv: v }))} inputMode="decimal" required
+                  onBlur={() => validateField("inv-arv", form.arv, true)}
+                  error={fieldErrors["inv-arv"]}
                   inputStyle={inputStyle} labelStyle={labelStyle} />
               </div>
 
               <div style={grid2}>
                 <InputField id="inv-repairs" label={t("repairs")} value={form.repairs}
                   onChange={(v) => setForm((f) => ({ ...f, repairs: v }))} inputMode="decimal" required
+                  onBlur={() => validateField("inv-repairs", form.repairs, true)}
+                  error={fieldErrors["inv-repairs"]}
                   inputStyle={inputStyle} labelStyle={labelStyle} />
                 <InputField id="inv-hold-months" label={
                   <TermTooltip term={t("holdMonths")} definition={tg("holdTime.short")} detailHref="/academy/glossary#term-holdTime">
@@ -244,8 +283,8 @@ export default function InvestorAnalyzePage() {
                   style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", fontSize: "0.85rem", fontWeight: 600, padding: 0, display: "flex", alignItems: "center", gap: "8px", width: "100%" }}
                 >
                   <span style={{ fontSize: "0.7rem" }}>{showKillSwitches ? "▾" : "▸"}</span>
-                  <TermTooltip term="Property Condition Flags (Kill Switches)" definition={tg("killSwitch.short")} detailHref="/academy/glossary#term-killSwitch">
-                    <span>Property Condition Flags (Kill Switches)</span>
+                  <TermTooltip term={t("killSwitchSectionTitle")} definition={tg("killSwitch.short")} detailHref="/academy/glossary#term-killSwitch">
+                    <span>{t("killSwitchSectionTitle")}</span>
                   </TermTooltip>
                   {killSwitchCount > 0 && (
                     <span style={{ marginLeft: "auto", background: "var(--red-dim)", color: "var(--red)", border: "1px solid rgba(231,76,60,0.3)", borderRadius: "4px", padding: "2px 8px", fontSize: "0.72rem", fontWeight: 700 }}>
@@ -257,9 +296,9 @@ export default function InvestorAnalyzePage() {
                 {showKillSwitches && (
                   <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "6px" }}>
                     <p style={{ fontSize: "0.78rem", color: "var(--text-soft)", marginBottom: "10px", lineHeight: 1.6 }}>
-                      Check any condition issues present. These adjust the MAO downward before the 70% rule is applied.
+                      {t("killSwitchSectionDesc")}
                     </p>
-                    {KILL_SWITCHES.map((ks) => (
+                    {KILL_SWITCH_DEFS.map((ks) => (
                       <label
                         key={ks.id}
                         style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 12px", background: activeKillSwitches.has(ks.id) ? "var(--red-dim)" : "var(--surface-strong)", border: `1px solid ${activeKillSwitches.has(ks.id) ? "rgba(231,76,60,0.3)" : "var(--border)"}`, borderRadius: "var(--radius-sm)", cursor: "pointer" }}
@@ -270,9 +309,9 @@ export default function InvestorAnalyzePage() {
                           onChange={() => toggleKillSwitch(ks.id)}
                           style={{ accentColor: "var(--red)", width: "15px", height: "15px", flexShrink: 0 }}
                         />
-                        <TermTooltip term={ks.label} definition={tg("killSwitch.short")} detailHref="/academy/glossary#term-killSwitch">
+                        <TermTooltip term={killSwitchLabels[ks.id]} definition={tg("killSwitch.short")} detailHref="/academy/glossary#term-killSwitch">
                           <span style={{ flex: 1, fontSize: "0.85rem", color: "var(--text)", fontWeight: activeKillSwitches.has(ks.id) ? 600 : 400 }}>
-                            {ks.label}
+                            {killSwitchLabels[ks.id]}
                           </span>
                         </TermTooltip>
                         <span style={{ fontSize: "0.72rem", fontWeight: 700, color: SEVERITY_COLORS[ks.severity], letterSpacing: "0.06em", flexShrink: 0 }}>
@@ -439,7 +478,7 @@ export default function InvestorAnalyzePage() {
 }
 
 function InputField({
-  id, label, value, onChange, required, inputMode, inputStyle, labelStyle,
+  id, label, value, onChange, required, inputMode, inputStyle, labelStyle, error, onBlur,
 }: {
   id: string; label: React.ReactNode; value: string;
   onChange: (v: string) => void;
@@ -447,6 +486,8 @@ function InputField({
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   inputStyle: React.CSSProperties;
   labelStyle: React.CSSProperties;
+  error?: string;
+  onBlur?: () => void;
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -456,11 +497,20 @@ function InputField({
       <input
         id={id} type="text" inputMode={inputMode}
         required={required} aria-required={required}
+        aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined}
         value={value} onChange={(e) => onChange(e.target.value)}
-        style={inputStyle}
+        style={{ ...inputStyle, ...(error ? { borderColor: "var(--red)" } : {}) }}
         onFocus={(e) => (e.target.style.borderColor = "var(--gold)")}
-        onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+        onBlur={(e) => {
+          e.target.style.borderColor = error ? "var(--red)" : "var(--border)";
+          onBlur?.();
+        }}
       />
+      {error && (
+        <p id={`${id}-error`} role="alert" style={{ fontSize: "0.72rem", color: "var(--red)", marginTop: "4px" }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
