@@ -393,7 +393,7 @@ textarea:focus:not(:focus-visible) {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   list-style: none;
 }
@@ -623,8 +623,8 @@ textarea:focus:not(:focus-visible) {
 /* --- Nav toggle base (hidden desktop, shown mobile) --- */
 .nav__toggle { display: none; }
 
-/* --- 1024px: collapse nav links earlier on tight viewports --- */
-@media (max-width: 1024px) {
+/* --- 1200px: compress nav links for 8-item nav --- */
+@media (max-width: 1200px) {
   .nav__links {
     gap: 0;
   }
@@ -644,11 +644,15 @@ textarea:focus:not(:focus-visible) {
   }
 }
 
-/* --- 768px: nav collapse, 2-col drops to 1-col --- */
+/* --- 960px: nav collapse to hamburger --- */
+@media (max-width: 960px) {
+  .nav__links  { display: none; }
+  .nav__toggle { display: flex !important; }
+}
+
+/* --- 768px: logo sizing, 2-col drops to 1-col --- */
 @media (max-width: 768px) {
-  .nav__links      { display: none; }
   .nav__logo-svg   { height: 36px; }
-  .nav__toggle     { display: flex !important; }
 
   .nd-section      { padding: 64px var(--space-5); }
   .nd-section--tight { padding: 40px var(--space-5); }
