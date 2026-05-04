@@ -10,9 +10,6 @@ interface PackageCardProps {
 }
 
 export function PackageCard({ pkg, locale, startHref, alt = false }: PackageCardProps) {
-  const getLabel = (key: string) =>
-    locale === "en" ? key : key;
-
   return (
     <section
       id={pkg.id}

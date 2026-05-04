@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -69,6 +69,7 @@ const COPY = {
     success: "Your brief has been received. We review every submission and will be in touch within 2 business days to assess fit.",
     error: "Submission failed. Please try again or email us directly at sales@nodrftsystems.com",
     required: "Required field",
+    emailInvalid: "Enter a valid email address",
   },
   es: {
     org: "Organización",
@@ -88,6 +89,7 @@ const COPY = {
     success: "Su brief ha sido recibido. Revisamos cada envío y nos pondremos en contacto en 2 días hábiles para evaluar el ajuste.",
     error: "Error al enviar. Por favor intente nuevamente o escríbanos a sales@nodrftsystems.com",
     required: "Campo requerido",
+    emailInvalid: "Ingrese una dirección de correo válida",
   },
 };
 
@@ -110,15 +112,40 @@ export function EngagementForm({ locale }: Props) {
     timeline: "",
     referral: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   function update(key: keyof typeof fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
+      if (fieldErrors[key]) setFieldErrors((prev) => { const n = { ...prev }; delete n[key]; return n; });
     };
+  }
+
+  function validate(): Record<string, string> {
+    const errors: Record<string, string> = {};
+    if (!fields.org.trim()) errors.org = c.required;
+    if (!fields.name.trim()) errors.name = c.required;
+    if (!fields.email.trim()) errors.email = c.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.email = c.emailInvalid;
+    if (!fields.scope) errors.scope = c.required;
+    if (!fields.description.trim()) errors.description = c.required;
+    if (!fields.timeline) errors.timeline = c.required;
+    return errors;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
     setStatus("submitting");
     try {
       const res = await fetch("/api/submit/engagement", {
@@ -139,7 +166,12 @@ export function EngagementForm({ locale }: Props) {
 
   if (status === "success") {
     return (
-      <div className="nd-form-status nd-form-status--success" role="status">
+      <div
+        ref={successRef}
+        className="nd-form-status nd-form-status--success"
+        role="status"
+        tabIndex={-1}
+      >
         <p className="nd-p">{c.success}</p>
       </div>
     );
@@ -158,9 +190,11 @@ export function EngagementForm({ locale }: Props) {
           placeholder={c.orgPh}
           value={fields.org}
           onChange={update("org")}
-          required
           autoComplete="organization"
+          aria-invalid={fieldErrors.org ? "true" : undefined}
+          aria-describedby={fieldErrors.org ? "eng-org-err" : undefined}
         />
+        {fieldErrors.org && <span id="eng-org-err" className="nd-field-error" role="alert">{fieldErrors.org}</span>}
       </div>
 
       <div className="nd-field">
@@ -174,9 +208,11 @@ export function EngagementForm({ locale }: Props) {
           placeholder={c.namePh}
           value={fields.name}
           onChange={update("name")}
-          required
           autoComplete="name"
+          aria-invalid={fieldErrors.name ? "true" : undefined}
+          aria-describedby={fieldErrors.name ? "eng-name-err" : undefined}
         />
+        {fieldErrors.name && <span id="eng-name-err" className="nd-field-error" role="alert">{fieldErrors.name}</span>}
       </div>
 
       <div className="nd-field">
@@ -190,9 +226,11 @@ export function EngagementForm({ locale }: Props) {
           placeholder={c.emailPh}
           value={fields.email}
           onChange={update("email")}
-          required
           autoComplete="email"
+          aria-invalid={fieldErrors.email ? "true" : undefined}
+          aria-describedby={fieldErrors.email ? "eng-email-err" : undefined}
         />
+        {fieldErrors.email && <span id="eng-email-err" className="nd-field-error" role="alert">{fieldErrors.email}</span>}
       </div>
 
       <div className="nd-field">
@@ -204,7 +242,8 @@ export function EngagementForm({ locale }: Props) {
           className="nd-select"
           value={fields.scope}
           onChange={update("scope")}
-          required
+          aria-invalid={fieldErrors.scope ? "true" : undefined}
+          aria-describedby={fieldErrors.scope ? "eng-scope-err" : undefined}
         >
           {scopes.map((opt) => (
             <option key={opt.value} value={opt.value} disabled={opt.value === ""}>
@@ -212,6 +251,7 @@ export function EngagementForm({ locale }: Props) {
             </option>
           ))}
         </select>
+        {fieldErrors.scope && <span id="eng-scope-err" className="nd-field-error" role="alert">{fieldErrors.scope}</span>}
       </div>
 
       <div className="nd-field">
@@ -224,9 +264,11 @@ export function EngagementForm({ locale }: Props) {
           placeholder={c.descriptionPh}
           value={fields.description}
           onChange={update("description")}
-          required
           rows={6}
+          aria-invalid={fieldErrors.description ? "true" : undefined}
+          aria-describedby={fieldErrors.description ? "eng-desc-err" : undefined}
         />
+        {fieldErrors.description && <span id="eng-desc-err" className="nd-field-error" role="alert">{fieldErrors.description}</span>}
       </div>
 
       <div className="nd-field">
@@ -238,7 +280,8 @@ export function EngagementForm({ locale }: Props) {
           className="nd-select"
           value={fields.timeline}
           onChange={update("timeline")}
-          required
+          aria-invalid={fieldErrors.timeline ? "true" : undefined}
+          aria-describedby={fieldErrors.timeline ? "eng-timeline-err" : undefined}
         >
           {timelines.map((opt) => (
             <option key={opt.value} value={opt.value} disabled={opt.value === ""}>
@@ -246,6 +289,7 @@ export function EngagementForm({ locale }: Props) {
             </option>
           ))}
         </select>
+        {fieldErrors.timeline && <span id="eng-timeline-err" className="nd-field-error" role="alert">{fieldErrors.timeline}</span>}
       </div>
 
       <div className="nd-field">
@@ -273,7 +317,7 @@ export function EngagementForm({ locale }: Props) {
         type="submit"
         className="btn"
         disabled={status === "submitting"}
-        aria-busy={status === "submitting"}
+        aria-busy={status === "submitting" ? "true" : undefined}
         style={{ marginTop: "var(--space-5)", width: "100%" }}
       >
         {status === "submitting" ? c.submitting : c.submit}

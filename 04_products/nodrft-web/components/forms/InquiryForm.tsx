@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -35,6 +35,7 @@ const COPY = {
     success: "Your inquiry has been received. We review every message and will respond within 2 business days.",
     error: "Submission failed. Please try again or email us at sales@nodrftsystems.com",
     required: "Required field",
+    emailInvalid: "Enter a valid email address",
   },
   es: {
     name: "Su nombre",
@@ -51,6 +52,7 @@ const COPY = {
     success: "Su consulta ha sido recibida. Revisamos cada mensaje y responderemos en 2 días hábiles.",
     error: "Error al enviar. Por favor intente nuevamente o escríbanos a sales@nodrftsystems.com",
     required: "Campo requerido",
+    emailInvalid: "Ingrese una dirección de correo válida",
   },
 };
 
@@ -70,15 +72,38 @@ export function InquiryForm({ locale }: Props) {
     body: "",
     urgency: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   function update(key: keyof typeof fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
+      if (fieldErrors[key]) setFieldErrors((prev) => { const n = { ...prev }; delete n[key]; return n; });
     };
+  }
+
+  function validate(): Record<string, string> {
+    const errors: Record<string, string> = {};
+    if (!fields.name.trim()) errors.name = c.required;
+    if (!fields.email.trim()) errors.email = c.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.email = c.emailInvalid;
+    if (!fields.body.trim()) errors.body = c.required;
+    if (!fields.urgency) errors.urgency = c.required;
+    return errors;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
     setStatus("submitting");
     try {
       const res = await fetch("/api/submit/inquiry", {
@@ -99,7 +124,12 @@ export function InquiryForm({ locale }: Props) {
 
   if (status === "success") {
     return (
-      <div className="nd-form-status nd-form-status--success" role="status">
+      <div
+        ref={successRef}
+        className="nd-form-status nd-form-status--success"
+        role="status"
+        tabIndex={-1}
+      >
         <p className="nd-p">{c.success}</p>
       </div>
     );
@@ -118,9 +148,11 @@ export function InquiryForm({ locale }: Props) {
           placeholder={c.namePh}
           value={fields.name}
           onChange={update("name")}
-          required
           autoComplete="name"
+          aria-invalid={fieldErrors.name ? "true" : undefined}
+          aria-describedby={fieldErrors.name ? "inq-name-err" : undefined}
         />
+        {fieldErrors.name && <span id="inq-name-err" className="nd-field-error" role="alert">{fieldErrors.name}</span>}
       </div>
 
       <div className="nd-field">
@@ -134,9 +166,11 @@ export function InquiryForm({ locale }: Props) {
           placeholder={c.emailPh}
           value={fields.email}
           onChange={update("email")}
-          required
           autoComplete="email"
+          aria-invalid={fieldErrors.email ? "true" : undefined}
+          aria-describedby={fieldErrors.email ? "inq-email-err" : undefined}
         />
+        {fieldErrors.email && <span id="inq-email-err" className="nd-field-error" role="alert">{fieldErrors.email}</span>}
       </div>
 
       <div className="nd-field">
@@ -164,9 +198,11 @@ export function InquiryForm({ locale }: Props) {
           placeholder={c.bodyPh}
           value={fields.body}
           onChange={update("body")}
-          required
           rows={5}
+          aria-invalid={fieldErrors.body ? "true" : undefined}
+          aria-describedby={fieldErrors.body ? "inq-body-err" : undefined}
         />
+        {fieldErrors.body && <span id="inq-body-err" className="nd-field-error" role="alert">{fieldErrors.body}</span>}
       </div>
 
       <div className="nd-field">
@@ -178,7 +214,8 @@ export function InquiryForm({ locale }: Props) {
           className="nd-select"
           value={fields.urgency}
           onChange={update("urgency")}
-          required
+          aria-invalid={fieldErrors.urgency ? "true" : undefined}
+          aria-describedby={fieldErrors.urgency ? "inq-urgency-err" : undefined}
         >
           {urgencies.map((opt) => (
             <option key={opt.value} value={opt.value} disabled={opt.value === ""}>
@@ -186,6 +223,7 @@ export function InquiryForm({ locale }: Props) {
             </option>
           ))}
         </select>
+        {fieldErrors.urgency && <span id="inq-urgency-err" className="nd-field-error" role="alert">{fieldErrors.urgency}</span>}
       </div>
 
       {status === "error" && (
@@ -198,7 +236,7 @@ export function InquiryForm({ locale }: Props) {
         type="submit"
         className="btn"
         disabled={status === "submitting"}
-        aria-busy={status === "submitting"}
+        aria-busy={status === "submitting" ? "true" : undefined}
         style={{ marginTop: "var(--space-5)", width: "100%" }}
       >
         {status === "submitting" ? c.submitting : c.submit}

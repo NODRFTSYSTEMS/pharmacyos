@@ -66,6 +66,41 @@ export function Nav() {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
+  // Focus trap in mobile menu
+  useEffect(() => {
+    if (!menuOpen || !menuRef.current) return;
+    const focusable = menuRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    function onTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    }
+    document.addEventListener("keydown", onTab);
+    return () => document.removeEventListener("keydown", onTab);
+  }, [menuOpen]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onClickOutside(e: MouseEvent) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        toggleRef.current && !toggleRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [menuOpen]);
+
   function isActive(href: string) {
     if (href === "/") return pathname === `/${locale}`;
     return pathname.startsWith(localHref(href));
@@ -161,7 +196,7 @@ export function Nav() {
                 ref={toggleRef}
                 className="nav__toggle"
                 type="button"
-                aria-expanded={menuOpen}
+                aria-expanded={menuOpen ? "true" : "false"}
                 aria-controls="mobile-nav"
                 aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
                 onClick={() => setMenuOpen((v) => !v)}
@@ -256,6 +291,8 @@ export function Nav() {
             ))}
             <Link
               href={localHref("/start")}
+              aria-hidden="true"
+              tabIndex={-1}
               style={{
                 display: "flex",
                 alignItems: "center",

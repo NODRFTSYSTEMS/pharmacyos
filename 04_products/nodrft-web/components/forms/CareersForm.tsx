@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -37,6 +37,7 @@ const COPY = {
     success: "Your application has been received. We review every submission and reach out when there's a fit with active needs.",
     error: "Submission failed. Please try again or email us at sales@nodrftsystems.com",
     required: "Required field",
+    emailInvalid: "Enter a valid email address",
   },
   es: {
     name: "Su nombre",
@@ -55,6 +56,7 @@ const COPY = {
     success: "Su aplicación ha sido recibida. Revisamos cada envío y nos comunicamos cuando hay un ajuste con las necesidades activas.",
     error: "Error al enviar. Por favor intente nuevamente o escríbanos a sales@nodrftsystems.com",
     required: "Campo requerido",
+    emailInvalid: "Ingrese una dirección de correo válida",
   },
 };
 
@@ -75,15 +77,39 @@ export function CareersForm({ locale }: Props) {
     portfolio: "",
     brief: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   function update(key: keyof typeof fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
+      if (fieldErrors[key]) setFieldErrors((prev) => { const n = { ...prev }; delete n[key]; return n; });
     };
+  }
+
+  function validate(): Record<string, string> {
+    const errors: Record<string, string> = {};
+    if (!fields.name.trim()) errors.name = c.required;
+    if (!fields.email.trim()) errors.email = c.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errors.email = c.emailInvalid;
+    if (!fields.discipline.trim()) errors.discipline = c.required;
+    if (!fields.availability) errors.availability = c.required;
+    if (!fields.brief.trim()) errors.brief = c.required;
+    return errors;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
     setStatus("submitting");
     try {
       const res = await fetch("/api/submit/careers", {
@@ -104,7 +130,12 @@ export function CareersForm({ locale }: Props) {
 
   if (status === "success") {
     return (
-      <div className="nd-form-status nd-form-status--success" role="status">
+      <div
+        ref={successRef}
+        className="nd-form-status nd-form-status--success"
+        role="status"
+        tabIndex={-1}
+      >
         <p className="nd-p">{c.success}</p>
       </div>
     );
@@ -123,9 +154,11 @@ export function CareersForm({ locale }: Props) {
           placeholder={c.namePh}
           value={fields.name}
           onChange={update("name")}
-          required
           autoComplete="name"
+          aria-invalid={fieldErrors.name ? "true" : undefined}
+          aria-describedby={fieldErrors.name ? "car-name-err" : undefined}
         />
+        {fieldErrors.name && <span id="car-name-err" className="nd-field-error" role="alert">{fieldErrors.name}</span>}
       </div>
 
       <div className="nd-field">
@@ -139,9 +172,11 @@ export function CareersForm({ locale }: Props) {
           placeholder={c.emailPh}
           value={fields.email}
           onChange={update("email")}
-          required
           autoComplete="email"
+          aria-invalid={fieldErrors.email ? "true" : undefined}
+          aria-describedby={fieldErrors.email ? "car-email-err" : undefined}
         />
+        {fieldErrors.email && <span id="car-email-err" className="nd-field-error" role="alert">{fieldErrors.email}</span>}
       </div>
 
       <div className="nd-field">
@@ -155,9 +190,11 @@ export function CareersForm({ locale }: Props) {
           placeholder={c.disciplinePh}
           value={fields.discipline}
           onChange={update("discipline")}
-          required
           autoComplete="off"
+          aria-invalid={fieldErrors.discipline ? "true" : undefined}
+          aria-describedby={fieldErrors.discipline ? "car-discipline-err" : undefined}
         />
+        {fieldErrors.discipline && <span id="car-discipline-err" className="nd-field-error" role="alert">{fieldErrors.discipline}</span>}
       </div>
 
       <div className="nd-field">
@@ -169,7 +206,8 @@ export function CareersForm({ locale }: Props) {
           className="nd-select"
           value={fields.availability}
           onChange={update("availability")}
-          required
+          aria-invalid={fieldErrors.availability ? "true" : undefined}
+          aria-describedby={fieldErrors.availability ? "car-availability-err" : undefined}
         >
           {availabilities.map((opt) => (
             <option key={opt.value} value={opt.value} disabled={opt.value === ""}>
@@ -177,6 +215,7 @@ export function CareersForm({ locale }: Props) {
             </option>
           ))}
         </select>
+        {fieldErrors.availability && <span id="car-availability-err" className="nd-field-error" role="alert">{fieldErrors.availability}</span>}
       </div>
 
       <div className="nd-field">
@@ -204,9 +243,11 @@ export function CareersForm({ locale }: Props) {
           placeholder={c.briefPh}
           value={fields.brief}
           onChange={update("brief")}
-          required
           rows={7}
+          aria-invalid={fieldErrors.brief ? "true" : undefined}
+          aria-describedby={fieldErrors.brief ? "car-brief-err" : undefined}
         />
+        {fieldErrors.brief && <span id="car-brief-err" className="nd-field-error" role="alert">{fieldErrors.brief}</span>}
       </div>
 
       {status === "error" && (
@@ -219,7 +260,7 @@ export function CareersForm({ locale }: Props) {
         type="submit"
         className="btn"
         disabled={status === "submitting"}
-        aria-busy={status === "submitting"}
+        aria-busy={status === "submitting" ? "true" : undefined}
         style={{ marginTop: "var(--space-5)", width: "100%" }}
       >
         {status === "submitting" ? c.submitting : c.submit}

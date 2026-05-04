@@ -19,14 +19,14 @@ export function EngagementCard({ record, locale }: EngagementCardProps) {
         {pick(record.label, locale)}
       </span>
       <p className="nd-p">{pick(record.summary, locale)}</p>
-      <div className="nd-eng-meta" role="list" aria-label={locale === "en" ? "Engagement details" : "Detalles del proyecto"}>
+      <dl className="nd-eng-meta" aria-label={locale === "en" ? "Engagement details" : "Detalles del proyecto"}>
         {record.meta.map((item, i) => (
-          <span key={i} style={{ display: "contents" }}>
-            <span className="nd-eng-key" role="term">{pick(item.key, locale)}</span>
-            <span className="nd-eng-val" role="definition">{pick(item.value, locale)}</span>
-          </span>
+          <div key={i} style={{ display: "contents" }}>
+            <dt className="nd-eng-key">{pick(item.key, locale)}</dt>
+            <dd className="nd-eng-val">{pick(item.value, locale)}</dd>
+          </div>
         ))}
-      </div>
+      </dl>
     </article>
   );
 }
