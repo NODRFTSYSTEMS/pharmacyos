@@ -125,8 +125,8 @@ export function Nav() {
               : undefined
           }
         >
-          <div className="nav__inner">
-            {/* Logo */}
+          {/* Banner strip */}
+          <div className="nav__banner-strip">
             <Link href={localHref("/")} className="nav__logo" aria-label="NoDrftSystems home">
               <Image
                 src="/assets/nodrftsystems-banner.png"
@@ -137,7 +137,9 @@ export function Nav() {
                 priority
               />
             </Link>
+          </div>
 
+          <div className="nav__inner">
             {/* Desktop links */}
             <ul className="nav__links" role="list">
               {NAV_LINKS.map(({ href, key }) => (
