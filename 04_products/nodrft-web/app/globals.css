@@ -489,6 +489,9 @@ textarea:focus:not(:focus-visible) {
 .nd-card--featured {
   border-top: 2px solid var(--accent);
 }
+.nd-card--copper {
+  border-top: 2px solid var(--copper);
+}
 
 /* --------------------------------------------------------------------------
    Labels / markers
@@ -628,10 +631,13 @@ textarea:focus:not(:focus-visible) {
   letter-spacing: -0.02em;
   color: #EEECEA;
   text-decoration: none;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
   transition: color var(--transition-fast);
 }
+.nd-footer-logo-mark { flex-shrink: 0; }
 .nd-footer-wordmark:hover { color: #3D9E96; }
 .nd-footer-wordmark__accent { color: #3D9E96; }
 .nd-footer-tagline {

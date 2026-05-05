@@ -88,8 +88,8 @@ const FIT = {
   en: {
     label: "Who we serve best",
     items: [
-      "Organizations with 10–50 employees needing stronger digital positioning",
-      "Teams that value clarity, structured delivery, and accountability",
+      "Organizations that need stronger digital positioning and disciplined delivery",
+      "Teams that value clarity, structured execution, and accountability",
       "Projects where scope discipline and quality control matter",
       "Companies ready to invest in systems that stay correct after handoff",
     ],
@@ -98,8 +98,8 @@ const FIT = {
   es: {
     label: "A quiénes servimos mejor",
     items: [
-      "Organizaciones de 10–50 empleados que necesitan mejor posicionamiento digital",
-      "Equipos que valoran claridad, entrega estructurada y responsabilidad",
+      "Organizaciones que necesitan mejor posicionamiento digital y entrega disciplinada",
+      "Equipos que valoran claridad, ejecución estructurada y responsabilidad",
       "Proyectos donde la disciplina de alcance y el control de calidad importan",
       "Empresas listas para invertir en sistemas que se mantienen correctos tras el traspaso",
     ],
@@ -238,7 +238,7 @@ export default async function HomePage({ params }: Props) {
           <div className="nd-grid-why">
             {STRENGTHS.map((s, i) => (
               <FadeUp key={i} delay={i * 0.06}>
-                <div className="nd-card" style={{ position: "relative", height: "100%" }}>
+                <div className={`nd-card${i === 0 || i === 4 ? " nd-card--copper" : ""}`} style={{ position: "relative", height: "100%" }}>
                   <span className="nd-card__corner" aria-hidden="true" />
                   <h3 className="nd-h3" style={{ marginBottom: "var(--space-3)" }}>{s.title}</h3>
                   <p className="nd-p-sm">{s.body}</p>
