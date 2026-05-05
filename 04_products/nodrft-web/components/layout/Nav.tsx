@@ -112,6 +112,20 @@ export function Nav() {
   return (
     <>
       <header role="banner">
+        {/* Full-width banner — not sticky, scrolls with page */}
+        <div className="nav__banner-full">
+          <Link href={localHref("/")} aria-label="NoDrftSystems home">
+            <Image
+              src="/assets/nodrftsystems-banner.png"
+              alt=""
+              width={2172}
+              height={724}
+              className="nav__banner-full-img"
+              priority
+            />
+          </Link>
+        </div>
+
         <nav
           className="nav"
           aria-label={t("ariaLabel")}
@@ -125,20 +139,6 @@ export function Nav() {
               : undefined
           }
         >
-          {/* Banner strip */}
-          <div className="nav__banner-strip">
-            <Link href={localHref("/")} className="nav__logo" aria-label="NoDrftSystems home">
-              <Image
-                src="/assets/nodrftsystems-banner.png"
-                alt=""
-                width={2172}
-                height={724}
-                className="nav__logo-img"
-                priority
-              />
-            </Link>
-          </div>
-
           <div className="nav__inner">
             {/* Desktop links */}
             <ul className="nav__links" role="list">

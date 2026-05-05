@@ -182,7 +182,7 @@
    Layout scale — shared across both themes
    -------------------------------------------------------------------------- */
 :root {
-  --nav-height:       116px;
+  --nav-height:       60px;
   --max-width:        1100px;
   --max-width-narrow: 620px;
   --max-width-wide:   1100px;
@@ -361,6 +361,24 @@ textarea:focus:not(:focus-visible) {
 /* --------------------------------------------------------------------------
    Navigation
    -------------------------------------------------------------------------- */
+.nav__banner-full {
+  display: block;
+  width: 100%;
+  background: #0F0F0E;
+  overflow: hidden;
+  height: clamp(100px, 20vw, 220px);
+}
+.nav__banner-full a {
+  display: block;
+  height: 100%;
+}
+.nav__banner-full-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
 .nav {
   position: sticky;
   top: 0;
@@ -369,13 +387,8 @@ textarea:focus:not(:focus-visible) {
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   backdrop-filter: blur(12px) saturate(180%);
   border-bottom: 1px solid var(--border-light);
+  height: var(--nav-height);
   transition: border-bottom-color var(--transition), box-shadow var(--transition), background var(--transition-slow);
-}
-.nav__banner-strip {
-  display: flex;
-  align-items: center;
-  padding: 6px var(--space-6);
-  border-bottom: 1px solid var(--border-light);
 }
 .nav__inner {
   max-width: var(--max-width-wide);
@@ -383,7 +396,7 @@ textarea:focus:not(:focus-visible) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
+  height: 100%;
   padding: 0 var(--space-6);
 }
 .nav__logo {
@@ -397,13 +410,6 @@ textarea:focus:not(:focus-visible) {
 }
 .nav__logo:hover { color: var(--accent); }
 .nav__logo-svg { display: block; height: 44px; width: auto; }
-.nav__logo-img {
-  display: block;
-  height: 52px;
-  width: auto;
-  transition: opacity var(--transition-fast);
-}
-.nav__logo:hover .nav__logo-img { opacity: 0.82; }
 
 .nav__links {
   display: flex;
@@ -769,9 +775,7 @@ textarea:focus:not(:focus-visible) {
 
 /* --- 768px: logo sizing, 2-col drops to 1-col --- */
 @media (max-width: 768px) {
-  :root { --nav-height: 100px; }
   .nav__logo-svg   { height: 36px; }
-  .nav__logo-img   { height: 36px; }
 
   .nd-section      { padding: 64px var(--space-5); }
   .nd-section--tight { padding: 40px var(--space-5); }
@@ -817,7 +821,6 @@ textarea:focus:not(:focus-visible) {
 
 /* --- 480px: single-column everything, tighter spacing --- */
 @media (max-width: 480px) {
-  :root { --nav-height: 88px; }
   .nd-section { padding: 48px var(--space-4); }
   .nd-section--tight { padding: 32px var(--space-4); }
 
