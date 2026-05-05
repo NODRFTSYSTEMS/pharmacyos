@@ -40,7 +40,8 @@ export function LanguageToggle() {
         letterSpacing: "0.04em",
         cursor: "pointer",
         transition: "all var(--transition-fast)",
-        minHeight: "32px",
+        minHeight: "44px",
+        minWidth: "44px",
         position: "relative",
         opacity: isPending ? 0.6 : 1,
       }}

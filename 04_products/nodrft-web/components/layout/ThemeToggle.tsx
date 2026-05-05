@@ -33,7 +33,7 @@ export function ThemeToggle() {
     localStorage.setItem(STORAGE_KEY, next);
   }
 
-  if (!mounted) return <div style={{ width: 36, height: 32 }} aria-hidden />;
+  if (!mounted) return <div style={{ width: 44, height: 44 }} aria-hidden />;
 
   return (
     <button
@@ -51,7 +51,8 @@ export function ThemeToggle() {
         letterSpacing: "0.04em",
         cursor: "pointer",
         transition: "all var(--transition-fast)",
-        minHeight: "32px",
+        minHeight: "44px",
+        minWidth: "44px",
         position: "relative",
       }}
     >

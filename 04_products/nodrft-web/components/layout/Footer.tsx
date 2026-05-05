@@ -9,88 +9,37 @@ export async function Footer() {
     return `/${locale}${href === "/" ? "" : href}`;
   }
 
+  const workLinks = [
+    { href: "/capabilities", key: "capabilities" as const },
+    { href: "/engagements", key: "engagements" as const },
+    { href: "/insights", key: "insights" as const },
+  ];
+
+  const companyLinks = [
+    { href: "/about", key: "about" as const },
+    { href: "/careers", key: "careers" as const },
+    { href: "/inquiries", key: "inquiries" as const },
+  ];
+
   return (
     <footer className="nd-footer" role="contentinfo">
-      <div className="nd-wrap-wide" style={{ padding: "0 var(--space-6)" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-8)",
-          }}
-        >
-          {/* Wordmark row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: "var(--space-8)",
-              flexWrap: "wrap",
-            }}
-          >
+      <div className="nd-wrap-wide">
+        <div className="nd-footer-inner">
+          <div className="nd-footer-top">
             <div>
-              <Link
-                href={localHref("/")}
-                aria-label="NoDrftSystems home"
-                style={{
-                  fontFamily: "var(--nd-font-mono, monospace)",
-                  fontWeight: 500,
-                  fontSize: "15px",
-                  letterSpacing: "-0.02em",
-                  color: "#EEECEA",
-                  textDecoration: "none",
-                  display: "block",
-                  marginBottom: "var(--space-3)",
-                }}
-              >
-                NoDrft<span style={{ color: "#3D9E96" }}>Systems</span>
+              <Link href={localHref("/")} className="nd-footer-wordmark" aria-label="NoDrftSystems home">
+                NoDrft<span className="nd-footer-wordmark__accent">Systems</span>
               </Link>
-              <p
-                style={{
-                  fontSize: "13px",
-                  color: "#908E87",
-                  maxWidth: "280px",
-                  lineHeight: 1.6,
-                }}
-              >
-                {t("tagline")}
-              </p>
+              <p className="nd-footer-tagline">{t("tagline")}</p>
             </div>
 
-            {/* Footer nav columns */}
-            <div
-              style={{
-                display: "flex",
-                gap: "var(--space-16)",
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="nd-footer-cols">
               <div>
-                <p
-                  style={{
-                    fontFamily: "var(--nd-font-mono, monospace)",
-                    fontSize: "11px",
-                    fontWeight: 500,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#48463F",
-                    marginBottom: "var(--space-4)",
-                  }}
-                >
-                  {t("workLabel")}
-                </p>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                  {[
-                    { href: "/capabilities", key: "capabilities" as const },
-                    { href: "/engagements", key: "engagements" as const },
-                    { href: "/insights", key: "insights" as const },
-                  ].map(({ href, key }) => (
+                <p className="nd-footer-col-label">{t("workLabel")}</p>
+                <ul className="nd-footer-links">
+                  {workLinks.map(({ href, key }) => (
                     <li key={href}>
-                      <Link
-                        href={localHref(href)}
-                        style={{ fontSize: "14px", color: "#908E87", textDecoration: "none" }}
-                      >
+                      <Link href={localHref(href)} className="nd-footer-link">
                         {t(key)}
                       </Link>
                     </li>
@@ -99,30 +48,11 @@ export async function Footer() {
               </div>
 
               <div>
-                <p
-                  style={{
-                    fontFamily: "var(--nd-font-mono, monospace)",
-                    fontSize: "11px",
-                    fontWeight: 500,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#48463F",
-                    marginBottom: "var(--space-4)",
-                  }}
-                >
-                  {t("companyLabel")}
-                </p>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                  {[
-                    { href: "/about", key: "about" as const },
-                    { href: "/careers", key: "careers" as const },
-                    { href: "/inquiries", key: "inquiries" as const },
-                  ].map(({ href, key }) => (
+                <p className="nd-footer-col-label">{t("companyLabel")}</p>
+                <ul className="nd-footer-links">
+                  {companyLinks.map(({ href, key }) => (
                     <li key={href}>
-                      <Link
-                        href={localHref(href)}
-                        style={{ fontSize: "14px", color: "#908E87", textDecoration: "none" }}
-                      >
+                      <Link href={localHref(href)} className="nd-footer-link">
                         {t(key)}
                       </Link>
                     </li>
@@ -132,35 +62,16 @@ export async function Footer() {
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div
-            style={{
-              borderTop: "1px solid #272522",
-              paddingTop: "var(--space-6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "var(--space-4)",
-              flexWrap: "wrap",
-            }}
-          >
-            <p style={{ fontSize: "12px", color: "#48463F" }}>
-              {t("copyright", { year: new Date().getFullYear() })}
-            </p>
-            <div style={{ display: "flex", gap: "var(--space-6)" }}>
-              <Link
-                href={localHref("/privacy")}
-                style={{ fontSize: "12px", color: "#48463F", textDecoration: "none" }}
-              >
+          <div className="nd-footer-bottom">
+            <p className="nd-footer-copy">{t("copyright", { year: new Date().getFullYear() })}</p>
+            <nav className="nd-footer-legal" aria-label={locale === "en" ? "Legal" : "Legal"}>
+              <Link href={localHref("/privacy")} className="nd-footer-legal-link">
                 {t("privacy")}
               </Link>
-              <Link
-                href={localHref("/terms")}
-                style={{ fontSize: "12px", color: "#48463F", textDecoration: "none" }}
-              >
+              <Link href={localHref("/terms")} className="nd-footer-legal-link">
                 {t("terms")}
               </Link>
-            </div>
+            </nav>
           </div>
         </div>
       </div>
