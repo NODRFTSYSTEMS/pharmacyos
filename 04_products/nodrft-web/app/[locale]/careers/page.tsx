@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const COPY = {
   en: {
     label: "Specialists",
-    heading: "We work with specialists, not generalists.",
+    heading: "The roster is small on purpose.",
     lead: "NoDrftSystems is a lean, delivery-focused studio. When a project requires a specific skill, we bring in a specialist who meets the quality and governance standard — not a generalist who approximates it.",
     whatLabel: "What we look for",
     what: [
