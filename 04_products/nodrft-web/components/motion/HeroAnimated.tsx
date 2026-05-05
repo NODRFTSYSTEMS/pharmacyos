@@ -163,13 +163,18 @@ export function HeroAnimated({
           animate={prefersReduced ? {} : "visible"}
           variants={containerVariant}
         >
-          <motion.p
-            className="nd-label"
-            style={{ marginBottom: "var(--space-4)" }}
+          <motion.div
+            className="nd-hero-label-wrap"
             variants={blockVariant}
           >
-            {label}
-          </motion.p>
+            <motion.div
+              className="nd-hero-copper-bar"
+              initial={prefersReduced ? {} : { scaleX: 0 }}
+              animate={prefersReduced ? {} : { scaleX: 1 }}
+              transition={{ duration: 0.5, ease: BRAND_EASE, delay: 0.08 }}
+            />
+            <p className="nd-label">{label}</p>
+          </motion.div>
 
           <h1
             id="hero-heading"

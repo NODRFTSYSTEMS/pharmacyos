@@ -1527,6 +1527,14 @@ textarea:focus:not(:focus-visible) {
 .nd-section-h3  { margin-bottom: var(--space-3); }
 .nd-section-p   { margin-bottom: var(--space-4); }
 .nd-form-submit-btn { margin-top: var(--space-5); width: 100%; }
+.nd-hero-label-wrap { margin-bottom: var(--space-4); }
+.nd-hero-copper-bar {
+  width: 32px;
+  height: 2px;
+  background: var(--copper);
+  margin-bottom: var(--space-3);
+  transform-origin: left center;
+}
 
 /* --------------------------------------------------------------------------
    Legal pages
