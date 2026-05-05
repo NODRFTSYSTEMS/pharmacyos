@@ -38,28 +38,75 @@ const INDUSTRY_OPTIONS = {
 const SCOPE_OPTIONS = {
   en: [
     { value: "", label: "Select a scope class" },
-    { value: "website-audit", label: "Website Audit" },
-    { value: "discovery-sprint", label: "Discovery Sprint" },
-    { value: "landing-page-sprint", label: "Conversion Landing Page Sprint" },
-    { value: "static-business-site", label: "Static Business Site" },
-    { value: "business-launch-site", label: "Business Launch Site" },
-    { value: "authority-website", label: "Authority Website" },
-    { value: "platform-starter", label: "Platform Starter" },
-    { value: "ecosystem-build", label: "Ecosystem Build" },
+    { value: "website-audit", label: "Website Audit — find out what's working and what isn't" },
+    { value: "discovery-sprint", label: "Discovery Sprint — I'm not sure what I need yet" },
+    { value: "landing-page-sprint", label: "Single Page — one focused page with a clear call to action" },
+    { value: "static-business-site", label: "Simple Business Site — pages and contact form, no CMS" },
+    { value: "business-launch-site", label: "Full Business Site — I'll need to update content myself" },
+    { value: "authority-website", label: "Authority Website — blog, forms, analytics, complete build" },
+    { value: "platform-starter", label: "Web App / Platform — needs login, database, or integrations" },
+    { value: "ecosystem-build", label: "Ecosystem Build — multiple systems, large scope" },
     { value: "not-sure", label: "Not sure yet — I need guidance" },
   ],
   es: [
     { value: "", label: "Seleccione una clase de alcance" },
-    { value: "website-audit", label: "Auditoría de Sitio Web" },
-    { value: "discovery-sprint", label: "Discovery Sprint" },
-    { value: "landing-page-sprint", label: "Sprint de Landing Page de Conversión" },
-    { value: "static-business-site", label: "Sitio Empresarial Estático" },
-    { value: "business-launch-site", label: "Sitio de Lanzamiento Empresarial" },
-    { value: "authority-website", label: "Sitio de Autoridad" },
-    { value: "platform-starter", label: "Plataforma Inicial" },
-    { value: "ecosystem-build", label: "Construcción de Ecosistema" },
-    { value: "not-sure", label: "No estoy seguro — necesito orientación" },
+    { value: "website-audit", label: "Auditoría Web — identificar qué funciona y qué no" },
+    { value: "discovery-sprint", label: "Discovery Sprint — aún no sé qué necesito" },
+    { value: "landing-page-sprint", label: "Página Única — una página enfocada con llamada a la acción" },
+    { value: "static-business-site", label: "Sitio Simple — páginas y contacto, sin sistema de contenido" },
+    { value: "business-launch-site", label: "Sitio Completo — necesitaré actualizar el contenido yo mismo" },
+    { value: "authority-website", label: "Sitio de Autoridad — blog, formularios, analíticas, construcción completa" },
+    { value: "platform-starter", label: "App Web / Plataforma — requiere acceso, base de datos o integraciones" },
+    { value: "ecosystem-build", label: "Ecosistema Digital — múltiples sistemas, alcance amplio" },
+    { value: "not-sure", label: "Aún no sé — necesito orientación" },
   ],
+};
+
+const DESCRIPTION_TEMPLATES: Record<string, { en: string; es: string }> = {
+  "healthcare-pharmacy": {
+    en: `We are a [pharmacy / clinic / medical practice] looking to [launch / refresh] our online presence.\n\nWe need: [online prescription refills / appointment scheduling / service and location info / patient resources]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [make it easy for patients to find and contact us / enable online appointment requests / display our services clearly]`,
+    es: `Somos una [farmacia / clínica / práctica médica] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [solicitudes de recetas en línea / programación de citas / información de servicios y ubicación / recursos para pacientes]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [facilitar que los pacientes nos encuentren y contacten / habilitar citas en línea / mostrar nuestros servicios claramente]`,
+  },
+  "automotive": {
+    en: `We are an [auto dealership / car wash / auto service shop] looking to [launch / refresh] our online presence.\n\nWe need: [vehicle inventory display / online service booking / promotions page / pricing / contact and location info]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [drive more walk-ins or bookings / display our inventory / showcase our services and pricing]`,
+    es: `Somos un [concesionario / lavado de autos / taller de servicio automotriz] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [exhibición de inventario / reservas de servicio en línea / página de promociones / precios / contacto y ubicación]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [atraer más visitas o reservas / mostrar nuestro inventario / exhibir servicios y precios]`,
+  },
+  "food-beverage": {
+    en: `We are a [restaurant / café / catering company] looking to [launch / refresh] our online presence.\n\nWe need: [online menu / reservation system / catering inquiry form / event booking / online ordering]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [increase reservations / showcase our menu / attract catering clients / make it easy for people to find us]`,
+    es: `Somos un [restaurante / café / empresa de catering] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [menú en línea / sistema de reservaciones / formulario de catering / reserva de eventos / pedidos en línea]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [aumentar reservaciones / mostrar nuestro menú / atraer clientes de catering / facilitar que nos encuentren]`,
+  },
+  "construction-trades": {
+    en: `We are a [general contractor / construction company / trade business] looking to [launch / refresh] our online presence.\n\nWe need: [project portfolio / quote request form / services and service area info / licensing and credentials display]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [generate more quote requests / showcase completed projects / build credibility and trust online]`,
+    es: `Somos una [empresa constructora / contratista general / negocio de oficios] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [portafolio de proyectos / formulario de cotización / área de servicio y licencias / credenciales]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [generar más solicitudes de cotización / mostrar proyectos completados / establecer credibilidad en línea]`,
+  },
+  "retail": {
+    en: `We are a [retail store / boutique / specialty shop] looking to [launch / refresh] our online presence.\n\nWe need: [product catalog / online store / store locator / promotions page / contact info]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [sell products online / drive foot traffic / build brand presence / showcase our inventory]`,
+    es: `Somos una [tienda minorista / boutique / tienda especializada] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [catálogo de productos / tienda en línea / localizador de tienda / promociones / información de contacto]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [vender productos en línea / atraer tráfico a la tienda / construir presencia de marca / mostrar inventario]`,
+  },
+  "publishing-media": {
+    en: `We are a [publisher / media outlet / news organization] looking to [launch / refresh] our online presence.\n\nWe need: [content publishing system / article categories / author profiles / subscription or newsletter / search]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [publish and organize content regularly / build a readership / establish editorial authority]`,
+    es: `Somos una [editorial / medio de comunicación / organización de noticias] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [sistema de publicación de contenido / categorías / perfiles de autores / suscripción o boletín / búsqueda]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [publicar y organizar contenido / construir audiencia / establecer autoridad editorial]`,
+  },
+  "content-creation": {
+    en: `We are a [content creator / production company / creative studio] looking to [launch / refresh] our online presence.\n\nWe need: [portfolio / media kit / booking or inquiry form / social media integration / content showcase]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [attract brand partnerships / showcase our work / make it easy for clients to hire us]`,
+    es: `Somos [creadores de contenido / empresa de producción / estudio creativo] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [portafolio / media kit / formulario de reserva o consulta / integración social / vitrina de contenido]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [atraer alianzas de marca / mostrar nuestro trabajo / facilitar que los clientes nos contraten]`,
+  },
+  "professional-services": {
+    en: `We are a [law firm / financial advisory / consulting practice] looking to [launch / refresh] our online presence.\n\nWe need: [services overview / team profiles / client inquiry form / case studies or results / location and contact info]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [generate qualified inquiries / establish authority in our field / convert visitors into consultations]`,
+    es: `Somos un [bufete de abogados / asesoría financiera / firma consultora] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [descripción de servicios / perfiles del equipo / formulario de consulta / casos de éxito / contacto y ubicación]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [generar consultas calificadas / establecer autoridad en nuestro campo / convertir visitantes en consultas]`,
+  },
+  "real-estate": {
+    en: `We are a [real estate agency / brokerage / property developer] looking to [launch / refresh] our online presence.\n\nWe need: [property listings / agent profiles / search or filter functionality / buyer and seller inquiry forms / market area info]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [display active listings / generate buyer or seller leads / establish our market presence]`,
+    es: `Somos una [agencia inmobiliaria / corredora / desarrolladora] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [listados de propiedades / perfiles de agentes / búsqueda y filtros / formularios para compradores y vendedores / información del mercado]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [mostrar listados activos / generar prospectos / establecer presencia en el mercado]`,
+  },
+  "technology": {
+    en: `We are a [tech company / software product / SaaS business] looking to [launch / refresh] our online presence.\n\nWe need: [product overview / feature highlights / pricing page / demo or trial request / user login or portal]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [drive product signups / explain our technology clearly / convert visitors to demos or trials]`,
+    es: `Somos una [empresa tecnológica / producto de software / negocio SaaS] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [descripción del producto / características destacadas / precios / solicitud de demo / acceso de usuarios]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [impulsar registros / explicar nuestra tecnología claramente / convertir visitantes en demos o pruebas]`,
+  },
+  "other": {
+    en: `We are a [describe your business type] looking to [launch / refresh] our online presence.\n\nWe need: [describe what you need — pages, features, functionality]\n\nWe currently [have a site at ___ / do not have a website].\n\nPriority: [describe your main goal — what success looks like for this project]`,
+    es: `Somos [describa su tipo de negocio] que busca [lanzar / actualizar] nuestra presencia en línea.\n\nNecesitamos: [describa qué necesita — páginas, funciones, características]\n\nActualmente [tenemos un sitio en ___ / no tenemos sitio web].\n\nPrioridad: [describa su objetivo principal — cómo se ve el éxito para este proyecto]`,
+  },
 };
 
 const TIMELINE_OPTIONS = {
@@ -157,6 +204,15 @@ export function EngagementForm({ locale }: Props) {
   useEffect(() => {
     if (status === "success") successRef.current?.focus();
   }, [status]);
+
+  useEffect(() => {
+    if (!fields.industry) return;
+    setFields(prev => {
+      if (prev.description.trim()) return prev;
+      const tpl = DESCRIPTION_TEMPLATES[prev.industry];
+      return tpl ? { ...prev, description: tpl[locale] } : prev;
+    });
+  }, [fields.industry, locale]);
 
   useEffect(() => {
     if (shouldFocusSummary.current && Object.keys(fieldErrors).length > 0) {
