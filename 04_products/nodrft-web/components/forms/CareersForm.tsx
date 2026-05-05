@@ -38,6 +38,7 @@ const COPY = {
     error: "Submission failed. Please try again or email us at sales@nodrftsystems.com",
     required: "Required field",
     emailInvalid: "Enter a valid email address",
+    errorSummary: "Please correct the errors marked below.",
   },
   es: {
     name: "Su nombre",
@@ -57,6 +58,7 @@ const COPY = {
     error: "Error al enviar. Por favor intente nuevamente o escríbanos a sales@nodrftsystems.com",
     required: "Campo requerido",
     emailInvalid: "Ingrese una dirección de correo válida",
+    errorSummary: "Por favor corrija los errores marcados a continuación.",
   },
 };
 
@@ -79,10 +81,19 @@ export function CareersForm({ locale }: Props) {
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const successRef = useRef<HTMLDivElement>(null);
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
+  const shouldFocusSummary = useRef(false);
 
   useEffect(() => {
     if (status === "success") successRef.current?.focus();
   }, [status]);
+
+  useEffect(() => {
+    if (shouldFocusSummary.current && Object.keys(fieldErrors).length > 0) {
+      errorSummaryRef.current?.focus();
+      shouldFocusSummary.current = false;
+    }
+  }, [fieldErrors]);
 
   function update(key: keyof typeof fields) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -106,6 +117,7 @@ export function CareersForm({ locale }: Props) {
     e.preventDefault();
     const errors = validate();
     if (Object.keys(errors).length > 0) {
+      shouldFocusSummary.current = true;
       setFieldErrors(errors);
       return;
     }
@@ -143,6 +155,16 @@ export function CareersForm({ locale }: Props) {
 
   return (
     <form className="nd-form" onSubmit={handleSubmit} noValidate>
+      {Object.keys(fieldErrors).length > 0 && (
+        <div
+          ref={errorSummaryRef}
+          className="nd-form-status nd-form-status--error nd-form-error-summary"
+          role="alert"
+          tabIndex={-1}
+        >
+          <p className="nd-p-sm">{c.errorSummary}</p>
+        </div>
+      )}
       <div className="nd-field">
         <label className="nd-field-label" htmlFor="car-name">
           {c.name} <span className="nd-field-req" aria-label={c.required}>*</span>
@@ -258,10 +280,9 @@ export function CareersForm({ locale }: Props) {
 
       <button
         type="submit"
-        className="btn"
+        className="btn nd-form-submit-btn"
         disabled={status === "submitting"}
         aria-busy={status === "submitting" ? "true" : undefined}
-        style={{ marginTop: "var(--space-5)", width: "100%" }}
       >
         {status === "submitting" ? c.submitting : c.submit}
       </button>

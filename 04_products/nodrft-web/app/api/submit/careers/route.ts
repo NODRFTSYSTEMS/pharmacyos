@@ -41,32 +41,31 @@ export async function POST(req: NextRequest) {
     console.error("FORM_WEBHOOK_URL not configured");
     return NextResponse.json({ ok: false, error: "Service unavailable" }, { status: 503 });
   }
-  {
-    try {
-      const payload = {
-        type: "careers",
-        name: String(body.name).trim(),
-        email: String(body.email).trim(),
-        discipline: String(body.discipline).trim(),
-        availability: String(body.availability).trim(),
-        portfolio: body.portfolio ? String(body.portfolio).trim() : "",
-        brief: String(body.brief).trim(),
-        locale: String(body.locale ?? "en"),
-        submittedAt: new Date().toISOString(),
-      };
-      const fwdRes = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!fwdRes.ok) {
-        console.error("Webhook forward failed", fwdRes.status);
-        return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
-      }
-    } catch (err) {
-      console.error("Webhook error", err);
+
+  try {
+    const params = new URLSearchParams({
+      "form-kind": "careers",
+      name: String(body.name).trim(),
+      email: String(body.email).trim(),
+      discipline: String(body.discipline).trim(),
+      availability: String(body.availability).trim(),
+      portfolio: body.portfolio ? String(body.portfolio).trim() : "",
+      brief: String(body.brief).trim(),
+      locale: String(body.locale ?? "en"),
+      submittedAt: new Date().toISOString(),
+    });
+    const fwdRes = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+    if (!fwdRes.ok) {
+      console.error("Webhook forward failed", fwdRes.status);
       return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
     }
+  } catch (err) {
+    console.error("Webhook error", err);
+    return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true });

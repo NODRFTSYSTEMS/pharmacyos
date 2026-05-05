@@ -42,5 +42,5 @@ export const jetbrainsMono = localFont({
   ],
   variable: "--nd-font-mono",
   display: "swap",
-  preload: false,
+  preload: true,
 });

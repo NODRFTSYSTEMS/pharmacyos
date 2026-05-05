@@ -640,6 +640,16 @@ textarea:focus:not(:focus-visible) {
   max-width: 280px;
   line-height: 1.6;
 }
+.nd-footer-email {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: 12px;
+  font-family: var(--nd-font-mono, monospace);
+  color: #908E87;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.nd-footer-email:hover { color: #EEECEA; }
 .nd-footer-cols {
   display: flex;
   gap: var(--space-16);
@@ -1511,6 +1521,8 @@ textarea:focus:not(:focus-visible) {
   border-color: var(--error);
   color: var(--error);
 }
+.nd-form-error-summary { margin-bottom: var(--space-4); }
+.nd-form-submit-btn { margin-top: var(--space-5); width: 100%; }
 
 /* --------------------------------------------------------------------------
    Legal pages

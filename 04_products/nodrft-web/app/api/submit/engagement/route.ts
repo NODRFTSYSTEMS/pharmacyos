@@ -33,33 +33,32 @@ export async function POST(req: NextRequest) {
     console.error("FORM_WEBHOOK_URL not configured");
     return NextResponse.json({ ok: false, error: "Service unavailable" }, { status: 503 });
   }
-  {
-    try {
-      const payload = {
-        type: "engagement",
-        org: String(body.org).trim(),
-        name: String(body.name).trim(),
-        email: String(body.email).trim(),
-        scope: String(body.scope).trim(),
-        description: String(body.description).trim(),
-        timeline: String(body.timeline).trim(),
-        referral: body.referral ? String(body.referral).trim() : "",
-        locale: String(body.locale ?? "en"),
-        submittedAt: new Date().toISOString(),
-      };
-      const fwdRes = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!fwdRes.ok) {
-        console.error("Webhook forward failed", fwdRes.status);
-        return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
-      }
-    } catch (err) {
-      console.error("Webhook error", err);
+
+  try {
+    const params = new URLSearchParams({
+      "form-kind": "engagement",
+      org: String(body.org).trim(),
+      name: String(body.name).trim(),
+      email: String(body.email).trim(),
+      scope: String(body.scope).trim(),
+      description: String(body.description).trim(),
+      timeline: String(body.timeline).trim(),
+      referral: body.referral ? String(body.referral).trim() : "",
+      locale: String(body.locale ?? "en"),
+      submittedAt: new Date().toISOString(),
+    });
+    const fwdRes = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+    if (!fwdRes.ok) {
+      console.error("Webhook forward failed", fwdRes.status);
       return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
     }
+  } catch (err) {
+    console.error("Webhook error", err);
+    return NextResponse.json({ ok: false, error: "Delivery failed" }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true });

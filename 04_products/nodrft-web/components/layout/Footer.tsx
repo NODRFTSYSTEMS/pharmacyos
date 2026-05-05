@@ -31,6 +31,9 @@ export async function Footer() {
                 NoDrft<span className="nd-footer-wordmark__accent">Systems</span>
               </Link>
               <p className="nd-footer-tagline">{t("tagline")}</p>
+              <a href="mailto:sales@nodrftsystems.com" className="nd-footer-email">
+                sales@nodrftsystems.com
+              </a>
             </div>
 
             <div className="nd-footer-cols">

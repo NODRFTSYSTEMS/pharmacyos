@@ -8,7 +8,6 @@ import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
 
 type NavKey =
-  | "home"
   | "capabilities"
   | "engagements"
   | "insights"
@@ -23,7 +22,6 @@ type NavLink = {
 };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/", key: "home" },
   { href: "/capabilities", key: "capabilities" },
   { href: "/engagements", key: "engagements" },
   { href: "/insights", key: "insights" },
