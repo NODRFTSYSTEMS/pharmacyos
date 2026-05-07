@@ -207,7 +207,8 @@ export function EngagementForm({ locale }: Props) {
 
   useEffect(() => {
     if (!fields.industry) return;
-    setFields(prev => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFields(prev => { // derived: populate description template when industry changes and field is empty
       if (prev.description.trim()) return prev;
       const tpl = DESCRIPTION_TEMPLATES[prev.industry];
       return tpl ? { ...prev, description: tpl[locale] } : prev;

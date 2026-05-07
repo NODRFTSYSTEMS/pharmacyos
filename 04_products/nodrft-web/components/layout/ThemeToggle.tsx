@@ -21,7 +21,8 @@ export function ThemeToggle() {
 
   useEffect(() => {
     const initial = getInitialTheme();
-    setTheme(initial);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTheme(initial); // hydration-safe: SSR renders "dark" placeholder; client reads localStorage once on mount
     document.documentElement.setAttribute("data-theme", initial);
     setMounted(true);
   }, []);
