@@ -41,7 +41,7 @@ export default async function LocaleLayout({
           id="theme-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `(function(){var s=localStorage.getItem('ndrf-theme');var m=window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme',s||(m?'light':'dark'));})();`,
+            __html: `(function(){var s=localStorage.getItem('ndrf-theme');document.documentElement.setAttribute('data-theme',s||'light');})();`,
           }}
         />
         <NextIntlClientProvider messages={messages} locale={locale}>

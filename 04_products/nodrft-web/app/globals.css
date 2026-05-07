@@ -366,7 +366,7 @@ textarea:focus:not(:focus-visible) {
   width: 100%;
   background: #0F0F0E;
   overflow: hidden;
-  height: clamp(64px, 10vw, 120px);
+  height: clamp(80px, 12vw, 160px);
 }
 .nav__banner-full a {
   display: block;
@@ -377,7 +377,7 @@ textarea:focus:not(:focus-visible) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: left center;
+  object-position: center center;
 }
 .nav {
   position: sticky;
@@ -534,6 +534,7 @@ textarea:focus:not(:focus-visible) {
   letter-spacing: -0.04em;
   color: var(--ink);
   font-optical-sizing: auto;
+  text-align: left;
 }
 .nd-h2 {
   font-family: var(--nd-font-display, var(--nd-font-sans));
@@ -543,6 +544,7 @@ textarea:focus:not(:focus-visible) {
   letter-spacing: -0.03em;
   color: var(--ink);
   font-optical-sizing: auto;
+  text-align: left;
 }
 .nd-h3 {
   font-size: clamp(18px, 2vw, 22px);
@@ -550,6 +552,7 @@ textarea:focus:not(:focus-visible) {
   line-height: 1.25;
   letter-spacing: -0.02em;
   color: var(--ink);
+  text-align: left;
 }
 .nd-lead {
   font-size: clamp(17px, 2.2vw, 22px);
@@ -557,11 +560,13 @@ textarea:focus:not(:focus-visible) {
   line-height: 1.65;
   letter-spacing: -0.01em;
   color: var(--text-md);
+  text-align: left;
 }
 .nd-p {
   font-size: 16px;
   line-height: 1.75;
   color: var(--text);
+  text-align: left;
 }
 
 /* --------------------------------------------------------------------------
@@ -818,6 +823,8 @@ textarea:focus:not(:focus-visible) {
 
   .nd-section-cta { max-width: 100%; }
   .nd-section-cta .nd-cta-row { align-items: stretch; }
+
+  .nd-h2, .nd-h3, .nd-lead { text-align: center; }
 }
 
 /* --- 480px: single-column everything, tighter spacing --- */
@@ -879,11 +886,13 @@ textarea:focus:not(:focus-visible) {
   font-size: 14px;
   line-height: 1.65;
   color: var(--text);
+  text-align: left;
 }
 .nd-p-xs {
   font-size: 12px;
   line-height: 1.6;
   color: var(--text-md);
+  text-align: left;
 }
 .nd-h4 {
   font-size: 16px;
