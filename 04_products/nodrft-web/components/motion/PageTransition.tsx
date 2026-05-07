@@ -1,32 +1,36 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 
 const BRAND_EASE = [0.16, 1, 0.3, 1] as const;
 
+/**
+ * PageTransition — motion wrapper for route transitions.
+ *
+ * Must be rendered as a direct child of AnimatePresence (provided by AnimatedLayout).
+ * AnimatePresence keys this component via the pathname prop on the parent — no
+ * internal pathname dependency needed here.
+ *
+ * If the user prefers reduced motion, children render immediately with no animation.
+ */
 export function PageTransition({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const prefersReduced = useReducedMotion();
 
+  if (prefersReduced) {
+    return <>{children}</>;
+  }
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={prefersReduced ? {} : { clipPath: "inset(0 100% 0 0)" }}
-        animate={prefersReduced ? {} : { clipPath: "inset(0 0% 0 0)" }}
-        exit={prefersReduced ? {} : { opacity: 0 }}
-        transition={
-          prefersReduced
-            ? {}
-            : {
-                clipPath: { duration: 0.28, ease: BRAND_EASE },
-                opacity: { duration: 0.12 },
-              }
-        }
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      initial={{ clipPath: "inset(0 100% 0 0)", opacity: 1 }}
+      animate={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        clipPath: { duration: 0.28, ease: BRAND_EASE },
+        opacity: { duration: 0.12 },
+      }}
+    >
+      {children}
+    </motion.div>
   );
 }

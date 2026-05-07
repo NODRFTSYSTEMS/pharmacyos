@@ -1,0 +1,101 @@
+---
+title: "El Estándar de 7 Revisiones: Lo que exige entregar sin arrepentimiento"
+slug: "build-standard"
+date: "2026-05-07"
+summary: "La mayoría de las agencias omite el QA. Esto es lo que una revisión estructurada implica — y lo que cuesta ignorarla."
+readTime: "6 min de lectura"
+tags: ["calidad", "proceso", "estándar de entrega"]
+lang: "es"
+---
+
+## El problema no es la agencia. Es el proceso.
+
+Descubrir fallas después del lanzamiento es uno de los patrones más costosos en el trabajo digital. El producto sale. Luego el cliente encuentra un formulario de contacto roto. O texto de relleno que llegó a producción. O una vista móvil que se desintegra en un viewport que nadie probó. O una auditoría de accesibilidad tres meses después que expone una falla WCAG y una pregunta legal incómoda.
+
+Nada de esto es una sorpresa. Son los resultados predecibles de una brecha de proceso predecible: entregar sin revisión estructurada.
+
+La mayoría de los equipos digitales hace QA informal. Una persona navega el sitio. Alguien lo revisa desde su teléfono. El desarrollador verifica las funciones que él mismo construyó. Eso no es QA — es sesgo de confirmación a escala industrial. La persona que construyó el formulario es la peor candidata para verificar si el formulario está roto.
+
+NoDrftSystems ejecuta siete revisiones independientes antes de liberar cualquier entrega. Cada una trata una categoría específica de calidad como su propia disciplina. Esto es lo que ese proceso implica, y por qué existe cada revisión.
+
+## Revisión 1: Verificación funcional
+
+Cada función en el alcance de trabajo firmado se prueba contra su comportamiento especificado. No el comportamiento previsto — el especificado. Hay una diferencia.
+
+Esta revisión detecta errores de lógica, flujos de usuario rotos, integraciones incompletas y casos límite que solo emergen bajo condiciones reales de uso. "Funciona en mi máquina" no es un resultado. Comportamiento especificado, confirmado — ese es el resultado.
+
+Cuando esta revisión se omite, las brechas funcionales llegan a producción. Las descubren los usuarios, no los desarrolladores.
+
+## Revisión 2: Revisión de contenido y redacción
+
+Cada palabra del producto se revisa en términos de exactitud, cumplimiento de la voz de marca y ausencia de texto de relleno.
+
+Esta revisión existe porque los errores de contenido son invisibles para los desarrolladores. Un desarrollador que prueba un formulario no lee el microcopy. Nadie atrapa el [NOMBRE DEL CLIENTE] que sobrevivió un cambio de plantilla. Nadie nota el cambio de tono entre páginas escritas por distintos colaboradores en distintos momentos del proyecto.
+
+La revisión de contenido y redacción es una disciplina separada de las pruebas funcionales. Tratarlas como una sola produce sitios que funcionan y se leen mal — o peor, sitios que hacen afirmaciones que nadie verificó.
+
+La Revisión 2 bloquea el avance por estadísticas fabricadas, marcadores de posición sin resolver y desviaciones de la voz de marca. Los tres han llegado a producción en equipos que no ejecutaron esta revisión.
+
+## Revisión 3: Fidelidad visual y de diseño
+
+El diseño aprobado es el contrato. Esta revisión verifica que la entrega lo cumple.
+
+Tipografía en cada breakpoint. Espaciado coherente con el sistema de diseño. Valores de color extraídos de la especificación, no aproximados. Comportamiento responsive probado en el rango de viewports definido — no solo en escritorio y un tamaño de móvil.
+
+La desviación visual es acumulativa. Un error de cuatro píxeles en el margen y un peso tipográfico ligeramente incorrecto son ignorables por separado. Juntos, en una entrega de 12 páginas, producen un sitio que parece ensamblado en lugar de diseñado. El cliente aprobó un diseño. Recibe algo adyacente a él. Esta revisión cierra esa brecha.
+
+## Revisión 4: QA técnico
+
+Calidad del código, seguridad de dependencias, Core Web Vitals e higiene de consola.
+
+Esta revisión ejecuta una auditoría de dependencias contra bases de datos de vulnerabilidades conocidas. Los hallazgos de severidad alta y crítica no avanzan a producción — no como declaración de política, sino como regla sin excepciones. Entregar vulnerabilidades conocidas no es un riesgo calculado. Es un pasivo diferido.
+
+Los Core Web Vitals se miden, no se estiman. Largest Contentful Paint, Cumulative Layout Shift, Interaction to Next Paint — se puntúan, no se aproximan con "carga suficientemente rápido." El rendimiento es verificable. Esta revisión lo verifica.
+
+Los errores de consola se eliminan. No son cosméticos. Son señales.
+
+## Revisión 5: Requisitos del cliente
+
+El alcance de trabajo firmado es una lista de verificación. Esta revisión la recorre línea por línea.
+
+Cada entregable especificado en el SOW se confirma como presente y funcional. No se asume — se confirma. Esta revisión detecta elementos del alcance que fueron postergados durante la construcción y nunca recuperados. Detecta la integración de analítica que estaba en el brief y no está en la entrega. Detecta la página 404 con identidad de marca que el SOW exigía y que nadie agregó.
+
+Una página 404 con identidad de marca no es opcional en ninguna entrega de NoDrftSystems. Una página 404 sin marca — la página de error cruda del framework — es un defecto de entrega y un bloqueador de liberación. Eso es lo que la Revisión 5 hace cumplir.
+
+## Revisión 6: Paridad bilingüe
+
+Esta revisión aplica únicamente a entregas bilingües. En esas entregas, no es opcional.
+
+La paridad bilingüe no es verificación de traducción. Es revisión de transcreación: para cada par de cadenas EN/ES, la versión en español debe transmitir el mismo significado, el mismo tono y la misma fuerza de llamada a la acción que la fuente en inglés. Un CTA en español que es gramaticalmente correcto pero más débil en registro que su contraparte en inglés es una falla. Falla a los usuarios y falla a la conversión.
+
+Esta revisión la ejecuta un revisor bilingüe, no una herramienta automatizada. La traducción automática puede producir cadenas que son precisas e inefectivas. Esta revisión detecta la diferencia.
+
+## Revisión 7: Accesibilidad
+
+El cumplimiento de WCAG 2.1 AA es el objetivo. Se verifica — no se asume.
+
+Jerarquía de encabezados correcta — para que los lectores de pantalla y tecnologías de asistencia puedan navegar la página. Campos de formulario etiquetados — para que un usuario con discapacidad visual pueda completar un formulario de contacto sin asistencia. Navegabilidad por teclado — para que un usuario que no puede usar un mouse no quede excluido de la interfaz. Relaciones de contraste de color que cumplen el umbral — probadas, no estimadas.
+
+Las fallas de accesibilidad no son refinamientos de UX. El software inaccesible es software roto. En muchas jurisdicciones y contextos, el cumplimiento de WCAG es un requisito legal. Esta revisión es la última línea antes de la liberación.
+
+## La compensación honesta
+
+Ejecutar siete revisiones toma más tiempo que ejecutar ninguna. Esa es la descripción precisa del intercambio.
+
+La pregunta no es si el QA estructurado cuesta tiempo. Lo cuesta. La pregunta es si ese tiempo se invierte antes del lanzamiento o después de él.
+
+Después del lanzamiento, los costos son concretos: horas de desarrollador de emergencia, escaladas con el cliente, errores visibles al público, remediación de accesibilidad en una entrega activa, correcciones de contenido desplegadas bajo presión. No son modos de falla hipotéticos. Son el resultado estándar de entregar sin un proceso de revisión estructurado.
+
+## Lo que esto implica para una entrega
+
+Elegir un proceso de entrega gobernado no es una declaración de valores. Es una decisión sobre dónde se gestiona el riesgo de falla.
+
+Antes del lanzamiento: más barato, más silencioso, acotado. Después del lanzamiento: costoso, visible y abierto sin límite.
+
+El Estándar de 7 Revisiones existe porque cada categoría de calidad que puede fallar de forma independiente debe revisarse de forma independiente. La verificación funcional no detecta errores de contenido. La revisión de contenido no detecta fallas de WCAG. La revisión de accesibilidad no detecta vulnerabilidades de dependencias.
+
+Cada revisión cierra una brecha específica. Juntas, hacen que el arrepentimiento post-lanzamiento sea infrecuente — no por promesa, sino por estructura.
+
+---
+
+*NoDrftSystems ejecuta el Estándar de 7 Revisiones en cada entrega, sin importar el nivel del proyecto. No es un complemento. Es el mínimo.*

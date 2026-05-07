@@ -15,7 +15,7 @@
     "onboarding": "Onboarding"
   },
   "footer": {
-    "tagline": "AI-integrated digital systems. Human-governed delivery from brief to launch.",
+    "tagline": "AI-integrated digital systems. Every output governed. Every delivery documented.",
     "workLabel": "Work",
     "companyLabel": "Company",
     "capabilities": "Website Packages",
@@ -35,12 +35,12 @@
   },
   "meta": {
     "home": {
-      "title": "NoDrftSystems — Precision Digital Delivery",
-      "description": "AI-integrated digital systems for teams that need disciplined execution, stronger positioning, and zero drift from brief to launch."
+      "title": "NoDrftSystems — AI-Integrated Digital Systems",
+      "description": "AI-integrated digital systems. Scoped precisely. Delivered without drift."
     },
     "capabilities": {
-      "title": "Website Packages — NoDrftSystems",
-      "description": "Clearly scoped website packages from conversion landing pages to full platform builds. No hidden scope, no scope creep."
+      "title": "Capabilities — NoDrftSystems",
+      "description": "Eight defined scopes from Website Audit to Ecosystem Build. Explicit boundaries on every package — what's in, what's out, what you own at the end."
     },
     "engagements": {
       "title": "Selected Engagements — NoDrftSystems",
@@ -83,21 +83,21 @@
     "markerLabel": "AI-INTEGRATED · HUMAN-GOVERNED · ZERO DRIFT",
     "headline1": "Digital systems. Built to perform—",
     "headline2": "structured to last.",
-    "lead": "AI-integrated digital systems for teams that need disciplined execution, stronger positioning, and zero drift from brief to launch.",
+    "lead": "AI-integrated digital systems. Scoped precisely. Delivered without drift.",
     "whyLabel": "Why this matters",
     "whyHeadline": "Your digital presence is evaluated before you are.",
-    "whyBody": "This is especially true for firms that don't rely on marketing—firms that grow through relationships, referrals, and reputation. The website isn't the sales strategy. But when it contradicts the firm's actual quality, it costs deals that were never tracked as losses.",
+    "whyBody": "This is especially true for firms that don't rely on marketing—firms that grow through relationships, referrals, and reputation. The website isn't the sales strategy. But when it contradicts the firm's actual quality, it costs deals.",
     "strengthsLabel": "Why NoDrftSystems",
     "strength1Title": "Strategy First",
-    "strength1Body": "Every engagement starts with a clear scope agreement. No build begins without a confirmed brief.",
+    "strength1Body": "No build begins without a locked scope and confirmed brief.",
     "strength2Title": "Structured Delivery",
     "strength2Body": "Defined packages with clear inclusions and exclusions. Every change is scoped and priced before work begins — no surprise additions.",
     "strength3Title": "Zero Drift",
-    "strength3Body": "What goes live stays correct after delivery. Scope is locked at kickoff — changes require a formal change order.",
-    "strength4Title": "Bilingual Ready",
-    "strength4Body": "Bilingual-aware structure built in from the start. Full bilingual delivery available on any package.",
-    "strength5Title": "Secure & Trusted",
-    "strength5Body": "AI-integrated workflows, human-governed output. Every deliverable reviewed before it goes live. No output reaches a client without Founder sign-off.",
+    "strength3Body": "Scope is locked at kickoff. Changes require a formal change order.",
+    "strength4Title": "Bilingual Native",
+    "strength4Body": "This site runs natively in English and Spanish — bilingual is not an add-on. Full bilingual delivery is available on any package.",
+    "strength5Title": "Governed Output",
+    "strength5Body": "AI-integrated workflows, governed output. Every deliverable reviewed before release. Sign-off is mandatory — no exceptions, no shortcuts.",
     "costsLabel": "What it quietly costs",
     "costsHeadline": "A weak digital presence has a cost that rarely appears on a budget line.",
     "cost1Title": "Credibility loss",
@@ -111,8 +111,8 @@
     "cost5Title": "Operational drag",
     "cost5Body": "Sites built without a content management system, documented architecture, or clear ownership require developer help for basic updates. That cost compounds over time.",
     "ctaLabel": "Ready when you are",
-    "ctaHeadline": "Start a conversation. Not a sales process.",
-    "ctaBody": "Tell us what you're building. We'll tell you honestly whether we can help.",
+    "ctaHeadline": "Tell us what you're building.",
+    "ctaBody": "We'll tell you whether we can help.",
     "ctaButton": "Start an Engagement",
     "ctaSecondary": "Explore Packages"
   }

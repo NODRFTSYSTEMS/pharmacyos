@@ -1,0 +1,100 @@
+---
+title: "The 7-Pass Standard: What It Takes to Ship Without Regret"
+slug: "build-standard"
+date: "2026-05-07"
+summary: "Most agencies skip QA. Here is what structured quality review actually looks like — and what it costs you when it's absent."
+readTime: "6 min read"
+tags: ["quality", "process", "build standard"]
+---
+
+## The Problem Is Not the Agency. It Is the Process.
+
+Post-launch discovery is one of the more expensive patterns in digital work. A build ships. Then the client finds a broken contact form. Or placeholder text that made it through to production. Or a mobile layout that collapses at a viewport no one tested. Or an accessibility audit three months later that surfaces a WCAG failure and an uncomfortable legal question.
+
+None of these are surprises. They are predictable outputs of a predictable process gap: shipping without structured review.
+
+Most digital teams run informal QA. One person clicks through the site. Someone checks it on their phone. The developer verifies the features they built. That is not QA — that is confirmation bias at scale. The person who built the form is the worst person to check whether the form is broken.
+
+NoDrftSystems runs seven discrete passes before any build is released. Each one treats a specific category of quality as its own discipline. This is what that looks like, and why each pass exists.
+
+## Pass 1: Functional Verification
+
+Every feature in the signed scope of work is tested against its specified behavior. Not the intended behavior — the specified behavior. There is a difference.
+
+This pass catches logic errors, broken user flows, incomplete integrations, and edge cases that only surface under real use conditions. "It works on my machine" is not a result. Specified behavior, confirmed — that is the result.
+
+When this pass is skipped, feature gaps make it to production. They are discovered by users, not developers.
+
+## Pass 2: Content and Copy Review
+
+Every word in the build is reviewed for accuracy, brand voice compliance, and the absence of placeholder text.
+
+This pass exists because content errors are invisible to developers. A developer testing a form does not read the microcopy. No one catches the [CLIENT NAME] that survived a template swap. No one notices the tone shift between pages written by different contributors at different points in the project.
+
+Content and copy review is a distinct discipline from functional testing. Treating it as one produces sites that work and read badly — or worse, sites that make claims no one verified.
+
+Pass 2 blocks on fabricated statistics, unresolved placeholders, and brand voice drift. All three have shipped in production from teams that did not run this pass.
+
+## Pass 3: Visual and Design Fidelity
+
+The approved design is the contract. This pass verifies that the build matches it.
+
+Typography at every breakpoint. Spacing consistent with the design system. Color values pulled from spec, not approximated. Responsive behavior tested across the defined viewport range — not just desktop and a single mobile size.
+
+Visual drift is cumulative. A four-pixel margin error and a slightly wrong font weight are individually ignorable. Together across a 12-page build, they produce a site that looks assembled rather than designed. The client approved a design. They receive something adjacent to it. This pass closes that gap.
+
+## Pass 4: Technical QA
+
+Code quality, dependency security, Core Web Vitals, and console hygiene.
+
+This pass runs a dependency audit against known vulnerability databases. High and critical severity findings do not proceed to production — not as a policy statement, but as a rule with no exceptions. Shipping known vulnerabilities is not a calculated risk. It is a deferred liability.
+
+Core Web Vitals are measured, not estimated. Largest Contentful Paint, Cumulative Layout Shift, Interaction to Next Paint — these are scored, not approximated with "it loads fast enough." Performance is verifiable. This pass verifies it.
+
+Console errors are cleared. They are not cosmetic. They are signals.
+
+## Pass 5: Client Requirements
+
+The signed scope of work is a checklist. This pass works through it line by line.
+
+Every deliverable specified in the SOW is confirmed present and functional. Not assumed present — confirmed. This pass catches scope items that were deprioritized during build and never recovered. It catches the analytics integration that was in the brief and not in the build. It catches the branded 404 page that the SOW required and that no one added.
+
+A branded 404 page is not optional on any NoDrftSystems build. An unbranded 404 — a raw framework error page — is a delivery defect and a release blocker. That is what Pass 5 enforces.
+
+## Pass 6: Bilingual Parity
+
+This pass applies only to bilingual builds. It is not optional on those builds.
+
+Bilingual parity is not translation verification. It is transcreation review: for every EN/ES string pair, the Spanish version must carry the same meaning, the same tone, and the same call-to-action strength as the English source. A Spanish CTA that is grammatically correct but weaker in register than its English counterpart is a failure. It fails users and it fails conversion.
+
+This pass is run by a bilingual reviewer, not an automated tool. Machine translation can produce strings that are accurate and ineffective. This pass catches the difference.
+
+## Pass 7: Accessibility
+
+WCAG 2.1 AA compliance is the target. It is verified, not assumed.
+
+Correct heading hierarchy — so screen readers and assistive technologies can navigate the page. Labeled form fields — so a user with a visual impairment can complete a contact form without assistance. Keyboard navigability — so a user who cannot use a mouse is not excluded from the interface. Color contrast ratios that meet the threshold — tested, not estimated.
+
+Accessibility failures are not UX refinements. Inaccessible software is broken software. In many jurisdictions and contexts, WCAG compliance is a legal requirement. This pass is the last line before release.
+
+## The Honest Tradeoff
+
+Running seven passes takes longer than running zero. That is the accurate statement of the tradeoff.
+
+The question is not whether structured QA costs time. It does. The question is whether the time is spent before launch or after it.
+
+After launch, the costs are concrete: emergency developer hours, client escalations, public-facing errors, accessibility remediation on a live build, content corrections deployed under pressure. These are not hypothetical failure modes. They are the standard output of shipping without a structured review process.
+
+## What This Means for a Build
+
+Choosing a governed build process is not a values statement. It is a decision about where failure risk is handled.
+
+Pre-launch is cheaper, quieter, and bounded. Post-launch is expensive, visible, and open-ended.
+
+The 7-Pass Standard exists because every category of quality that can fail independently must be reviewed independently. Functional verification does not catch copy errors. Copy review does not catch WCAG failures. Accessibility review does not catch dependency vulnerabilities.
+
+Each pass closes a specific gap. Together, they make post-launch regret rare — not by promise, but by structure.
+
+---
+
+*NoDrftSystems runs the 7-Pass Standard on every build, regardless of project tier. It is not an add-on. It is the minimum.*

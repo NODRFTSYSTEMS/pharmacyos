@@ -6,7 +6,7 @@ import { inter, jetbrainsMono, syne } from "@/lib/fonts";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { SkipLink } from "@/components/layout/SkipLink";
-import { PageTransition } from "@/components/motion/PageTransition";
+import { AnimatedLayout } from "@/components/layout/AnimatedLayout";
 import Script from "next/script";
 import type { Metadata } from "next";
 
@@ -48,7 +48,7 @@ export default async function LocaleLayout({
           <SkipLink label={locale === "es" ? "Saltar al contenido" : "Skip to content"} />
           <Nav />
           <main id="main-content" tabIndex={-1}>
-            <PageTransition>{children}</PageTransition>
+            <AnimatedLayout>{children}</AnimatedLayout>
           </main>
           <Footer />
         </NextIntlClientProvider>

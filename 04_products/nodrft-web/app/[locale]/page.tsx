@@ -41,7 +41,7 @@ const MISCONCEPTIONS = {
     },
     {
       q: "“A freelancer can do this cheaper.”",
-      a: "A lower hourly rate doesn’t account for scope drift, rework cycles, unavailability, or a site that breaks when the relationship ends. Total project cost and outcome quality are the relevant comparisons, not rate.",
+      a: "The comparison that matters is total project cost and delivery outcome — not hourly rate. Scope drift, rework cycles, and sites that fail without continued developer involvement are common in underscoped builds. You’re not hiring a rate. You’re buying a result.",
     },
     {
       q: "“We just need a refresh, not a rebuild.”",
@@ -67,7 +67,7 @@ const MISCONCEPTIONS = {
     },
     {
       q: "“Un freelancer puede hacerlo más barato.”",
-      a: "Una tarifa más baja no tiene en cuenta la desviación del alcance, ciclos de retrabajo o un sitio que se rompe cuando termina la relación. El costo total del proyecto y la calidad del resultado son las comparaciones relevantes, no la tarifa.",
+      a: "La comparación que importa es el costo total del proyecto y el resultado final, no la tarifa por hora. La desviación del alcance, los ciclos de retrabajo y los sitios que fallan sin soporte continuo son comunes en construcciones mal definidas. No se contrata una tarifa. Se compra un resultado.",
     },
     {
       q: "“Solo necesitamos una actualización, no una reconstrucción.”",
@@ -88,22 +88,22 @@ const FIT = {
   en: {
     label: "Who we serve best",
     items: [
-      "Organizations that need stronger digital positioning and disciplined delivery",
-      "Teams that value clarity, structured execution, and accountability",
-      "Projects where scope discipline and quality control matter",
-      "Companies ready to invest in systems that stay correct after handoff",
+      "Organizations where positioning accuracy and delivery consistency are strategic requirements",
+      "Teams with defined decision authority and a scope that can be locked before build begins",
+      "Projects where a single accountable decision-maker holds scope authority",
+      "Companies investing in systems that must remain correct through handoff — without rework cycles",
     ],
-    note: "Not every project is accepted. Fit matters—to the quality of the outcome, not just the relationship. We evaluate scope clarity, timeline, decision structure, and budget reality before proposing. When it’s a strong fit, the engagement gets full commitment.",
+    note: "Not every project is accepted. Fit matters to the quality of the outcome. We evaluate scope clarity, timeline, decision structure, and budget reality before proposing. When it’s a strong fit, the engagement gets full commitment.",
   },
   es: {
     label: "A quiénes servimos mejor",
     items: [
-      "Organizaciones que necesitan mejor posicionamiento digital y entrega disciplinada",
-      "Equipos que valoran claridad, ejecución estructurada y responsabilidad",
-      "Proyectos donde la disciplina de alcance y el control de calidad importan",
-      "Empresas listas para invertir en sistemas que se mantienen correctos tras el traspaso",
+      "Organizaciones donde la precisión de posicionamiento y la consistencia de entrega son requisitos estratégicos",
+      "Equipos con autoridad de decisión definida y un alcance que puede cerrarse antes de construir",
+      "Proyectos donde un único responsable de decisiones mantiene la autoridad de alcance",
+      "Empresas que invierten en sistemas que deben mantenerse correctos hasta el traspaso — sin ciclos de retrabajo",
     ],
-    note: "No todos los proyectos son aceptados. El ajuste importa para la calidad del resultado, no solo para la relación. Evaluamos la claridad del alcance, el cronograma, la estructura de decisiones y la realidad del presupuesto antes de proponer. Cuando es un ajuste sólido, el compromiso es total.",
+    note: "No todos los proyectos son aceptados. El ajuste importa para la calidad del resultado. Evaluamos la claridad del alcance, el cronograma, la estructura de decisiones y la realidad del presupuesto antes de proponer. Cuando es un ajuste sólido, el compromiso es total.",
   },
 };
 
@@ -145,8 +145,8 @@ const WORK_ON_RECORD = {
   en: {
     label: "Work on record",
     items: [
-      "Repositioned a 30-person firm from outdated brochure-ware to a structured authority site with intake routing and bilingual parity.",
-      "Built a gated PropTech application with authentication, data integration, and admin controls under strict access requirements.",
+      "Restructured the digital presence of a 30-person professional services firm — from a static site to a structured authority build with bilingual delivery and self-qualifying intake flow.",
+      "Delivered a gated PropTech application with authentication, data integration, and admin controls — scoped and executed under strict access requirements.",
     ],
     disclaimer: "Client names not disclosed. Outcomes framed qualitatively.",
     link: "View all selected engagements →",
@@ -154,8 +154,8 @@ const WORK_ON_RECORD = {
   es: {
     label: "Trabajo realizado",
     items: [
-      "Reposicionamiento de la presencia digital de una firma de 30 personas a un sitio de autoridad con enrutamiento de intake y paridad bilingüe.",
-      "Construcción de una aplicación PropTech con autenticación, integración de datos y controles de administración bajo requisitos estrictos.",
+      "Reestructuración de la presencia digital de una firma de servicios profesionales de 30 personas — de un sitio estático a una plataforma de autoridad con entrega bilingüe y flujo de intake auto-calificante.",
+      "Entrega de una aplicación PropTech con autenticación, integración de datos y controles de administración — definida y ejecutada bajo requisitos estrictos de acceso.",
     ],
     disclaimer: "Nombres de clientes no revelados. Resultados enmarcados cualitativamente.",
     link: "Ver todos los proyectos seleccionados →",

@@ -32,11 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const COPY = {
   en: {
     label: "Website Packages",
-    heading: "Every package is scoped, bounded, and built to hand off clean.",
-    lead: "NoDrftSystems delivers across eight defined scopes — from a Website Audit through a full Ecosystem Build. Each package has explicit boundaries: what's in, what's out, what you own at the end, and what comes next.",
-    sub: "Pricing is provided after an engagement inquiry. No prices are shown publicly — scope determines price, and scope requires a conversation.",
+    heading: "Every scope is defined before build starts. Every deliverable hands off clean.",
+    lead: "Eight defined scopes. Each one with explicit boundaries: what's in, what's out, what you own at the end, and what comes next.",
+    sub: "Pricing is provided after an engagement inquiry. Scope determines price, and scope is established through a conversation.",
     findLabel: "Find your package",
-    findSub: "Jump to the package that fits your situation.",
+    findSub: "Select the package that fits your situation.",
     pathLabel: "Which path fits",
     pathHeading: "Three starting situations. One right entry point each.",
     paths: [
@@ -50,14 +50,14 @@ const COPY = {
       {
         tag: "You need a new presence",
         heading: "You don't have a site, or yours doesn't represent you.",
-        body: "Start with a Discovery Sprint if scope is unclear — multiple decision-makers, unknown platform needs, legacy situation, or a build that carries real business risk. If scope is already clear and scoped, go directly to Landing Page Sprint, Static Business Site, Business Launch Site, or Authority Website depending on page count and CMS need.",
+        body: "Start with a Discovery Sprint if scope is unclear — multiple decision-makers, unknown platform requirements, an inherited situation, or a build that carries real business risk. If scope is already defined, go directly to Landing Page Sprint, Static Business Site, Business Launch Site, or Authority Website depending on page count and content management needs.",
         cta: "Go to Discovery Sprint →",
         href: "#pkg-discovery",
       },
       {
         tag: "You need more than a website",
-        heading: "Logins, dashboards, workflows, integrations.",
-        body: "When the requirement is a workflow layer — not just a public-facing site — the entry point is Platform Starter (bounded: auth, dashboard, structured intake, up to 3 integrations) or Ecosystem Build (multi-surface: public + app + admin + integrations as one coordinated program). Discovery Sprint required first for both.",
+        heading: "User accounts, dashboards, workflows, or data integrations.",
+        body: "When the requirement is an application layer — not just a public-facing site — the entry point is Platform Starter (bounded: user login, dashboard, structured data intake, up to three integrations) or Ecosystem Build (multi-surface: public site, application, and admin panel as a single coordinated program). A Discovery Sprint is required before either.",
         cta: "Go to Platform Starter →",
         href: "#pkg-platform",
       },
@@ -70,7 +70,7 @@ const COPY = {
     compareColTime: "Timeline",
     compareColNot: "Not for",
     thresholdLabel: "Scope guidance",
-    thresholdHeading: "When to escalate to the next tier.",
+    thresholdHeading: "When to move to the next package.",
     thresholds: [
       {
         from: "Discovery Sprint",
@@ -80,17 +80,17 @@ const COPY = {
       {
         from: "Landing Page / Static Site",
         to: "Business Launch Site",
-        trigger: "Client needs to edit content after launch without involving a developer.",
+        trigger: "The client needs to edit content after launch without involving a developer.",
       },
       {
         from: "Business Launch Site",
         to: "Authority Website",
-        trigger: "More than 5 pages, content-structured credibility architecture, search visibility as a primary objective, or 3+ form types needed.",
+        trigger: "More than 5 pages, a content-driven credibility structure, search visibility as a primary objective, or three or more form types required.",
       },
       {
         from: "Authority Website",
         to: "Platform Starter",
-        trigger: "The requirement includes a login layer, user-specific data, or a structured workflow that a CMS cannot handle.",
+        trigger: "The requirement includes a login layer, user-specific data, or a structured workflow that a content management system cannot handle.",
       },
       {
         from: "Platform Starter",
@@ -99,17 +99,17 @@ const COPY = {
       },
     ],
     ctaHeading: "Ready to start?",
-    ctaBody: "If the scope is already clear, submit a project brief. If you need scope clarity first, open an inquiry — we'll assess fit and recommend the right starting point.",
+    ctaBody: "Submit a project brief if scope is clear. Open an inquiry if you need scope clarity first — we'll assess fit and recommend the right starting point.",
     ctaPrimary: "Start an Engagement",
     ctaSecondary: "Open an Inquiry",
   },
   es: {
     label: "Paquetes Web",
-    heading: "Cada paquete está definido, acotado y construido para una entrega limpia.",
-    lead: "NoDrftSystems entrega en ocho alcances definidos — desde una Auditoría de Sitio hasta una Construcción de Ecosistema completa. Cada paquete tiene límites explícitos: qué incluye, qué no, qué usted posee al final y cuál es el siguiente paso.",
-    sub: "El precio se proporciona tras una consulta de proyecto. No se muestran precios públicamente — el alcance determina el precio, y el alcance requiere una conversación.",
+    heading: "Cada alcance se define antes de construir. Cada entregable se traspasa en orden.",
+    lead: "Ocho alcances definidos. Cada uno con límites explícitos: qué incluye, qué no, qué usted posee al final y cuál es el siguiente paso.",
+    sub: "El precio se proporciona tras una consulta de proyecto. El alcance determina el precio, y el alcance se establece mediante una conversación.",
     findLabel: "Encuentre su paquete",
-    findSub: "Salte al paquete que se ajuste a su situación.",
+    findSub: "Seleccione el paquete que se ajuste a su situación.",
     pathLabel: "Cuál ruta encaja",
     pathHeading: "Tres situaciones de partida. Un punto de entrada correcto para cada una.",
     paths: [
@@ -123,14 +123,14 @@ const COPY = {
       {
         tag: "Necesita una nueva presencia",
         heading: "No tiene un sitio, o el suyo no lo representa.",
-        body: "Comience con un Discovery Sprint si el alcance no está claro: múltiples responsables de decisión, necesidades de plataforma desconocidas, situación legacy, o una construcción que conlleva riesgo real. Si el alcance ya está claro, vaya directamente a Sprint de Landing, Sitio Estático, Sitio de Lanzamiento o Sitio de Autoridad según el número de páginas y necesidad de CMS.",
+        body: "Comience con un Discovery Sprint si el alcance no está claro: múltiples responsables de decisión, requisitos de plataforma desconocidos, una situación heredada, o una construcción que conlleva riesgo real. Si el alcance ya está definido, vaya directamente a Sprint de Landing, Sitio Estático, Sitio de Lanzamiento o Sitio de Autoridad según el número de páginas y necesidades de gestión de contenido.",
         cta: "Ir a Discovery Sprint →",
         href: "#pkg-discovery",
       },
       {
         tag: "Necesita más que un sitio",
-        heading: "Logins, dashboards, flujos de trabajo, integraciones.",
-        body: "Cuando el requisito es una capa de flujo de trabajo — no solo un sitio público — el punto de entrada es Plataforma Inicial (acotado: auth, dashboard, intake estructurado, hasta 3 integraciones) o Construcción de Ecosistema (multi-superficie: público + app + admin + integraciones como programa coordinado). Discovery Sprint requerido primero para ambos.",
+        heading: "Cuentas de usuario, paneles, flujos de trabajo o integraciones de datos.",
+        body: "Cuando el requisito es una capa de aplicación — no solo un sitio público — el punto de entrada es Plataforma Inicial (acotado: acceso de usuario, panel, intake de datos estructurado, hasta tres integraciones) o Construcción de Ecosistema (multi-superficie: sitio público, aplicación y panel de administración como un programa coordinado único). Se requiere un Discovery Sprint antes de ambos.",
         cta: "Ir a Plataforma Inicial →",
         href: "#pkg-platform",
       },
@@ -143,7 +143,7 @@ const COPY = {
     compareColTime: "Cronograma",
     compareColNot: "No es para",
     thresholdLabel: "Guía de alcance",
-    thresholdHeading: "Cuándo escalar al siguiente nivel.",
+    thresholdHeading: "Cuándo pasar al siguiente paquete.",
     thresholds: [
       {
         from: "Discovery Sprint",
@@ -158,12 +158,12 @@ const COPY = {
       {
         from: "Sitio de Lanzamiento",
         to: "Sitio de Autoridad",
-        trigger: "Más de 5 páginas, arquitectura de credibilidad estructurada por contenido, visibilidad en búsquedas como objetivo principal, o 3+ tipos de formulario.",
+        trigger: "Más de 5 páginas, estructura de credibilidad basada en contenido, visibilidad en búsquedas como objetivo principal, o tres o más tipos de formulario.",
       },
       {
         from: "Sitio de Autoridad",
         to: "Plataforma Inicial",
-        trigger: "El requisito incluye una capa de login, datos específicos por usuario, o un flujo estructurado que un CMS no puede manejar.",
+        trigger: "El requisito incluye una capa de acceso, datos específicos por usuario, o un flujo estructurado que un gestor de contenido no puede manejar.",
       },
       {
         from: "Plataforma Inicial",
@@ -172,7 +172,7 @@ const COPY = {
       },
     ],
     ctaHeading: "¿Listo para comenzar?",
-    ctaBody: "Si el alcance ya está claro, envíe un brief de proyecto. Si necesita claridad de alcance primero, abra una consulta — evaluaremos el ajuste y recomendaremos el punto de partida correcto.",
+    ctaBody: "Envíe un brief de proyecto si el alcance es claro. Abra una consulta si necesita definir el alcance primero — evaluaremos el ajuste y recomendaremos el punto de partida correcto.",
     ctaPrimary: "Iniciar un Proyecto",
     ctaSecondary: "Abrir una Consulta",
   },
@@ -389,12 +389,12 @@ export default async function CapabilitiesPage({ params }: Props) {
                   {[
                     {
                       discipline: { en: "Implementation support", es: "Soporte de implementación" },
-                      rate: { en: "From $35 / hr", es: "Desde $35 / hr" },
-                      minimum: { en: "Change Order required", es: "Requiere Change Order" },
+                      rate: { en: "From $95 / hr", es: "Desde $95 / hr" },
+                      minimum: { en: "Signed scope addendum required", es: "Requiere addendum de alcance firmado" },
                     },
                     {
                       discipline: { en: "Strategy, QA, and security review", es: "Estrategia, QA y revisión de seguridad" },
-                      rate: { en: "$45–$75 / hr", es: "$45–$75 / hr" },
+                      rate: { en: "$125–$175 / hr", es: "$125–$175 / hr" },
                       minimum: { en: "2 hours", es: "2 horas" },
                     },
                     {
@@ -437,12 +437,12 @@ export default async function CapabilitiesPage({ params }: Props) {
                 </h3>
                 {(loc === "en" ? [
                   "Full website or platform builds — use fixed packages",
-                  "Ongoing support and iteration — use Support Plans",
-                  "Unbounded delivery without an SOW",
+                  "Ongoing support and iteration — use a Maintenance Retainer",
+                  "Open-ended delivery without a defined scope and signed agreement",
                 ] : [
                   "Builds completos de sitio o plataforma — use paquetes fijos",
-                  "Soporte e iteración continua — use Planes de Soporte",
-                  "Entrega sin límite sin SOW",
+                  "Soporte e iteración continua — use un Retainer de Mantenimiento",
+                  "Entrega abierta sin alcance definido y acuerdo firmado",
                 ]).map((item, i) => (
                   <p key={i} className="nd-exc" style={{ marginBottom: "var(--space-2)" }}>{item}</p>
                 ))}
@@ -452,6 +452,121 @@ export default async function CapabilitiesPage({ params }: Props) {
               {loc === "en"
                 ? "Quoted by appointment. Fixed packages remain the default for production work."
                 : "Cotizado con cita previa. Los paquetes fijos siguen siendo el estándar para producción."}
+            </p>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* Social Content Creation */}
+      <section id="pkg-social" className="nd-section" aria-labelledby="social-heading">
+        <div className="nd-wrap">
+          <FadeUp>
+            <span className="nd-label" style={{ display: "block", marginBottom: "var(--space-3)" }}>
+              {loc === "en" ? "CONTENT CREATION" : "CREACIÓN DE CONTENIDO"}
+            </span>
+            <h2 id="social-heading" className="nd-h2" style={{ marginBottom: "var(--space-3)" }}>
+              {loc === "en" ? "Social Content Production" : "Producción de Contenido Social"}
+            </h2>
+            <p className="nd-p" style={{ maxWidth: "640px", marginBottom: "var(--space-8)" }}>
+              {loc === "en"
+                ? "Platform-native content for Instagram, TikTok, and Facebook — strategy, copy, design, and delivery. Platform boosting and ad spend are client-managed and client-paid, separate from production fees."
+                : "Contenido nativo para Instagram, TikTok y Facebook — estrategia, redacción, diseño y entrega. El impulso de plataforma y el gasto en publicidad son administrados y pagados directamente por el cliente, separados de las tarifas de producción."}
+            </p>
+          </FadeUp>
+          <FadeUp delay={0.05}>
+            <div style={{ overflowX: "auto", marginBottom: "var(--space-8)" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                    <th style={{ textAlign: "left", padding: "8px 12px 10px 0", color: "var(--text-md)", fontWeight: 500 }}>
+                      {loc === "en" ? "Package" : "Paquete"}
+                    </th>
+                    <th style={{ textAlign: "left", padding: "8px 12px 10px 12px", color: "var(--text-md)", fontWeight: 500 }}>
+                      {loc === "en" ? "Volume" : "Volumen"}
+                    </th>
+                    <th style={{ textAlign: "left", padding: "8px 12px 10px 12px", color: "var(--text-md)", fontWeight: 500 }}>
+                      {loc === "en" ? "Platforms" : "Plataformas"}
+                    </th>
+                    <th style={{ textAlign: "left", padding: "8px 0 10px 12px", color: "var(--text-md)", fontWeight: 500 }}>
+                      {loc === "en" ? "Pricing" : "Precio"}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      name: { en: "Content Foundation", es: "Base de Contenido" },
+                      volume: { en: "8 posts / month", es: "8 publicaciones / mes" },
+                      platforms: { en: "Instagram + TikTok", es: "Instagram + TikTok" },
+                      price: { en: "Quoted on inquiry", es: "Cotización en consulta" },
+                    },
+                    {
+                      name: { en: "Content Engine", es: "Motor de Contenido" },
+                      volume: { en: "16 posts / month", es: "16 publicaciones / mes" },
+                      platforms: { en: "Instagram, TikTok, Facebook", es: "Instagram, TikTok, Facebook" },
+                      price: { en: "Quoted on inquiry", es: "Cotización en consulta" },
+                    },
+                    {
+                      name: { en: "Content System", es: "Sistema de Contenido" },
+                      volume: { en: "24–30 posts / month", es: "24–30 publicaciones / mes" },
+                      platforms: { en: "Instagram, TikTok, Facebook", es: "Instagram, TikTok, Facebook" },
+                      price: { en: "Quoted on inquiry", es: "Cotización en consulta" },
+                    },
+                  ].map((row, i) => (
+                    <tr key={i} style={{ borderBottom: i < 2 ? "1px solid var(--border-subtle)" : undefined }}>
+                      <td style={{ padding: "12px 12px 12px 0", color: "var(--ink)", fontWeight: 600 }}>{row.name[loc]}</td>
+                      <td style={{ padding: "12px", color: "var(--ink)" }}>{row.volume[loc]}</td>
+                      <td style={{ padding: "12px", color: "var(--text-md)" }}>{row.platforms[loc]}</td>
+                      <td style={{ padding: "12px 0 12px 12px", color: "var(--ink)", fontFamily: "var(--nd-font-mono)", letterSpacing: "-0.01em" }}>{row.price[loc]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.1}>
+            <div style={{ display: "flex", gap: "var(--space-10)", flexWrap: "wrap", marginBottom: "var(--space-6)" }}>
+              <div>
+                <h3 className="nd-h3" style={{ marginBottom: "var(--space-4)" }}>
+                  {loc === "en" ? "What content production covers" : "Qué cubre la producción de contenido"}
+                </h3>
+                {(loc === "en" ? [
+                  "Monthly content calendar planned and delivered in advance",
+                  "Copywriting, caption strategy, and hashtag research",
+                  "Static and animated graphics matched to brand standards",
+                  "Video concept scripts and creative direction briefs",
+                  "Client approval round before any post is scheduled",
+                ] : [
+                  "Calendario de contenido mensual planificado y entregado con anticipación",
+                  "Redacción, estrategia de captions e investigación de hashtags",
+                  "Gráficos estáticos y animados alineados con los estándares de marca",
+                  "Guiones de concepto de video y briefs de dirección creativa",
+                  "Ronda de aprobación del cliente antes de programar cualquier publicación",
+                ]).map((item, i) => (
+                  <p key={i} className="nd-inc" style={{ marginBottom: "var(--space-2)" }}>{item}</p>
+                ))}
+              </div>
+              <div>
+                <h3 className="nd-h3" style={{ marginBottom: "var(--space-4)", color: "var(--text-md)" }}>
+                  {loc === "en" ? "What content production does not cover" : "Qué no cubre la producción de contenido"}
+                </h3>
+                {(loc === "en" ? [
+                  "Platform ad spend and boosting — client pays these directly to the platform",
+                  "Video filming or on-site production — scripting and direction are included; camera work is not",
+                  "Platform account management without a content production engagement",
+                ] : [
+                  "Gasto en publicidad e impulso en plataformas — el cliente paga esto directamente a la plataforma",
+                  "Filmación de video o producción en sitio — guiones y dirección incluidos; trabajo de cámara no",
+                  "Gestión de cuentas de plataforma sin un compromiso de producción de contenido",
+                ]).map((item, i) => (
+                  <p key={i} className="nd-exc" style={{ marginBottom: "var(--space-2)" }}>{item}</p>
+                ))}
+              </div>
+            </div>
+            <p className="nd-p-sm" style={{ color: "var(--text-md)", fontStyle: "italic" }}>
+              {loc === "en"
+                ? "All tiers are monthly retainer engagements. Scope and platform mix confirmed at onboarding."
+                : "Todos los niveles son compromisos de retención mensual. El alcance y la combinación de plataformas se confirman en el inicio."}
             </p>
           </FadeUp>
         </div>

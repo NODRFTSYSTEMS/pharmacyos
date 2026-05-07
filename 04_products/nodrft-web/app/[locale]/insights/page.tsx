@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import type { Locale } from "@/content/types";
 import { InsightCard } from "@/components/sections/InsightCard";
 import { FadeUp } from "@/components/motion/FadeUp";
+import { getAllInsights } from "@/lib/insights";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -197,10 +198,48 @@ const COPY = {
   },
 };
 
+// ---------------------------------------------------------------------------
+// Published articles copy — bilingual labels for the MDX article list
+// ---------------------------------------------------------------------------
+
+const ARTICLES_COPY = {
+  en: {
+    sectionLabel: "Published Articles",
+    sectionHeading: "In-depth guides and briefs from the field.",
+    emptyState:
+      "No articles published yet. Check back soon.",
+    readLabel: "Read article",
+    dateLabel: "Published",
+  },
+  es: {
+    sectionLabel: "Artículos publicados",
+    sectionHeading: "Guías detalladas y resúmenes del trabajo real.",
+    emptyState:
+      "Aún no hay artículos publicados. Vuelva pronto.",
+    readLabel: "Leer artículo",
+    dateLabel: "Publicado",
+  },
+} as const;
+
+function formatArticleDate(isoDate: string, locale: string): string {
+  try {
+    return new Date(isoDate).toLocaleDateString(
+      locale === "es" ? "es-ES" : "en-US",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+  } catch {
+    return isoDate;
+  }
+}
+
 export default async function InsightsPage({ params }: Props) {
   const { locale } = await params;
   const loc = locale as Locale;
   const copy = COPY[loc];
+  const articlesCopy = ARTICLES_COPY[loc];
+
+  // getAllInsights() returns [] when content/insights/ is absent — safe.
+  const articles = getAllInsights();
 
   return (
     <>
@@ -247,6 +286,87 @@ export default async function InsightsPage({ params }: Props) {
               </FadeUp>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Published MDX articles */}
+      <section className="nd-section" aria-labelledby="articles-heading">
+        <div className="nd-wrap">
+          <FadeUp>
+            <span className="nd-label" style={{ display: "block", marginBottom: "var(--space-4)" }}>
+              {articlesCopy.sectionLabel}
+            </span>
+            <h2 id="articles-heading" className="nd-h2" style={{ marginBottom: "var(--space-8)" }}>
+              {articlesCopy.sectionHeading}
+            </h2>
+          </FadeUp>
+
+          {articles.length === 0 ? (
+            <FadeUp>
+              <p className="nd-p" style={{ color: "var(--text-md)" }}>
+                {articlesCopy.emptyState}
+              </p>
+            </FadeUp>
+          ) : (
+            <ul
+              style={{ listStyle: "none", padding: 0, margin: 0 }}
+              aria-label={articlesCopy.sectionLabel}
+            >
+              {articles.map((article, i) => (
+                <FadeUp key={article.slug} delay={i * 0.07}>
+                  <li
+                    style={{
+                      borderTop: "1px solid var(--border)",
+                      padding: "var(--space-6) 0",
+                    }}
+                  >
+                    <article aria-labelledby={`article-title-${article.slug}`}>
+                      {/* Tags */}
+                      {article.tags.length > 0 && (
+                        <div
+                          className="nd-chip-row"
+                          aria-label="Topics"
+                          style={{ marginBottom: "var(--space-3)" }}
+                        >
+                          {article.tags.map((tag) => (
+                            <span key={tag} className="nd-chip">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      <h3
+                        id={`article-title-${article.slug}`}
+                        className="nd-h3"
+                        style={{ marginBottom: "var(--space-2)" }}
+                      >
+                        <a href={`/${locale}/insights/${article.slug}`}>
+                          {article.title}
+                        </a>
+                      </h3>
+
+                      <p className="nd-p-sm" style={{ marginBottom: "var(--space-3)", color: "var(--text-md)" }}>
+                        <time dateTime={article.date}>
+                          {formatArticleDate(article.date, locale)}
+                        </time>
+                        <span aria-hidden="true" style={{ margin: "0 var(--space-2)" }}>·</span>
+                        {article.readTime}
+                      </p>
+
+                      <p className="nd-p-sm" style={{ marginBottom: "var(--space-4)" }}>
+                        {article.summary}
+                      </p>
+
+                      <p className="nd-p-xs">
+                        <a href={`/${locale}/insights/${article.slug}`}>
+                          {articlesCopy.readLabel} →
+                        </a>
+                      </p>
+                    </article>
+                  </li>
+                </FadeUp>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 

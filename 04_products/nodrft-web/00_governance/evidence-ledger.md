@@ -139,4 +139,4 @@ Four independent reviewers ran in parallel against the Banner & Positioning Spri
 
 **DRA status: PASS — authorize for production**
 
-**Gate 6 status: AWAITING FOUNDER AUTHORIZATION**
+**Gate 6 status: AUTHORIZED — Founder sign-off 2026-05-06 — local review before push**

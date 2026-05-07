@@ -15,7 +15,7 @@
     "onboarding": "Incorporación"
   },
   "footer": {
-    "tagline": "Sistemas digitales con IA integrada. Entrega gobernada por humanos del brief al lanzamiento.",
+    "tagline": "Sistemas digitales con IA integrada. Cada resultado gobernado. Cada entrega documentada.",
     "workLabel": "Trabajo",
     "companyLabel": "Empresa",
     "capabilities": "Paquetes Web",
@@ -35,12 +35,12 @@
   },
   "meta": {
     "home": {
-      "title": "NoDrftSystems — Entrega Digital de Precisión",
-      "description": "Sistemas digitales con IA integrada para equipos que necesitan ejecución disciplinada, mejor posicionamiento y cero desviación del brief al lanzamiento."
+      "title": "NoDrftSystems — Sistemas Digitales con IA Integrada",
+      "description": "Sistemas digitales con IA integrada. Definidos con precisión. Entregados sin desviación."
     },
     "capabilities": {
-      "title": "Paquetes Web — NoDrftSystems",
-      "description": "Paquetes de sitios web con alcance claramente definido, desde páginas de aterrizaje hasta plataformas completas. Sin alcance oculto, sin desvío de scope."
+      "title": "Capacidades — NoDrftSystems",
+      "description": "Ocho alcances definidos desde Auditoría Web hasta Construcción de Ecosistema. Límites explícitos en cada paquete — qué incluye, qué no, y qué usted posee al final."
     },
     "engagements": {
       "title": "Proyectos Seleccionados — NoDrftSystems",
@@ -83,21 +83,21 @@
     "markerLabel": "IA INTEGRADA · GOBERNADA POR HUMANOS · CERO DESVIACIÓN",
     "headline1": "Sistemas digitales. Construidos para rendir—",
     "headline2": "estructurados para durar.",
-    "lead": "Sistemas digitales con IA integrada para equipos que necesitan ejecución disciplinada, mejor posicionamiento y cero desviación del brief al lanzamiento.",
+    "lead": "Sistemas digitales con IA integrada. Definidos con precisión. Entregados sin desviación.",
     "whyLabel": "Por qué esto importa",
     "whyHeadline": "Su presencia digital se evalúa antes que usted.",
-    "whyBody": "Esto es especialmente cierto para las empresas que no dependen del marketing, las que crecen a través de relaciones y referencias. El sitio web no es la estrategia de ventas. Pero cuando contradice la calidad real de la empresa, cuesta acuerdos que nunca se registraron como pérdidas.",
+    "whyBody": "Esto es especialmente cierto para las empresas que no dependen del marketing, las que crecen a través de relaciones y referencias. El sitio web no es la estrategia de ventas. Pero cuando contradice la calidad real de la empresa, cuesta acuerdos.",
     "strengthsLabel": "Por qué NoDrftSystems",
     "strength1Title": "Estrategia Primero",
-    "strength1Body": "Cada proyecto comienza con un acuerdo de alcance claro. No se inicia ninguna construcción sin un brief confirmado.",
+    "strength1Body": "Ningún proyecto comienza sin un alcance cerrado y un brief confirmado.",
     "strength2Title": "Entrega Estructurada",
     "strength2Body": "Paquetes definidos con inclusiones y exclusiones claras. Cada cambio se define y cotiza antes de comenzar — sin adiciones inesperadas.",
     "strength3Title": "Cero Desviación",
-    "strength3Body": "Lo que se lanza permanece correcto después de la entrega. El alcance se cierra al inicio — los cambios requieren una orden de cambio formal.",
-    "strength4Title": "Listo Bilingüe",
-    "strength4Body": "Estructura bilingüe integrada desde el inicio. Entrega bilingüe completa disponible en cualquier paquete.",
-    "strength5Title": "Seguro y Confiable",
-    "strength5Body": "Flujos de trabajo con IA integrada, salidas gobernadas por humanos. Cada entregable revisado antes de salir. Ningún resultado llega a un cliente sin autorización del Fundador.",
+    "strength3Body": "El alcance se cierra al inicio. Los cambios requieren una orden de cambio formal.",
+    "strength4Title": "Bilingüe Nativo",
+    "strength4Body": "Este sitio opera nativamente en inglés y español — el bilingüismo no es un complemento. La entrega bilingüe completa está disponible en cualquier paquete.",
+    "strength5Title": "Salida Gobernada",
+    "strength5Body": "Flujos de trabajo con IA integrada, salidas gobernadas. Cada entregable revisado antes de su lanzamiento. La aprobación es obligatoria — sin excepciones, sin atajos.",
     "costsLabel": "Lo que cuesta en silencio",
     "costsHeadline": "Una presencia digital débil tiene un costo que rara vez aparece en el presupuesto.",
     "cost1Title": "Pérdida de credibilidad",
@@ -111,8 +111,8 @@
     "cost5Title": "Arrastre operacional",
     "cost5Body": "Los sitios construidos sin un sistema de gestión de contenido, arquitectura documentada o responsabilidad clara requieren ayuda del desarrollador para actualizaciones básicas. Ese costo se acumula.",
     "ctaLabel": "Listos cuando usted lo esté",
-    "ctaHeadline": "Inicie una conversación. No un proceso de ventas.",
-    "ctaBody": "Cuéntenos qué está construyendo. Le diremos honestamente si podemos ayudar.",
+    "ctaHeadline": "Cuéntenos qué está construyendo.",
+    "ctaBody": "Le diremos si podemos ayudar.",
     "ctaButton": "Iniciar un Proyecto",
     "ctaSecondary": "Explorar Paquetes"
   }

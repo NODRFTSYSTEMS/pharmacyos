@@ -3,7 +3,7 @@
 **Task ID:** nodrft-web Banner & Positioning Sprint  
 **Date:** 2026-05-06  
 **Agent / Session:** Codex (claude-sonnet-4-6) — interactive Founder-directed session  
-**Status:** AWAITING GATE 6 — Gate 5 complete; all HOLDs resolved; Founder authorization required
+**Status:** GATE 6 AUTHORIZED — Founder authorized 2026-05-06; pending local review and push to production
 
 ---
 
@@ -120,4 +120,5 @@ Repositioned the NoDrftSystems public website from a "websites" framing to an "A
 ☑ PROCEED — all Gate 5 HOLDs resolved; TypeScript, lint, and build clean; Founder F1–F5 decisions confirmed  
 ☐ HOLD — no current blockers
 
-**Pending:** Gate 6 Founder authorization (item 1 above) and bundled-commit decision (item 2 above).
+**Gate 6 authorization:** Founder authorized 2026-05-06. Local review in progress before push to remote (Vercel production).  
+**Pending:** Bundled-commit decision (item 2 above).

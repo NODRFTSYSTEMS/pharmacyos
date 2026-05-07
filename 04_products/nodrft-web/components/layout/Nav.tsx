@@ -14,8 +14,7 @@ type NavKey =
   | "insights"
   | "about"
   | "start"
-  | "careers"
-  | "inquiries";
+  | "careers";
 
 type NavLink = {
   href: string;
@@ -29,7 +28,6 @@ const NAV_LINKS: NavLink[] = [
   { href: "/about", key: "about" },
   { href: "/start", key: "start" },
   { href: "/careers", key: "careers" },
-  { href: "/inquiries", key: "inquiries" },
 ];
 
 export function Nav() {
