@@ -1,0 +1,15 @@
+-- PharmacyOS — Development Seed Data
+-- Classification: Internal — NoDrftSystems Proprietary
+--
+-- This file is loaded into the local development database after migrations run.
+-- It must NEVER contain production data, real PII, or real patient information.
+--
+-- Add seed data only when:
+--   1. The migration introducing the relevant table has been merged
+--   2. DSS has approved the schema for that table
+--   3. SCA has reviewed any role/auth-relevant seed entries
+--
+-- Pattern:
+--   - Reference roles by their canonical snake_case key (pharmacist, pharmacy_technician, etc.)
+--   - Use deterministic UUIDs for seed entities (so test fixtures can reference them)
+--   - Synthetic patient names only (e.g., "Test Patient One") — never real names

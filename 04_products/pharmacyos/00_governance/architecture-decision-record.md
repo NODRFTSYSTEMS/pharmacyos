@@ -1,13 +1,24 @@
 # ARCHITECTURE DECISION RECORD: PharmacyOS — Winchester Global Pharmacy Operations Platform
 
 **Date:** 2026-05-07
-**Project:** PharmacyOS — Winchester Global Pharmacy Operations Platform
+**Project:** PharmacyOS — NoDrftSystems proprietary platform (Winchester Global Pharmacy is first licensed deployment per [decision-log.md DL-001](decision-log.md))
 **Author:** SAA (Samara) — Solution Architecture Assistant
-**Status:** PROPOSED — Awaiting ARE + Founder authorization before Gate 1A clears
-**Classification:** Internal — Client Confidential. Do not commit to client repositories.
+**Status:** **APPROVED** — Founder authorized 2026-05-08 (gacrespservices@gmail.com, in-session)
+**Classification:** Internal — NoDrftSystems Proprietary. Do not commit to client repositories.
 **Build Class:** Class 3 — Integration or Data-Sensitive (Class 4 treatment at auth, JDPA, and financial surfaces)
 **Repository:** github.com/NODRFTSYSTEMS/pharmacyos (private)
 **Governance reference:** `04_products/pharmacyos/00_governance/build-activation-packet.md`
+
+---
+
+## Approval
+
+**Founder approval:** 2026-05-08, in-session authorization. Scaffolding work in `app/` and `supabase/` proceeded under this approved architecture; build verified passing (`tsc -b && vite build`).
+
+**Documented architectural drift from ADR text:**
+- React 19 (Vite default scaffold) vs. ADR's "React 18" specification — forward-compatible for the patterns specified throughout the ADR; no architectural change required. Future ADR revisions should reference React 19 or current.
+
+**ARE technical review:** Reserved for Gate 6 (pre-production deployment). ARE does not gate scaffolding or schema work; ARE gates production deployment.
 
 ---
 

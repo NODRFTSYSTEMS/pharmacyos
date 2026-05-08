@@ -350,13 +350,23 @@ Per mandatory-build-activation-protocol, build will pause if:
 
 ---
 
-## Governance Note — Workspace Location
+## Governance Note — Workspace Location and Classification
 
 Per Founder direction (2026-05-07), the PharmacyOS production build lives in `04_products/pharmacyos/`.
 
-Note for compliance: CLAUDE.md Section 3 defines `04_products/` as NoDrftSystems proprietary products. PharmacyOS is a client-owned product being built under a client SOW. The client IP ownership clause in the MSA governs — PharmacyOS IP belongs to Winchester Global Pharmacy on delivery, not NoDrftSystems.
+**IP classification — UPDATED 2026-05-08 per [decision-log.md DL-001](decision-log.md):**
+PharmacyOS is now a **NoDrftSystems proprietary product**. CLAUDE.md Section 3's definition of `04_products/` as NoDrftSystems proprietary products applies directly — no carve-out needed. PharmacyOS IP, source code, schemas, AI prompts, and platform improvements remain NoDrftSystems property.
+
+Winchester Global Pharmacy is the **first licensed deployment** of the platform, not a bespoke-build client. The original client–vendor IP-on-delivery posture is superseded by the proprietary classification.
+
+**Required follow-on artifacts before any further commercial commitment to Winchester:**
+- Signed MSA amendment (see [msa-amendment-brief.md](msa-amendment-brief.md))
+- Signed new SOW (see [sow-restructure-brief.md](sow-restructure-brief.md))
+- NoDrftSystems product registry entry as proprietary product
+
+**Pre-amendment build discipline:** Architectural and scaffolding work in this workspace is internal NoDrftSystems work product and does not commit either party to a specific commercial structure. No production deployment, no Winchester access to the deployed instance, and no IP-affecting code transfer occurs until the amended MSA is signed.
 
 For client management artifacts (SOW, discovery records, handoff, legal review), a paired client workspace must exist at:
 `02_client-system/WINCHESTERGLOBAL_pharmacyos/`
 
-This record is distinct from `02_client-system/WINCHESTERGLOBAL_pharmacy-website/` (Phase 1 informational site — separate SOW).
+This record is distinct from `02_client-system/WINCHESTERGLOBAL_pharmacy-website/` (Phase 1 informational site — separate SOW, unaffected by this reclassification).

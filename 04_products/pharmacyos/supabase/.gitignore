@@ -1,0 +1,10 @@
+# Supabase CLI local artifacts
+.branches/
+.temp/
+.env
+.env.*
+!.env.example
+
+# Generated types (regenerated locally by `supabase gen types`)
+# Do not commit — these can drift from the actual schema
+# types/database.generated.ts

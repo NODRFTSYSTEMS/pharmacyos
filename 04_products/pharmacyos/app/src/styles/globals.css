@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/*
+ * PharmacyOS — Design Tokens
+ *
+ * Token vocabulary is owned by the design handoff:
+ *   ../../00_governance/pharmacyos-design-handoff-claude-design-2026-05-07.md (Section 2)
+ *
+ * FIS populates the @theme block below with real values from that handoff during
+ * the build phase. Until then, defaults from Tailwind v4 apply.
+ *
+ * Rule (per ADR Decision 2): no hardcoded hex values in component files.
+ * All color, spacing, type, radius, and shadow values reference tokens defined here.
+ */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Design-handoff tokens are added here by FIS during build phase. */
+}
+
+:root {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
