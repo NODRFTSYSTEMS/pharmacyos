@@ -18,7 +18,7 @@ This ledger records every piece of verification evidence produced during the Pha
 |---|---|---|---|---|---|
 | 2026-05-07 | Gate 0 | Build Activation Packet | Created | PMA / Codex | Initial packet — awaiting SAA architecture decision |
 | 2026-05-07 | Gate 0A | Agent Assessment & Routing | Documented in BAP | MOA / PMA | 6 capability gaps identified — must close before Gate 2 clears |
-| — | Gate 1A | SAA Architecture Record | PENDING | SAA (Samara) | Stack, infra, monorepo decision required |
+| 2026-05-07 | Gate 1A | SAA Architecture Record | PRODUCED — AWAITING ARE + FOUNDER | SAA (Samara) | React 18 + Vite + Tailwind v4 + shadcn/ui + Supabase + Edge Functions. See architecture-decision-record.md |
 | — | Gate 1A | DSS Schema Approval | PENDING | DSS | 15+ tables; RLS; migrations |
 | — | Gate 2 | SCA Auth + JDPA Review | PENDING | SCA (Omari) | Required before any patient data schema finalized |
 | — | Gate 2 | legal-compliance skill run | PENDING | LCA (Dorothy) | JDPA consent flow + Jamaica Data Protection Act 2020 |
@@ -58,7 +58,7 @@ Prototype is for design validation and stakeholder review only. Production imple
 
 | # | Gap | Owner | Status |
 |---|---|---|---|
-| G1 | SAA architecture decision | SAA (Samara) | OPEN |
+| G1 | SAA architecture decision | SAA (Samara) | CLOSED — ADR produced 2026-05-07; awaiting ARE + Founder approval |
 | G2 | Supabase project not provisioned | PIS + Founder | OPEN — cost authorization required |
 | G3 | Claude Vision API access not confirmed | Founder / Codex | OPEN |
 | G4 | Lynk payment API credentials absent | Client | OPEN |
