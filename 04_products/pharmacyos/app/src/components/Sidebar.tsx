@@ -1,6 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { SignOut } from '@phosphor-icons/react'
+import { MagnifyingGlass, SignOut } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
+
+/** Trigger CommandPalette (which listens for Cmd/Ctrl+K on window). */
+function openCommandPalette() {
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))
+}
 
 /**
  * Sidebar — design handoff Section 4.1.
@@ -141,6 +146,22 @@ export function Sidebar() {
               Built by NoDrftSystems
             </p>
           </div>
+        </div>
+
+        {/* Cmd+K search affordance */}
+        <div className="px-3 pt-3 shrink-0">
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Open command palette (Ctrl+K)"
+            className="w-full flex items-center gap-2 h-9 px-3 rounded-control bg-bg-sidebar-hover hover:bg-white/10 text-text-on-dark-dim hover:text-text-on-dark transition-colors group"
+          >
+            <MagnifyingGlass size={14} aria-hidden="true" />
+            <span className="type-body-sm flex-1 text-left">Search…</span>
+            <kbd className="inline-flex items-center px-1.5 rounded type-tiny font-mono bg-black/30 text-text-on-dark-dim group-hover:text-text-on-dark border border-white/10">
+              ⌘K
+            </kbd>
+          </button>
         </div>
 
         {/* Nav */}

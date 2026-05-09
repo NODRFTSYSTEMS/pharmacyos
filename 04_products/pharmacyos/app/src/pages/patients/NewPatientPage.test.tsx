@@ -3,12 +3,15 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { NewPatientPage } from './NewPatientPage'
+import { ToastProvider } from '@/components/Toast'
 
 function renderPage() {
   return render(
-    <MemoryRouter>
-      <NewPatientPage />
-    </MemoryRouter>,
+    <ToastProvider>
+      <MemoryRouter>
+        <NewPatientPage />
+      </MemoryRouter>
+    </ToastProvider>,
   )
 }
 
@@ -27,9 +30,16 @@ describe('NewPatientPage (smoke)', () => {
     expect(textboxes.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('Save Patient button starts disabled', () => {
+  it('clicking Save Patient with empty form shows field errors and a toast', async () => {
     renderPage()
-    expect(screen.getByRole('button', { name: /save patient/i })).toBeDisabled()
+    const save = screen.getByRole('button', { name: /save patient/i })
+    expect(save).not.toBeDisabled() // pattern: enabled with validation-on-click
+    await userEvent.click(save)
+    // Multiple "Required" alerts appear on blank required fields
+    const alerts = screen.getAllByText('Required')
+    expect(alerts.length).toBeGreaterThan(0)
+    // Toast confirms validation failure
+    expect(screen.getByText(/Fill the required fields/i)).toBeInTheDocument()
   })
 
   it('JDPA consent paragraph references the Jamaica Data Protection Act', () => {
