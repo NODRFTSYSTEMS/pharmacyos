@@ -47,12 +47,12 @@ export function CatalogPage() {
                   onClick={() => navigate(`/inventory/catalog/${item.din}`)}
                   className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer"
                 >
-                  <td className="px-4 text-[13px] text-text-primary">{item.drug}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{item.drug}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{item.din}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{item.supplier}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{item.supplier}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{item.unitCostJmd.toLocaleString()}</td>
                   <td className="px-4">
-                    {item.isSchedule ? <StatusPill variant="schedule">SCHEDULED</StatusPill> : <span className="text-[12px] text-text-disabled">—</span>}
+                    {item.isSchedule ? <StatusPill variant="schedule">SCHEDULED</StatusPill> : <span className="type-body-xs text-text-disabled">—</span>}
                   </td>
                 </tr>
               ))}

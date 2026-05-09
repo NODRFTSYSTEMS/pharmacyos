@@ -109,7 +109,7 @@ function Row({ label, status, detail, warn, muted }: { label: string; status: st
         <p className="text-xs text-text-secondary">{detail}</p>
       </div>
       <span className={[
-        'inline-flex items-center px-2 py-0.5 rounded-pill text-[11px] font-semibold',
+        'inline-flex items-center px-2 py-0.5 rounded-pill type-label font-semibold',
         warn ? 'bg-rx-verified-bg text-rx-verified-fg'
           : muted ? 'bg-rx-dispensed-bg text-rx-dispensed-fg'
           : 'bg-rx-filled-bg text-rx-filled-fg',

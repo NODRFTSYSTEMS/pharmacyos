@@ -70,13 +70,13 @@ export function InventoryReportPage() {
                 <tr key={r.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                   <td className="px-4 type-mono-data text-text-primary font-medium">{r.receiveNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{r.date}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{r.supplier}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{r.drug}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{r.supplier}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{r.drug}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{r.din}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{r.lot}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{r.qtyReceived}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{r.expiryDate}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{r.receivedBy}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{r.receivedBy}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{r.invoiceRef}</td>
                 </tr>
               ))}
@@ -99,7 +99,7 @@ function Kpi({ title, value, note }: { title: string; value: string; note: strin
     <div className="bg-bg-surface rounded-card shadow-card p-4">
       <p className="type-caption text-text-secondary">{title}</p>
       <p className="type-mono-metric text-text-primary leading-none mt-2">{value}</p>
-      <p className="text-[11px] text-text-secondary mt-2">{note}</p>
+      <p className="type-label text-text-secondary mt-2">{note}</p>
     </div>
   )
 }

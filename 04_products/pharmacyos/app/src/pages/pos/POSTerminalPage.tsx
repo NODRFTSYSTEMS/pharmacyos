@@ -93,16 +93,16 @@ export function POSTerminalPage() {
             value={scan}
             onChange={(e) => setScan(e.target.value)}
             placeholder="Scan barcode or type product code…"
-            className="flex-1 type-mono-input text-text-primary bg-transparent focus:outline-none placeholder:text-text-disabled"
+            className="flex-1 type-mono-input text-text-primary bg-transparent focus:outline-none focus:ring-[3px] focus:ring-primary/20 focus:bg-bg-subtle placeholder:text-text-disabled"
             autoFocus
           />
           {items.length > 0 && (
             <button
               type="button"
               onClick={clearCart}
-              className="text-xs text-error hover:text-tag-schedule-fg flex items-center gap-1"
+              className="h-14 px-4 text-sm text-error hover:text-tag-schedule-fg flex items-center gap-1.5 rounded-control hover:bg-tag-schedule-bg transition-colors"
             >
-              <Trash size={14} />
+              <Trash size={20} />
               Clear cart
             </button>
           )}
@@ -147,18 +147,18 @@ export function POSTerminalPage() {
                       type="button"
                       aria-label="Decrease quantity"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-8 h-8 rounded-control border border-border hover:bg-bg-subtle flex items-center justify-center text-text-secondary"
+                      className="w-14 h-14 rounded-control border border-border hover:bg-bg-subtle flex items-center justify-center text-text-secondary"
                     >
-                      <Minus size={14} />
+                      <Minus size={24} />
                     </button>
-                    <span className="type-mono-data w-8 text-center text-text-primary">{item.quantity}</span>
+                    <span className="type-mono-data w-14 text-center text-text-primary">{item.quantity}</span>
                     <button
                       type="button"
                       aria-label="Increase quantity"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-8 h-8 rounded-control border border-border hover:bg-bg-subtle flex items-center justify-center text-text-secondary"
+                      className="w-14 h-14 rounded-control border border-border hover:bg-bg-subtle flex items-center justify-center text-text-secondary"
                     >
-                      <Plus size={14} />
+                      <Plus size={24} />
                     </button>
                   </div>
                   <p className="type-mono-data text-text-primary w-24 text-right">
@@ -168,9 +168,9 @@ export function POSTerminalPage() {
                     type="button"
                     aria-label="Remove from cart"
                     onClick={() => removeItem(item.id)}
-                    className="w-8 h-8 rounded-control hover:bg-tag-schedule-bg flex items-center justify-center text-error"
+                    className="w-14 h-14 rounded-control hover:bg-tag-schedule-bg flex items-center justify-center text-error"
                   >
-                    <X size={14} />
+                    <X size={24} />
                   </button>
                 </div>
               ))}

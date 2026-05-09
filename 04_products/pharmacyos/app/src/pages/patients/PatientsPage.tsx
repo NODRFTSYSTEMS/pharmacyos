@@ -84,24 +84,24 @@ export function PatientsPage() {
                   >
                     <td className="px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                        <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center type-label font-semibold shrink-0">
                           {p.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                         </div>
                         <div>
-                          <p className="text-[13px] font-medium text-text-primary leading-tight">{p.name}</p>
-                          <p className="type-mono-data text-text-disabled text-[10px]">{p.id}</p>
+                          <p className="type-body-sm font-medium text-text-primary leading-tight">{p.name}</p>
+                          <p className="type-mono-data text-text-disabled type-tiny">{p.id}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4">
                       <span className="type-mono-data text-text-secondary">{p.dob}</span>
-                      <span className="text-[12px] text-text-secondary"> · {age(p.dob)}</span>
+                      <span className="type-body-xs text-text-secondary"> · {age(p.dob)}</span>
                     </td>
                     <td className="px-4 type-mono-data text-text-secondary">{p.nhfNumber}</td>
                     <td className="px-4 type-mono-data text-text-secondary">{p.phone}</td>
                     <td className="px-4">
                       {p.allergies.length === 0 ? (
-                        <span className="text-[12px] text-text-disabled">None recorded</span>
+                        <span className="type-body-xs text-text-disabled">None recorded</span>
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {p.allergies.map((a) => (

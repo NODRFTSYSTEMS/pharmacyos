@@ -69,7 +69,7 @@ export function PrescriptionDetailPage() {
                     >
                       {done ? <Check size={14} weight="bold" /> : i + 1}
                     </div>
-                    <p className={`text-[11px] ${current ? 'font-semibold text-text-primary' : 'text-text-secondary'}`}>{stage}</p>
+                    <p className={`type-label ${current ? 'font-semibold text-text-primary' : 'text-text-secondary'}`}>{stage}</p>
                   </div>
                   {i < STAGE_ORDER.length - 1 && (
                     <div className={`flex-1 h-0.5 mx-2 ${done ? 'bg-rx-filled-fg' : 'bg-border'}`} />
@@ -93,7 +93,7 @@ export function PrescriptionDetailPage() {
             ) : (
               <span className="text-sm text-text-primary">{rx.patient}</span>
             )}
-            <p className="text-[11px] text-text-secondary mt-0.5">ID {rx.patientId}</p>
+            <p className="type-label text-text-secondary mt-0.5">ID {rx.patientId}</p>
           </Card>
           <Card icon={<Stethoscope size={16} className="text-text-secondary" />} label="Prescriber">
             <p className="text-sm font-medium text-text-primary">{rx.prescriber}</p>

@@ -45,12 +45,12 @@ export function JobQueuePage() {
                 <tr key={job.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
                   <td className="px-4 type-mono-data text-text-primary font-medium">{job.jobNumber}</td>
                   <td className="px-4">
-                    <span className="inline-flex items-center gap-1.5 text-[12px] text-text-primary">
+                    <span className="inline-flex items-center gap-1.5 type-body-xs text-text-primary">
                       {jobIcon(job.type)}
                       {job.type}
                     </span>
                   </td>
-                  <td className="px-4 text-[12px] text-text-secondary">{job.target}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{job.target}</td>
                   <td className="px-4">
                     <StatusPill variant={STATUS_VARIANT[job.status]}>{job.status}</StatusPill>
                   </td>
@@ -67,12 +67,12 @@ export function JobQueuePage() {
                   </td>
                   <td className="px-4">
                     {job.flagged ? (
-                      <span className="inline-flex items-center gap-1 text-[12px] text-warning">
+                      <span className="inline-flex items-center gap-1 type-body-xs text-warning">
                         <MagnifyingGlass size={12} />
                         {job.flagged}
                       </span>
                     ) : (
-                      <span className="text-[12px] text-text-disabled">—</span>
+                      <span className="type-body-xs text-text-disabled">—</span>
                     )}
                   </td>
                 </tr>

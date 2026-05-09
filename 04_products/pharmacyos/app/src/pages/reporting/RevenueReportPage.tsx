@@ -93,7 +93,7 @@ export function RevenueReportPage() {
                 <tr key={t.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                   <td className="px-4 type-mono-data text-text-primary font-medium">{t.txNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{t.time}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{t.cashier}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{t.cashier}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{t.items}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{t.totalJmd.toLocaleString()}</td>
                   <td className="px-4">
@@ -114,7 +114,7 @@ function Kpi({ title, value, trend, trendUp = false }: { title: string; value: s
     <div className="bg-bg-surface rounded-card shadow-card p-4">
       <p className="type-caption text-text-secondary">{title}</p>
       <p className="type-mono-metric text-text-primary leading-none mt-2">{value}</p>
-      <p className={`text-[11px] mt-2 inline-flex items-center gap-1 ${trendUp ? 'text-rx-filled-fg' : 'text-tag-schedule-fg'}`}>
+      <p className={`type-label mt-2 inline-flex items-center gap-1 ${trendUp ? 'text-rx-filled-fg' : 'text-tag-schedule-fg'}`}>
         {trendUp ? <TrendUp size={12} weight="bold" /> : <TrendDown size={12} weight="bold" />}
         {trend} vs prior period
       </p>

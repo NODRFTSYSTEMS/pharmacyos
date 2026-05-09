@@ -93,16 +93,16 @@ export function UsersPage() {
                     <tr key={u.id} className="h-12 border-b border-border-subtle hover:bg-bg-subtle cursor-pointer">
                       <td className="px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                          <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center type-label font-semibold shrink-0">
                             {initials}
                           </div>
                           <div>
-                            <p className="text-[13px] font-medium text-text-primary leading-tight">{u.name}</p>
-                            <p className="type-mono-data text-text-disabled text-[10px]">{u.id}</p>
+                            <p className="type-body-sm font-medium text-text-primary leading-tight">{u.name}</p>
+                            <p className="type-mono-data text-text-disabled type-tiny">{u.id}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 text-[12px] text-text-secondary">{u.email}</td>
+                      <td className="px-4 type-body-xs text-text-secondary">{u.email}</td>
                       <td className="px-4">
                         <StatusPill variant={ROLE_VARIANT[u.role]}>{u.role}</StatusPill>
                       </td>

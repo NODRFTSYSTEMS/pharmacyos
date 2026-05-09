@@ -102,7 +102,7 @@ export function DrugDetailPage() {
                         {rx.rxNumber}
                       </Link>
                     </td>
-                    <td className="px-4 text-[13px] text-text-primary">{rx.patient}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{rx.patient}</td>
                     <td className="px-4 type-mono-data text-text-secondary">{rx.received}</td>
                     <td className="px-4">
                       <StatusPill variant={rx.status.toLowerCase() as 'received' | 'verified' | 'filled' | 'dispensed'}>

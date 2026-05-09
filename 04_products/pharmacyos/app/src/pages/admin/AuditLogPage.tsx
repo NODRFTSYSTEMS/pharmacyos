@@ -86,10 +86,10 @@ export function AuditLogPage() {
                 filtered.map((entry) => (
                   <tr key={entry.id} className="h-10 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
                     <td className="px-4 type-mono-data text-text-secondary whitespace-nowrap">{entry.timestamp}</td>
-                    <td className="px-4 text-[13px] text-text-primary whitespace-nowrap">{entry.user}</td>
-                    <td className="px-4 text-[12px] text-text-secondary">{entry.role}</td>
-                    <td className="px-4 text-[13px] text-text-primary">{entry.action}</td>
-                    <td className="px-4 text-[12px] text-text-secondary truncate max-w-[400px]">{entry.target}</td>
+                    <td className="px-4 type-body-sm text-text-primary whitespace-nowrap">{entry.user}</td>
+                    <td className="px-4 type-body-xs text-text-secondary">{entry.role}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{entry.action}</td>
+                    <td className="px-4 type-body-xs text-text-secondary truncate max-w-[400px]">{entry.target}</td>
                   </tr>
                 ))
               )}

@@ -28,19 +28,19 @@
   --color-error: #EF4444;
   --color-info: #3B82F6;
 
-  /* Rx queue states */
+  /* Rx queue states — foregrounds darkened for WCAG 1.4.3 AA ≥4.5:1 at 11px */
   --color-rx-received-bg: #E0E7FF;
-  --color-rx-received-fg: #6366F1;
+  --color-rx-received-fg: #3730A3;
   --color-rx-verified-bg: #FEF3C7;
-  --color-rx-verified-fg: #D97706;
+  --color-rx-verified-fg: #92400E;
   --color-rx-filled-bg: #D1FAE5;
-  --color-rx-filled-fg: #059669;
+  --color-rx-filled-fg: #065F46;
   --color-rx-dispensed-bg: #F3F4F6;
-  --color-rx-dispensed-fg: #6B7280;
+  --color-rx-dispensed-fg: #4B5563;
 
-  /* Tags */
+  /* Tags — schedule darkened for WCAG AA; nhf already passes */
   --color-tag-schedule-bg: #FEE2E2;
-  --color-tag-schedule-fg: #DC2626;
+  --color-tag-schedule-fg: #991B1B;
   --color-tag-nhf-bg: #EFF6FF;
   --color-tag-nhf-fg: #2563EB;
 
@@ -127,6 +127,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+.type-body-xs { font-size: 12px; line-height: 16px; font-weight: 400; }
+.type-tiny { font-size: 10px; line-height: 14px; font-weight: 400; }
 .type-mono-data { font-family: var(--font-mono); font-size: 13px; line-height: 20px; font-weight: 400; }
 .type-mono-input { font-family: var(--font-mono); font-size: 14px; line-height: 20px; font-weight: 400; }
 .type-mono-metric { font-family: var(--font-mono); font-size: 28px; line-height: 32px; font-weight: 500; }

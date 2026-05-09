@@ -33,7 +33,7 @@ export function ScheduleLogPage() {
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
           <div className="px-4 py-3 border-b border-border bg-tag-schedule-bg/50 flex items-center gap-2">
             <Lock size={14} className="text-tag-schedule-fg" />
-            <p className="text-[12px] font-medium text-tag-schedule-fg">
+            <p className="type-body-xs font-medium text-tag-schedule-fg">
               Pharmacy Act Regulated Record · entries cannot be modified or deleted
             </p>
           </div>
@@ -57,13 +57,13 @@ export function ScheduleLogPage() {
                 <tr key={entry.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
                   <td className="px-4 type-mono-data text-text-primary font-medium">{entry.logNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary whitespace-nowrap">{entry.date} {entry.time}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{entry.drug}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{entry.drug}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{entry.din}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{entry.qty}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{entry.rxNumber}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{entry.patient}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{entry.prescriber}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{entry.dispensedBy}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{entry.patient}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{entry.prescriber}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{entry.dispensedBy}</td>
                   <td className="px-4">
                     <StatusPill variant={entry.verified ? 'success' : 'warning'}>
                       {entry.verified ? 'Verified' : 'Pending'}

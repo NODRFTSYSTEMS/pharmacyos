@@ -56,7 +56,7 @@ export function DashboardPage() {
               <p className="type-caption text-text-secondary">{m.label}</p>
               <div>
                 <p className="type-mono-metric text-text-primary leading-none">{m.value}</p>
-                <p className="text-[11px] text-text-secondary mt-0.5">{m.note}</p>
+                <p className="type-label text-text-secondary mt-0.5">{m.note}</p>
               </div>
             </div>
           ))}
@@ -77,7 +77,7 @@ export function DashboardPage() {
                   <div key={col}>
                     <div
                       className={[
-                        'inline-flex items-center px-2 py-0.5 rounded-pill text-[10px] font-semibold mb-2',
+                        'inline-flex items-center px-2 py-0.5 rounded-pill type-tiny font-semibold mb-2',
                         RX_STATUS_BADGE[col],
                       ].join(' ')}
                     >
@@ -85,28 +85,28 @@ export function DashboardPage() {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       {items.length === 0 && (
-                        <p className="text-[11px] text-text-disabled italic">None</p>
+                        <p className="type-label text-text-disabled italic">None</p>
                       )}
                       {items.map((rx) => (
                         <article
                           key={rx.id}
                           className="rounded-control border border-border p-2 shadow-card hover:shadow-card-hover transition-shadow cursor-default"
                         >
-                          <p className="text-[11px] font-semibold text-text-primary leading-tight">
+                          <p className="type-label font-semibold text-text-primary leading-tight">
                             {rx.patient}
                           </p>
-                          <p className="type-mono-data text-[10px] text-text-secondary mt-0.5">
+                          <p className="type-mono-data type-tiny text-text-secondary mt-0.5">
                             {rx.rxNumber}
                           </p>
                           {(rx.isSchedule || rx.isNhf) && (
                             <div className="flex gap-1 mt-1">
                               {rx.isSchedule && (
-                                <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] font-semibold bg-tag-schedule-bg text-tag-schedule-fg">
+                                <span className="inline-flex items-center px-1.5 py-px rounded type-tiny font-semibold bg-tag-schedule-bg text-tag-schedule-fg">
                                   SCHED
                                 </span>
                               )}
                               {rx.isNhf && (
-                                <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] font-semibold bg-tag-nhf-bg text-tag-nhf-fg">
+                                <span className="inline-flex items-center px-1.5 py-px rounded type-tiny font-semibold bg-tag-nhf-bg text-tag-nhf-fg">
                                   NHF
                                 </span>
                               )}
@@ -145,10 +145,10 @@ export function DashboardPage() {
                         aria-hidden="true"
                       />
                       <div className="min-w-0">
-                        <p className="text-[12px] font-medium text-text-primary leading-tight truncate">
+                        <p className="type-body-xs font-medium text-text-primary leading-tight truncate">
                           {item.drug}
                         </p>
-                        <p className="text-[11px] text-text-secondary mt-0.5">
+                        <p className="type-label text-text-secondary mt-0.5">
                           {item.qtyOnHand} on hand · reorder at {item.reorderPoint}
                           {isExpiringSoon && (
                             <span className="text-warning"> · Expiry {item.expiryDate}</span>
@@ -194,10 +194,10 @@ export function DashboardPage() {
                   <td className="px-4 type-mono-data text-text-secondary whitespace-nowrap">
                     {entry.timestamp.split(' ')[1]}
                   </td>
-                  <td className="px-4 text-[13px] text-text-primary">{entry.user}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{entry.role}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{entry.action}</td>
-                  <td className="px-4 text-[12px] text-text-secondary truncate max-w-[260px]">
+                  <td className="px-4 type-body-sm text-text-primary">{entry.user}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{entry.role}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{entry.action}</td>
+                  <td className="px-4 type-body-xs text-text-secondary truncate max-w-[260px]">
                     {entry.target}
                   </td>
                 </tr>

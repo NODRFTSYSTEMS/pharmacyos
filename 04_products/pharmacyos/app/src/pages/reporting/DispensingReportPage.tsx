@@ -85,7 +85,7 @@ export function DispensingReportPage() {
                   const rate = stats.total === 0 ? 0 : Math.round((stats.dispensed / stats.total) * 100)
                   return (
                     <tr key={prescriber} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
-                      <td className="px-4 text-[13px] text-text-primary">{prescriber}</td>
+                      <td className="px-4 type-body-sm text-text-primary">{prescriber}</td>
                       <td className="px-4 type-mono-data text-text-primary text-right">{stats.total}</td>
                       <td className="px-4 type-mono-data text-text-primary text-right">{stats.dispensed}</td>
                       <td className="px-4 type-mono-data text-text-primary text-right">{rate}%</td>
@@ -105,7 +105,7 @@ function Kpi({ title, value, note }: { title: string; value: string; note?: stri
     <div className="bg-bg-surface rounded-card shadow-card p-4">
       <p className="type-caption text-text-secondary">{title}</p>
       <p className="type-mono-metric text-text-primary leading-none mt-2">{value}</p>
-      {note && <p className="text-[11px] text-text-secondary mt-2">{note}</p>}
+      {note && <p className="type-label text-text-secondary mt-2">{note}</p>}
     </div>
   )
 }

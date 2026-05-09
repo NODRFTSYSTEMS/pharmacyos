@@ -68,7 +68,7 @@ export function StockPage() {
                   >
                     <td className="px-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] text-text-primary">{item.drug}</span>
+                        <span className="type-body-sm text-text-primary">{item.drug}</span>
                         {item.isSchedule && <StatusPill variant="schedule">SCHED</StatusPill>}
                       </div>
                     </td>
@@ -84,7 +84,7 @@ export function StockPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 text-[12px] text-text-secondary">{item.supplier}</td>
+                    <td className="px-4 type-body-xs text-text-secondary">{item.supplier}</td>
                     <td className="px-4">
                       <StatusPill variant={stock.variant}>{stock.label}</StatusPill>
                     </td>

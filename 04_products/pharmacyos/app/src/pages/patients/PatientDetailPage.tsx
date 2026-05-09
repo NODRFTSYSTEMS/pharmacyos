@@ -99,8 +99,8 @@ export function PatientDetailPage() {
                       {meds.map((rx) => (
                         <tr key={rx.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                           <td className="px-4 type-mono-data text-text-primary">{rx.rxNumber}</td>
-                          <td className="px-4 text-[12px] text-text-primary">{rx.drugs.join(', ')}</td>
-                          <td className="px-4 text-[12px] text-text-secondary">{rx.prescriber}</td>
+                          <td className="px-4 type-body-xs text-text-primary">{rx.drugs.join(', ')}</td>
+                          <td className="px-4 type-body-xs text-text-secondary">{rx.prescriber}</td>
                           <td className="px-4 type-mono-data text-text-secondary">{rx.received}</td>
                           <td className="px-4">
                             <StatusPill variant={rx.status.toLowerCase() as 'received' | 'verified' | 'filled' | 'dispensed'}>
@@ -157,7 +157,7 @@ export function PatientDetailPage() {
                       Request Erasure
                     </Button>
                   </div>
-                  <p className="text-[11px] text-text-disabled">
+                  <p className="type-label text-text-disabled">
                     Erasure requests are reviewed against Pharmacy Act retention rules — clinical records may be
                     redacted rather than deleted.
                   </p>

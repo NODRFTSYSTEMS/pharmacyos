@@ -44,13 +44,13 @@ export function POSProductsPage() {
             <tbody>
               {SAMPLE_POS_PRODUCTS.map((p) => (
                 <tr key={p.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer">
-                  <td className="px-4 text-[13px] text-text-primary">{p.name}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{p.name}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{p.barcode}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{p.category}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{p.category}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{p.priceJmd.toLocaleString()}</td>
                   <td className={`px-4 type-mono-data text-right ${p.stockQty < 10 ? 'text-warning' : 'text-text-primary'}`}>{p.stockQty}</td>
                   <td className="px-4">
-                    {p.requiresRx ? <StatusPill variant="info">Rx</StatusPill> : <span className="text-[12px] text-text-disabled">—</span>}
+                    {p.requiresRx ? <StatusPill variant="info">Rx</StatusPill> : <span className="type-body-xs text-text-disabled">—</span>}
                   </td>
                 </tr>
               ))}

@@ -86,7 +86,7 @@ export function LoginPage() {
         {submitting ? 'Signing in…' : 'Sign in'}
       </Button>
 
-      <p className="flex items-center justify-center gap-1.5 text-[11px] text-text-disabled">
+      <p className="flex items-center justify-center gap-1.5 type-label text-text-disabled">
         <ShieldCheck size={12} />
         Two-factor authentication required after sign in
       </p>

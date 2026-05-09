@@ -35,8 +35,8 @@ export function SuppliersPage() {
             <tbody>
               {SAMPLE_SUPPLIERS.map((s) => (
                 <tr key={s.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
-                  <td className="px-4 text-[13px] font-medium text-text-primary">{s.name}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{s.contact}</td>
+                  <td className="px-4 type-body-sm font-medium text-text-primary">{s.name}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{s.contact}</td>
                   <td className="px-4">
                     <span className="inline-flex items-center gap-1.5 type-mono-data text-text-secondary">
                       <Phone size={12} />
@@ -44,12 +44,12 @@ export function SuppliersPage() {
                     </span>
                   </td>
                   <td className="px-4">
-                    <span className="inline-flex items-center gap-1.5 text-[12px] text-text-secondary">
+                    <span className="inline-flex items-center gap-1.5 type-body-xs text-text-secondary">
                       <Envelope size={12} />
                       {s.email}
                     </span>
                   </td>
-                  <td className="px-4 text-[12px] text-text-secondary">{s.location}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{s.location}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{s.lastOrder}</td>
                   <td className="px-4">
                     <StatusPill variant={s.status === 'Active' ? 'success' : 'neutral'}>{s.status}</StatusPill>

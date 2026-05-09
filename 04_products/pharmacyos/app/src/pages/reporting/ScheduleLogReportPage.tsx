@@ -69,7 +69,7 @@ export function ScheduleLogReportPage() {
                 .sort((a, b) => b[1].units - a[1].units)
                 .map(([drug, stats]) => (
                   <tr key={drug} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
-                    <td className="px-4 text-[13px] text-text-primary">{drug}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{drug}</td>
                     <td className="px-4 type-mono-data text-text-primary text-right">{stats.count}</td>
                     <td className="px-4 type-mono-data text-text-primary text-right">{stats.units}</td>
                   </tr>
@@ -99,9 +99,9 @@ export function ScheduleLogReportPage() {
                 <tr key={e.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                   <td className="px-4 type-mono-data text-text-primary">{e.logNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{e.date}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{e.drug}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{e.drug}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{e.qty}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{e.patient}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{e.patient}</td>
                   <td className="px-4">
                     <StatusPill variant={e.verified ? 'success' : 'warning'}>{e.verified ? 'Verified' : 'Pending'}</StatusPill>
                   </td>
@@ -120,7 +120,7 @@ function Kpi({ title, value, note }: { title: string; value: string; note?: stri
     <div className="bg-bg-surface rounded-card shadow-card p-4">
       <p className="type-caption text-text-secondary">{title}</p>
       <p className="type-mono-metric text-text-primary leading-none mt-2">{value}</p>
-      {note && <p className="text-[11px] text-text-secondary mt-2">{note}</p>}
+      {note && <p className="type-label text-text-secondary mt-2">{note}</p>}
     </div>
   )
 }

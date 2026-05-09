@@ -43,10 +43,10 @@ export function LoyaltyPage() {
                 <tr key={m.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer">
                   <td className="px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                      <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center type-label font-semibold shrink-0">
                         {m.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                       </div>
-                      <p className="text-[13px] font-medium text-text-primary">{m.name}</p>
+                      <p className="type-body-sm font-medium text-text-primary">{m.name}</p>
                     </div>
                   </td>
                   <td className="px-4 type-mono-data text-text-secondary">{m.patientId}</td>

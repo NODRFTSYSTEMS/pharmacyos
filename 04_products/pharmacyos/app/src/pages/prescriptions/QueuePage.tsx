@@ -41,11 +41,11 @@ export function QueuePage() {
                       {col.label} ({counts[col.key]})
                     </StatusPill>
                   </div>
-                  <p className="text-[11px] text-text-secondary mt-1.5">{col.description}</p>
+                  <p className="type-label text-text-secondary mt-1.5">{col.description}</p>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
                   {items.length === 0 && (
-                    <p className="text-[12px] text-text-disabled italic text-center mt-4">No prescriptions</p>
+                    <p className="type-body-xs text-text-disabled italic text-center mt-4">No prescriptions</p>
                   )}
                   {items.map((rx) => (
                     <article
@@ -53,20 +53,20 @@ export function QueuePage() {
                       className="rounded-control border border-border bg-bg-surface p-3 hover:shadow-card-hover hover:border-primary/30 transition-all cursor-pointer"
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <p className="text-[13px] font-semibold text-text-primary leading-tight truncate">{rx.patient}</p>
+                        <p className="type-body-sm font-semibold text-text-primary leading-tight truncate">{rx.patient}</p>
                         {rx.isSchedule && <StatusPill variant="schedule">SCHED</StatusPill>}
                       </div>
-                      <p className="type-mono-data text-text-secondary text-[11px] mb-2">{rx.rxNumber}</p>
-                      <ul className="text-[12px] text-text-primary leading-snug space-y-0.5">
+                      <p className="type-mono-data text-text-secondary type-label mb-2">{rx.rxNumber}</p>
+                      <ul className="type-body-xs text-text-primary leading-snug space-y-0.5">
                         {rx.drugs.map((d, i) => (
                           <li key={i} className="truncate">• {d}</li>
                         ))}
                       </ul>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-border-subtle">
-                        <span className="text-[11px] text-text-secondary">{rx.prescriber}</span>
+                        <span className="type-label text-text-secondary">{rx.prescriber}</span>
                         {rx.isNhf && <StatusPill variant="nhf">NHF</StatusPill>}
                       </div>
-                      <p className="type-mono-data text-text-disabled text-[10px] mt-1">{rx.received}</p>
+                      <p className="type-mono-data text-text-disabled type-tiny mt-1">{rx.received}</p>
                     </article>
                   ))}
                 </div>

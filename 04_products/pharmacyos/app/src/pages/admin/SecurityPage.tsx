@@ -72,8 +72,8 @@ export function SecurityPage() {
               <tbody>
                 {without2fa.map((u) => (
                   <tr key={u.id} className="h-11 border-b border-border-subtle">
-                    <td className="px-4 text-[13px] text-text-primary">{u.name}</td>
-                    <td className="px-4 text-[12px] text-text-secondary">{u.role}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{u.name}</td>
+                    <td className="px-4 type-body-xs text-text-secondary">{u.role}</td>
                     <td className="px-4 type-mono-data text-text-secondary">{u.lastLogin}</td>
                     <td className="px-4 text-right">
                       <Button variant="secondary" size="sm">Force Enrollment</Button>
@@ -103,8 +103,8 @@ export function SecurityPage() {
             <tbody>
               {activeSessions.map((s) => (
                 <tr key={s.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
-                  <td className="px-4 text-[13px] text-text-primary">{s.name}</td>
-                  <td className="px-4 text-[12px] text-text-secondary">{s.device}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{s.name}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{s.device}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{s.ip}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{s.lastLogin}</td>
                   <td className="px-4 text-right">
@@ -137,8 +137,8 @@ export function SecurityPage() {
                 {securityEvents.map((e) => (
                   <tr key={e.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                     <td className="px-4 type-mono-data text-text-secondary">{e.timestamp}</td>
-                    <td className="px-4 text-[13px] text-text-primary">{e.user}</td>
-                    <td className="px-4 text-[13px] text-text-primary">{e.action}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{e.user}</td>
+                    <td className="px-4 type-body-sm text-text-primary">{e.action}</td>
                     <td className="px-4">
                       <StatusPill variant="success">Success</StatusPill>
                     </td>
@@ -161,7 +161,7 @@ function PostureCard({ icon, title, value, note, tone }: { icon: React.ReactNode
         <p className="type-caption text-text-secondary">{title}</p>
       </div>
       <p className={`type-mono-metric leading-none ${tone === 'good' ? 'text-text-primary' : 'text-rx-verified-fg'}`}>{value}</p>
-      <p className="text-[11px] text-text-secondary mt-2">{note}</p>
+      <p className="type-label text-text-secondary mt-2">{note}</p>
     </div>
   )
 }

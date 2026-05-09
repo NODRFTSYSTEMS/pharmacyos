@@ -44,13 +44,13 @@ export function POSReportsPage() {
                 <tr key={t.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
                   <td className="px-4 type-mono-data text-text-primary font-medium">{t.txNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{t.time}</td>
-                  <td className="px-4 text-[13px] text-text-primary">{t.cashier}</td>
+                  <td className="px-4 type-body-sm text-text-primary">{t.cashier}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{t.items}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{t.totalJmd.toLocaleString()}</td>
                   <td className="px-4">
                     <StatusPill variant={METHOD_VARIANT[t.method]}>{t.method}</StatusPill>
                   </td>
-                  <td className="px-4 text-[12px] text-text-secondary">{t.patient ?? <span className="text-text-disabled">Walk-in</span>}</td>
+                  <td className="px-4 type-body-xs text-text-secondary">{t.patient ?? <span className="text-text-disabled">Walk-in</span>}</td>
                 </tr>
               ))}
             </tbody>
