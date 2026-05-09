@@ -1,0 +1,59 @@
+name: PharmacyOS — Deploy to GitHub Pages
+
+# Builds the PharmacyOS app and deploys the dist to the gh-pages branch of
+# NODRFTSYSTEMS/pharmacyos so it serves at https://nodrftsystems.github.io/pharmacyos/
+#
+# Prerequisites (one-time setup):
+#   1. Create a GitHub Personal Access Token (classic) with repo scope.
+#   2. Add it as a repository secret named PAGES_DEPLOY_TOKEN in this repo:
+#      Settings → Secrets and variables → Actions → New repository secret
+#   3. In NODRFTSYSTEMS/pharmacyos repo: Settings → Pages → Source → Deploy from branch → gh-pages / root
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '04_products/pharmacyos/app/**'
+      - '.github/workflows/pharmacyos-pages.yml'
+  # Allow manual trigger for first-time deploy or hotfix
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: 04_products/pharmacyos/app
+
+jobs:
+  deploy:
+    name: Build + deploy to gh-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '04_products/pharmacyos/app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (base = /pharmacyos/)
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /pharmacyos/
+
+      # Adds a .nojekyll file so GitHub Pages serves files that start with _
+      - name: Deploy to NODRFTSYSTEMS/pharmacyos gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+          external_repository: NODRFTSYSTEMS/pharmacyos
+          publish_branch: gh-pages
+          publish_dir: ./04_products/pharmacyos/app/dist
+          force_orphan: true
+          enable_jekyll: false
+          commit_message: "deploy: ${{ github.sha }}"

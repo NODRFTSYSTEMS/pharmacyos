@@ -7,8 +7,11 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
+// VITE_BASE_PATH is injected by the GitHub Pages workflow (/pharmacyos/).
+// Local dev and CI test builds use '/' (default).
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  base: process.env.VITE_BASE_PATH ?? '/',
   server: {
     port: 3000,
   },
