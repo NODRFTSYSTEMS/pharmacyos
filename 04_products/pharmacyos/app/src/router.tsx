@@ -10,6 +10,15 @@ import { ROUTE_PERMISSIONS } from '@/config/route-permissions'
 
 // Lazy-loaded real pages — feature-by-feature replacement of <Placeholder /> as work lands.
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
+const StockPage = lazy(() => import('@/pages/inventory/StockPage'))
+const CatalogPage = lazy(() => import('@/pages/inventory/CatalogPage'))
+const SuppliersPage = lazy(() => import('@/pages/inventory/SuppliersPage'))
+const QueuePage = lazy(() => import('@/pages/prescriptions/QueuePage'))
+const ScheduleLogPage = lazy(() => import('@/pages/prescriptions/ScheduleLogPage'))
+const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'))
+const AuditLogPage = lazy(() => import('@/pages/admin/AuditLogPage'))
+const JobQueuePage = lazy(() => import('@/pages/ai/JobQueuePage'))
+const LoyaltyPage = lazy(() => import('@/pages/pos/LoyaltyPage'))
 
 function PageFallback() {
   return (
@@ -56,11 +65,11 @@ export const router = createBrowserRouter([
 
       // Inventory (7)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory'].roles}><Placeholder title="Stock overview" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory'].roles}>{lazyPage(StockPage)}</RoleGuard>,
         path: '/inventory',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/catalog'].roles}><Placeholder title="Drug catalog" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/catalog'].roles}>{lazyPage(CatalogPage)}</RoleGuard>,
         path: '/inventory/catalog',
       },
       {
@@ -80,13 +89,13 @@ export const router = createBrowserRouter([
         path: '/inventory/alerts',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/suppliers'].roles}><Placeholder title="Suppliers" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/suppliers'].roles}>{lazyPage(SuppliersPage)}</RoleGuard>,
         path: '/inventory/suppliers',
       },
 
       // Prescriptions (5)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions'].roles}><Placeholder title="Prescription queue" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions'].roles}>{lazyPage(QueuePage)}</RoleGuard>,
         path: '/prescriptions',
       },
       {
@@ -102,13 +111,13 @@ export const router = createBrowserRouter([
         path: '/prescriptions/scanner',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions/schedule-log'].roles}><Placeholder title="Schedule drug log" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions/schedule-log'].roles}>{lazyPage(ScheduleLogPage)}</RoleGuard>,
         path: '/prescriptions/schedule-log',
       },
 
       // Patients (5)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/patients'].roles}><Placeholder title="Patient search" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/patients'].roles}>{lazyPage(PatientsPage)}</RoleGuard>,
         path: '/patients',
       },
       {
@@ -152,7 +161,7 @@ export const router = createBrowserRouter([
 
       // AI (1)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/ai/queue'].roles}><Placeholder title="AI job queue" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/ai/queue'].roles}>{lazyPage(JobQueuePage)}</RoleGuard>,
         path: '/ai/queue',
       },
 
@@ -162,7 +171,7 @@ export const router = createBrowserRouter([
         path: '/admin/users',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/audit'].roles}><Placeholder title="Audit log" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/audit'].roles}>{lazyPage(AuditLogPage)}</RoleGuard>,
         path: '/admin/audit',
       },
       {
@@ -209,7 +218,7 @@ export const router = createBrowserRouter([
         path: '/pos/reports',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/pos/loyalty'].roles}><Placeholder title="Loyalty search" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/pos/loyalty'].roles}>{lazyPage(LoyaltyPage)}</RoleGuard>,
         path: '/pos/loyalty',
       },
       {
