@@ -2,26 +2,90 @@
 
 /*
  * PharmacyOS — Design Tokens
- *
- * Token vocabulary is owned by the design handoff:
- *   ../../00_governance/pharmacyos-design-handoff-claude-design-2026-05-07.md (Section 2)
- *
- * FIS populates the @theme block below with real values from that handoff during
- * the build phase. Until then, defaults from Tailwind v4 apply.
- *
- * Rule (per ADR Decision 2): no hardcoded hex values in component files.
- * All color, spacing, type, radius, and shadow values reference tokens defined here.
+ * Source of truth: 04_products/pharmacyos/00_governance/pharmacyos-design-handoff-claude-design-2026-05-07.md (Section 2)
+ * Rule (per ADR Decision 2): no hardcoded hex values in component files. All references go through tokens.
  */
 
 @theme {
+  /* Fonts */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
 
-  /* Design-handoff tokens are added here by FIS during build phase. */
+  /* Color — surface & structure */
+  --color-bg-base: #f5f7fa;
+  --color-bg-surface: #ffffff;
+  --color-bg-sidebar: #111827;
+  --color-bg-sidebar-hover: #1f2937;
+
+  /* Color — action & accent */
+  --color-primary: #0f6fff;
+  --color-primary-hover: #0257cc;
+  --color-accent: #00b894;
+
+  /* Color — semantic */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Color — text */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-disabled: #d1d5db;
+  --color-text-on-dark: #f9fafb;
+
+  /* Color — border */
+  --color-border: #e5e7eb;
+  --color-border-subtle: #f3f4f6;
+  --color-border-focus: #0f6fff;
+
+  /* Color — prescription queue states (bg / fg) */
+  --color-rx-received-bg: #e0e7ff;
+  --color-rx-received-fg: #6366f1;
+  --color-rx-verified-bg: #fef3c7;
+  --color-rx-verified-fg: #d97706;
+  --color-rx-filled-bg: #d1fae5;
+  --color-rx-filled-fg: #059669;
+  --color-rx-dispensed-bg: #f3f4f6;
+  --color-rx-dispensed-fg: #6b7280;
+  --color-rx-cancelled-bg: #fee2e2;
+  --color-rx-cancelled-fg: #dc2626;
+
+  /* Color — regulatory tags */
+  --color-schedule-bg: #fee2e2;
+  --color-schedule-fg: #dc2626;
+  --color-nhf-bg: #eff6ff;
+  --color-nhf-fg: #2563eb;
+
+  /* Spacing — 4px base grid */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* Border radius */
+  --radius-card: 6px;
+  --radius-control: 4px;
+  --radius-table: 0px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 :root {
   font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -29,4 +93,16 @@
 body {
   margin: 0;
   min-height: 100vh;
+}
+
+/* Reduced-motion respect — Section 8 a11y */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
