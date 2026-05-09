@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { RoleGuard } from '@/components/auth/RoleGuard'
@@ -6,6 +7,25 @@ import { AuthLayout } from '@/layouts/AuthLayout'
 import { AdminPortalLayout } from '@/layouts/AdminPortalLayout'
 import { PosLayout } from '@/layouts/PosLayout'
 import { ROUTE_PERMISSIONS } from '@/config/route-permissions'
+
+// Lazy-loaded real pages — feature-by-feature replacement of <Placeholder /> as work lands.
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
+
+function PageFallback() {
+  return (
+    <div className="flex flex-1 items-center justify-center text-text-secondary text-sm p-6">
+      Loading…
+    </div>
+  )
+}
+
+function lazyPage(Component: React.ComponentType) {
+  return (
+    <Suspense fallback={<PageFallback />}>
+      <Component />
+    </Suspense>
+  )
+}
 
 /**
  * Single source of truth for routing.
@@ -31,7 +51,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { path: '/', element: <Navigate to="/dashboard" replace /> },
-      { path: '/dashboard', element: <Placeholder title="Dashboard" /> },
+      { path: '/dashboard', element: lazyPage(DashboardPage) },
       { path: '/profile', element: <Placeholder title="My profile" /> },
 
       // Inventory (7)

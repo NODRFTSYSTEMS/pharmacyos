@@ -6,25 +6,22 @@ import { Outlet } from 'react-router-dom'
  */
 export function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-bg-base)] p-4">
-      <div className="mb-12 text-center">
-        <p className="font-sans text-2xl font-semibold tracking-tight text-[var(--color-text-primary)]">
-          PharmacyOS
-        </p>
-        <p className="font-sans text-xs text-[var(--color-text-secondary)] mt-1">Winchester Global</p>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-bg-base px-4">
+      <div className="mb-10 text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-card bg-primary/10 mb-4">
+          <span className="text-xl font-bold text-primary">℞</span>
+        </div>
+        <h1 className="type-section text-text-primary">PharmacyOS</h1>
+        <p className="text-xs text-text-secondary mt-1">Secure pharmacy operations platform</p>
       </div>
-      <main
-        className="w-full max-w-[400px] bg-[var(--color-bg-surface)] p-8"
-        style={{
-          borderRadius: 'var(--radius-card)',
-          boxShadow: 'var(--shadow-card)',
-        }}
-      >
+
+      <main className="w-full max-w-[400px] bg-bg-surface rounded-card shadow-card p-8">
         <Outlet />
       </main>
-      <footer className="mt-8 text-xs text-[var(--color-text-secondary)]">
-        © Winchester Global Pharmacy {new Date().getFullYear()}
-      </footer>
+
+      <p className="mt-8 text-xs text-text-disabled">
+        © {new Date().getFullYear()} Winchester Global Pharmacy · Built by NoDrftSystems
+      </p>
     </div>
   )
 }

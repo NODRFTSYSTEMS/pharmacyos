@@ -3,9 +3,8 @@ import { PageHeader } from './PageHeader'
 import type { BreadcrumbItem } from './Breadcrumb'
 
 /**
- * Placeholder used by every route during the scaffold phase.
- * Real page components replace this one route at a time during the build phase —
- * never extend Placeholder for production behavior.
+ * Placeholder used by routes that haven't been implemented yet.
+ * Replace per route as feature work lands — never extend this for production behavior.
  */
 
 function deriveBreadcrumb(pathname: string): BreadcrumbItem[] {
@@ -29,16 +28,13 @@ export function Placeholder({ title }: { title: string }) {
     <div className="flex flex-col flex-1 min-h-0">
       <PageHeader title={title} breadcrumb={breadcrumb} />
       <section className="flex-1 p-6">
-        <div
-          className="bg-[var(--color-bg-surface)] border border-[var(--color-border)] p-12 text-center"
-          style={{ borderRadius: 'var(--radius-card)', boxShadow: 'var(--shadow-card)' }}
-        >
-          <p className="type-card-title text-[var(--color-text-primary)] mb-2">This screen is not yet implemented</p>
-          <p className="type-body-sm text-[var(--color-text-secondary)]">
-            Scaffold milestone — visual elevation in progress, feature work to follow.
+        <div className="bg-bg-surface border border-border rounded-card shadow-card p-12 text-center">
+          <p className="type-card-title text-text-primary mb-2">This screen is not yet implemented</p>
+          <p className="type-body-sm text-text-secondary">
+            Scaffold milestone — feature work lands route by route during the build phase.
           </p>
           {import.meta.env.DEV && (
-            <p className="type-label text-[var(--color-text-disabled)] mt-6">
+            <p className="type-label text-text-disabled mt-6">
               <span className="type-mono-data">{location.pathname}</span>
             </p>
           )}
