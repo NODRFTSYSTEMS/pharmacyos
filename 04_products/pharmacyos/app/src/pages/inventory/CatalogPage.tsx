@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Plus } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
@@ -14,6 +15,7 @@ import { SAMPLE_STOCK } from '@/data/sample'
 const CATALOG = Array.from(new Map(SAMPLE_STOCK.map((s) => [s.din, s])).values())
 
 export function CatalogPage() {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col h-full">
       <PageHeader
@@ -30,7 +32,7 @@ export function CatalogPage() {
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Drug Name</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">DIN</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Default Supplier</th>
@@ -40,7 +42,11 @@ export function CatalogPage() {
             </thead>
             <tbody>
               {CATALOG.map((item) => (
-                <tr key={item.din} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
+                <tr
+                  key={item.din}
+                  onClick={() => navigate(`/inventory/catalog/${item.din}`)}
+                  className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer"
+                >
                   <td className="px-4 text-[13px] text-text-primary">{item.drug}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{item.din}</td>
                   <td className="px-4 text-[12px] text-text-secondary">{item.supplier}</td>

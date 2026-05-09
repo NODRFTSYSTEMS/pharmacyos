@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Plus, Warning } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
@@ -22,6 +23,7 @@ function stockStatus(qty: number, reorder: number) {
 }
 
 export function StockPage() {
+  const navigate = useNavigate()
   const total = SAMPLE_STOCK.length
   const lowStock = SAMPLE_STOCK.filter((s) => s.qtyOnHand <= s.reorderPoint).length
   const expiring = SAMPLE_STOCK.filter((s) => expiryStatus(s.expiryDate)).length
@@ -43,7 +45,7 @@ export function StockPage() {
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Drug</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">DIN</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Lot</th>
@@ -59,7 +61,11 @@ export function StockPage() {
                 const stock = stockStatus(item.qtyOnHand, item.reorderPoint)
                 const expiry = expiryStatus(item.expiryDate)
                 return (
-                  <tr key={item.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors">
+                  <tr
+                    key={item.id}
+                    onClick={() => navigate(`/inventory/catalog/${item.din}`)}
+                    className="h-11 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer"
+                  >
                     <td className="px-4">
                       <div className="flex items-center gap-2">
                         <span className="text-[13px] text-text-primary">{item.drug}</span>

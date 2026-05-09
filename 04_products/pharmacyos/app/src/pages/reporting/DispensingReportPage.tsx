@@ -71,7 +71,7 @@ export function DispensingReportPage() {
           </div>
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Prescriber</th>
                 <th scope="col" className="h-9 px-4 text-right type-caption text-text-secondary">Total Rx</th>
                 <th scope="col" className="h-9 px-4 text-right type-caption text-text-secondary">Dispensed</th>

@@ -173,7 +173,7 @@ export function DashboardPage() {
           </div>
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 {['Time', 'User', 'Role', 'Action', 'Target'].map((h) => (
                   <th
                     key={h}

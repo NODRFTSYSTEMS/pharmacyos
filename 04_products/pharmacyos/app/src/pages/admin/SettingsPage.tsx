@@ -3,6 +3,8 @@ import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
 import { Input, FormField } from '@/components/Input'
 import { Checkbox } from '@/components/Checkbox'
+import { useToast } from '@/components/Toast'
+import { pharmacyConfig } from '@/config/pharmacy'
 
 export function SettingsPage() {
   return (
@@ -12,34 +14,40 @@ export function SettingsPage() {
         <div className="max-w-3xl flex flex-col gap-4">
           <Section icon={<Building size={18} className="text-rx-received-fg" />} title="Pharmacy Profile" description="Identity used on receipts, prescriptions, and reports.">
             <FormField label="Pharmacy Name" required>
-              {(id) => <Input id={id} defaultValue="Winchester Global Pharmacy" />}
+              {(id) => <Input id={id} defaultValue={pharmacyConfig.name} />}
             </FormField>
             <FormField label="Address">
-              {(id) => <Input id={id} defaultValue="42 Hope Road, Kingston 6, Jamaica" />}
+              {(id) => <Input id={id} defaultValue={pharmacyConfig.address} />}
             </FormField>
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Phone">
-                {(id) => <Input id={id} type="tel" defaultValue="876-555-0142" mono />}
+                {(id) => <Input id={id} type="tel" defaultValue={pharmacyConfig.phone} mono />}
               </FormField>
               <FormField label="Pharmacy Council #">
-                {(id) => <Input id={id} defaultValue="PCJ-2024-0817" mono />}
+                {(id) => <Input id={id} defaultValue={pharmacyConfig.pharmacyCouncilNumber} mono />}
               </FormField>
             </div>
-            <SaveRow />
+            <SaveRow section="Pharmacy profile" />
           </Section>
 
           <Section icon={<Database size={18} className="text-rx-filled-fg" />} title="Inventory Defaults" description="Thresholds applied across all SKUs unless overridden per drug.">
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Low Stock Threshold (units)" helper="Triggers low-stock alert">
-                {(id) => <Input id={id} type="number" defaultValue="50" mono />}
+                {(id) => <Input id={id} type="number" defaultValue={pharmacyConfig.defaults.lowStockThreshold} mono />}
               </FormField>
               <FormField label="Expiry Alert Window (days)" helper="Items expiring within this window appear in alerts">
-                {(id) => <Input id={id} type="number" defaultValue="90" mono />}
+                {(id) => <Input id={id} type="number" defaultValue={pharmacyConfig.defaults.expiryAlertWindowDays} mono />}
               </FormField>
             </div>
-            <Checkbox label="Auto-generate purchase orders when stock drops below threshold" defaultChecked={false} />
-            <Checkbox label="Block dispensing of expired lots (recommended)" defaultChecked={true} />
-            <SaveRow />
+            <Checkbox
+              label="Auto-generate purchase orders when stock drops below threshold"
+              defaultChecked={pharmacyConfig.defaults.autoGeneratePurchaseOrders}
+            />
+            <Checkbox
+              label="Block dispensing of expired lots (recommended)"
+              defaultChecked={pharmacyConfig.defaults.blockExpiredDispensing}
+            />
+            <SaveRow section="Inventory defaults" />
           </Section>
 
           <Section icon={<Bell size={18} className="text-rx-verified-fg" />} title="Notifications" description="Alert routing for staff and management.">
@@ -47,7 +55,7 @@ export function SettingsPage() {
             <Checkbox label="Email me when AI scan confidence falls below 85%" defaultChecked />
             <Checkbox label="Email manager on stock alerts" defaultChecked />
             <Checkbox label="Daily revenue summary email at end of day" defaultChecked />
-            <SaveRow />
+            <SaveRow section="Notifications" />
           </Section>
 
           <Section icon={<Globe size={18} className="text-tag-nhf-fg" />} title="Integrations" description="External services connected to PharmacyOS.">
@@ -77,11 +85,18 @@ function Section({ icon, title, description, children }: { icon: React.ReactNode
   )
 }
 
-function SaveRow() {
+function SaveRow({ section }: { section: string }) {
+  const toast = useToast()
   return (
     <div className="flex items-center justify-end gap-2 pt-2 border-t border-border-subtle">
       <Button variant="tertiary" size="md">Cancel</Button>
-      <Button variant="primary" size="md">Save Changes</Button>
+      <Button
+        variant="primary"
+        size="md"
+        onClick={() => toast.show(`${section} saved`, { variant: 'success' })}
+      >
+        Save Changes
+      </Button>
     </div>
   )
 }

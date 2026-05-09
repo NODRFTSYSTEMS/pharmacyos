@@ -62,7 +62,7 @@ export function SecurityPage() {
             </div>
             <table className="w-full">
               <thead>
-                <tr className="bg-bg-subtle border-b border-border">
+                <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">User</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Role</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Last Login</th>
@@ -92,7 +92,7 @@ export function SecurityPage() {
           </div>
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">User</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Device</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">IP</th>
@@ -126,7 +126,7 @@ export function SecurityPage() {
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="bg-bg-subtle border-b border-border">
+                <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Time</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">User</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Action</th>

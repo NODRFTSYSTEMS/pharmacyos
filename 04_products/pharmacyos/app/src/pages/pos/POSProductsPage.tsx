@@ -32,7 +32,7 @@ export function POSProductsPage() {
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Product</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Barcode</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Category</th>

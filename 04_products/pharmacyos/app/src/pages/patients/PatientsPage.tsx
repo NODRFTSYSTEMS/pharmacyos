@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, MagnifyingGlass } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
@@ -7,19 +9,33 @@ import { SAMPLE_PATIENTS } from '@/data/sample'
 function age(dob: string) {
   const birth = new Date(dob)
   const now = new Date('2026-05-08')
-  let age = now.getFullYear() - birth.getFullYear()
+  let a = now.getFullYear() - birth.getFullYear()
   const m = now.getMonth() - birth.getMonth()
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--
-  return age
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) a--
+  return a
 }
 
 export function PatientsPage() {
+  const navigate = useNavigate()
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return SAMPLE_PATIENTS
+    return SAMPLE_PATIENTS.filter((p) =>
+      p.name.toLowerCase().includes(q) ||
+      p.nhfNumber.toLowerCase().includes(q) ||
+      p.phone.includes(q),
+    )
+  }, [query])
+
   const withAllergies = SAMPLE_PATIENTS.filter((p) => p.allergies.length > 0).length
+
   return (
     <div className="flex flex-col h-full">
       <PageHeader
         title="Patients"
-        subtitle={`${SAMPLE_PATIENTS.length} on file · ${withAllergies} with documented allergies`}
+        subtitle={`${SAMPLE_PATIENTS.length} on file · ${withAllergies} with documented allergies${query ? ` · ${filtered.length} matching` : ''}`}
         cta={
           <Button variant="primary" size="md">
             <Plus size={16} weight="bold" />
@@ -31,6 +47,8 @@ export function PatientsPage() {
             <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
             <input
               type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by name, NHF #, or phone…"
               className="w-full h-10 pl-9 pr-3 type-body-sm bg-bg-surface border border-border rounded-control focus:outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/20 transition-shadow"
             />
@@ -41,7 +59,7 @@ export function PatientsPage() {
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-bg-subtle border-b border-border">
+              <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Patient</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">DOB · Age</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">NHF #</th>
@@ -51,39 +69,51 @@ export function PatientsPage() {
               </tr>
             </thead>
             <tbody>
-              {SAMPLE_PATIENTS.map((p) => (
-                <tr key={p.id} className="h-12 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer">
-                  <td className="px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
-                        {p.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                      </div>
-                      <div>
-                        <p className="text-[13px] font-medium text-text-primary leading-tight">{p.name}</p>
-                        <p className="type-mono-data text-text-disabled text-[10px]">{p.id}</p>
-                      </div>
-                    </div>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-text-secondary">
+                    No patients match "{query}".
                   </td>
-                  <td className="px-4">
-                    <span className="type-mono-data text-text-secondary">{p.dob}</span>
-                    <span className="text-[12px] text-text-secondary"> · {age(p.dob)}</span>
-                  </td>
-                  <td className="px-4 type-mono-data text-text-secondary">{p.nhfNumber}</td>
-                  <td className="px-4 type-mono-data text-text-secondary">{p.phone}</td>
-                  <td className="px-4">
-                    {p.allergies.length === 0 ? (
-                      <span className="text-[12px] text-text-disabled">None recorded</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {p.allergies.map((a) => (
-                          <StatusPill key={a} variant="error">{a}</StatusPill>
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 type-mono-data text-text-secondary">{p.lastVisit}</td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((p) => (
+                  <tr
+                    key={p.id}
+                    onClick={() => navigate(`/patients/${p.id}`)}
+                    className="h-12 border-b border-border-subtle hover:bg-bg-subtle transition-colors cursor-pointer"
+                  >
+                    <td className="px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-pill bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                          {p.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-medium text-text-primary leading-tight">{p.name}</p>
+                          <p className="type-mono-data text-text-disabled text-[10px]">{p.id}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4">
+                      <span className="type-mono-data text-text-secondary">{p.dob}</span>
+                      <span className="text-[12px] text-text-secondary"> · {age(p.dob)}</span>
+                    </td>
+                    <td className="px-4 type-mono-data text-text-secondary">{p.nhfNumber}</td>
+                    <td className="px-4 type-mono-data text-text-secondary">{p.phone}</td>
+                    <td className="px-4">
+                      {p.allergies.length === 0 ? (
+                        <span className="text-[12px] text-text-disabled">None recorded</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {p.allergies.map((a) => (
+                            <StatusPill key={a} variant="error">{a}</StatusPill>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 type-mono-data text-text-secondary">{p.lastVisit}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

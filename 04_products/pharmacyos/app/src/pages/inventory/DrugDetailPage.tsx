@@ -87,7 +87,7 @@ export function DrugDetailPage() {
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="bg-bg-subtle border-b border-border">
+                <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Rx #</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Patient</th>
                   <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Received</th>
