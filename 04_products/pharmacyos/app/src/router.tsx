@@ -27,6 +27,11 @@ const DrugDetailPage = lazy(() => import('@/pages/inventory/DrugDetailPage'))
 const POSTerminalPage = lazy(() => import('@/pages/pos/POSTerminalPage'))
 const POSProductsPage = lazy(() => import('@/pages/pos/POSProductsPage'))
 const POSReportsPage = lazy(() => import('@/pages/pos/POSReportsPage'))
+const ReportingHubPage = lazy(() => import('@/pages/reporting/ReportingHubPage'))
+const InventoryReportPage = lazy(() => import('@/pages/reporting/InventoryReportPage'))
+const DispensingReportPage = lazy(() => import('@/pages/reporting/DispensingReportPage'))
+const ScheduleLogReportPage = lazy(() => import('@/pages/reporting/ScheduleLogReportPage'))
+const RevenueReportPage = lazy(() => import('@/pages/reporting/RevenueReportPage'))
 
 function PageFallback() {
   return (
@@ -147,23 +152,23 @@ export const router = createBrowserRouter([
 
       // Reports (5)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports'].roles}><Placeholder title="Reports hub" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports'].roles}>{lazyPage(ReportingHubPage)}</RoleGuard>,
         path: '/reports',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/inventory'].roles}><Placeholder title="Inventory report" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/inventory'].roles}>{lazyPage(InventoryReportPage)}</RoleGuard>,
         path: '/reports/inventory',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/dispensing'].roles}><Placeholder title="Dispensing report" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/dispensing'].roles}>{lazyPage(DispensingReportPage)}</RoleGuard>,
         path: '/reports/dispensing',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/schedule-log'].roles}><Placeholder title="Schedule log report" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/schedule-log'].roles}>{lazyPage(ScheduleLogReportPage)}</RoleGuard>,
         path: '/reports/schedule-log',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/revenue'].roles}><Placeholder title="Revenue report" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/reports/revenue'].roles}>{lazyPage(RevenueReportPage)}</RoleGuard>,
         path: '/reports/revenue',
       },
 
