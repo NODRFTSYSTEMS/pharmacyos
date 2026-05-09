@@ -21,6 +21,9 @@ const JobQueuePage = lazy(() => import('@/pages/ai/JobQueuePage'))
 const LoyaltyPage = lazy(() => import('@/pages/pos/LoyaltyPage'))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const TwoFactorPage = lazy(() => import('@/pages/auth/TwoFactorPage'))
+const PatientDetailPage = lazy(() => import('@/pages/patients/PatientDetailPage'))
+const PrescriptionDetailPage = lazy(() => import('@/pages/prescriptions/PrescriptionDetailPage'))
+const DrugDetailPage = lazy(() => import('@/pages/inventory/DrugDetailPage'))
 
 function PageFallback() {
   return (
@@ -75,7 +78,7 @@ export const router = createBrowserRouter([
         path: '/inventory/catalog',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/catalog/:id'].roles}><Placeholder title="Drug detail" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/inventory/catalog/:id'].roles}>{lazyPage(DrugDetailPage)}</RoleGuard>,
         path: '/inventory/catalog/:id',
       },
       {
@@ -105,7 +108,7 @@ export const router = createBrowserRouter([
         path: '/prescriptions/new',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions/:id'].roles}><Placeholder title="Prescription detail" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/prescriptions/:id'].roles}>{lazyPage(PrescriptionDetailPage)}</RoleGuard>,
         path: '/prescriptions/:id',
       },
       {
@@ -127,7 +130,7 @@ export const router = createBrowserRouter([
         path: '/patients/new',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/patients/:id'].roles}><Placeholder title="Patient profile" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/patients/:id'].roles}>{lazyPage(PatientDetailPage)}</RoleGuard>,
         path: '/patients/:id',
       },
       {
