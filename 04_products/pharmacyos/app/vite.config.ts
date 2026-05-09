@@ -8,13 +8,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 //
-// ⚠️  DEPLOYMENT: Do NOT set VITE_BASE_PATH as an env var — Git Bash on Windows
-// converts /pharmacyos/ to a Windows path (MSYS path expansion).
-// Use the CLI flag instead (see memory file — project_pharmacyos_winchester.md):
-//   MSYS_NO_PATHCONV=1 VITE_DEMO_MODE=true npx vite build --base /pharmacyos/
+// ─── Deployment targets ───────────────────────────────────────────────────────
 //
-// The `base` field below is the local dev default ('/'). The --base CLI flag
-// overrides it at build time and is not subject to env var path conversion.
+// VERCEL (primary)
+//   base: '/' — correct as-is. vercel.json handles SPA rewrites.
+//   Set in Vercel dashboard → Environment Variables:
+//     VITE_DEMO_MODE=true
+//     VITE_SUPABASE_URL=https://your-project.supabase.co
+//     VITE_SUPABASE_ANON_KEY=your-anon-key
+//   Vercel auto-runs: npm install && npm run build
+//
+// GITHUB PAGES (secondary / preview)
+//   ⚠️  Do NOT set VITE_BASE_PATH as an env var — Git Bash on Windows (MSYS2)
+//   converts /pharmacyos/ to a Windows filesystem path silently.
+//   Use the CLI --base flag instead:
+//     MSYS_NO_PATHCONV=1 VITE_DEMO_MODE=true npx vite build --base /pharmacyos/
+//   Then sync dist/ → docs/ and copy docs/index.html → docs/404.html
+// ─────────────────────────────────────────────────────────────────────────────
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/',
