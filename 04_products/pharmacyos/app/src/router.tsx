@@ -32,6 +32,9 @@ const InventoryReportPage = lazy(() => import('@/pages/reporting/InventoryReport
 const DispensingReportPage = lazy(() => import('@/pages/reporting/DispensingReportPage'))
 const ScheduleLogReportPage = lazy(() => import('@/pages/reporting/ScheduleLogReportPage'))
 const RevenueReportPage = lazy(() => import('@/pages/reporting/RevenueReportPage'))
+const UsersPage = lazy(() => import('@/pages/admin/UsersPage'))
+const SettingsPage = lazy(() => import('@/pages/admin/SettingsPage'))
+const SecurityPage = lazy(() => import('@/pages/admin/SecurityPage'))
 
 function PageFallback() {
   return (
@@ -218,7 +221,7 @@ export const router = createBrowserRouter([
 
       // Admin (4)
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users'].roles}><Placeholder title="User management" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users'].roles}>{lazyPage(UsersPage)}</RoleGuard>,
         path: '/admin/users',
       },
       {
@@ -226,11 +229,11 @@ export const router = createBrowserRouter([
         path: '/admin/audit',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/settings'].roles}><Placeholder title="System settings" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/settings'].roles}>{lazyPage(SettingsPage)}</RoleGuard>,
         path: '/admin/settings',
       },
       {
-        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/security'].roles}><Placeholder title="Security" /></RoleGuard>,
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/security'].roles}>{lazyPage(SecurityPage)}</RoleGuard>,
         path: '/admin/security',
       },
     ],
