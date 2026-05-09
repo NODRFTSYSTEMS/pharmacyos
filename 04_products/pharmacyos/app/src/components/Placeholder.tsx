@@ -30,15 +30,15 @@ export function Placeholder({ title }: { title: string }) {
       <PageHeader title={title} breadcrumb={breadcrumb} />
       <section className="flex-1 p-6">
         <div
-          className="bg-[--color-bg-surface] border border-[--color-border] p-12 text-center"
+          className="bg-[var(--color-bg-surface)] border border-[var(--color-border)] p-12 text-center"
           style={{ borderRadius: 'var(--radius-card)', boxShadow: 'var(--shadow-card)' }}
         >
-          <p className="type-card-title text-[--color-text-primary] mb-2">This screen is not yet implemented</p>
-          <p className="type-body-sm text-[--color-text-secondary]">
+          <p className="type-card-title text-[var(--color-text-primary)] mb-2">This screen is not yet implemented</p>
+          <p className="type-body-sm text-[var(--color-text-secondary)]">
             Scaffold milestone — visual elevation in progress, feature work to follow.
           </p>
           {import.meta.env.DEV && (
-            <p className="type-label text-[--color-text-disabled] mt-6">
+            <p className="type-label text-[var(--color-text-disabled)] mt-6">
               <span className="type-mono-data">{location.pathname}</span>
             </p>
           )}

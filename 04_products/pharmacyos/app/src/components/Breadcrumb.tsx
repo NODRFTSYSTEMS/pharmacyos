@@ -14,22 +14,22 @@ export function Breadcrumb({ items, className = '' }: { items: readonly Breadcru
   if (items.length === 0) return null
   return (
     <nav aria-label="Breadcrumb" className={`type-label ${className}`}>
-      <ol className="flex items-center gap-1.5 text-[--color-text-secondary]">
+      <ol className="flex items-center gap-1.5 text-[var(--color-text-secondary)]">
         {items.map((item, i) => {
           const isLast = i === items.length - 1
           return (
             <li key={`${item.label}-${i}`} className="flex items-center gap-1.5">
               {i > 0 && (
-                <span aria-hidden className="text-[--color-text-secondary]">
+                <span aria-hidden className="text-[var(--color-text-secondary)]">
                   ›
                 </span>
               )}
               {item.to && !isLast ? (
-                <Link to={item.to} className="hover:text-[--color-text-primary]">
+                <Link to={item.to} className="hover:text-[var(--color-text-primary)]">
                   {item.label}
                 </Link>
               ) : (
-                <span className={isLast ? 'text-[--color-text-primary]' : ''} aria-current={isLast ? 'page' : undefined}>
+                <span className={isLast ? 'text-[var(--color-text-primary)]' : ''} aria-current={isLast ? 'page' : undefined}>
                   {item.label}
                 </span>
               )}

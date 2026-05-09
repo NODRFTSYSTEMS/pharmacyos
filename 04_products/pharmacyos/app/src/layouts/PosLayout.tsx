@@ -10,12 +10,12 @@ import { Link, Outlet } from 'react-router-dom'
  */
 export function PosLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[--color-bg-base]">
-      <header className="h-14 px-6 flex items-center justify-between bg-[--color-bg-surface] border-b border-[--color-border]">
+    <div className="min-h-screen flex flex-col bg-[var(--color-bg-base)]">
+      <header className="h-14 px-6 flex items-center justify-between bg-[var(--color-bg-surface)] border-b border-[var(--color-border)]">
         <p className="font-sans font-semibold text-sm">PharmacyOS · Retail</p>
         <Link
           to="/dashboard"
-          className="text-xs text-[--color-primary] hover:text-[--color-primary-hover]"
+          className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]"
         >
           Close POS
         </Link>

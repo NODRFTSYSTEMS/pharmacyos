@@ -11,13 +11,13 @@ type Size = 'sm' | 'md' | 'lg' | 'xl'
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
-    'bg-[--color-primary] text-white border border-transparent hover:bg-[--color-primary-hover] disabled:bg-[--color-border-subtle] disabled:text-[--color-text-disabled]',
+    'bg-[var(--color-primary)] text-white border border-transparent hover:bg-[var(--color-primary-hover)] disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-disabled)]',
   secondary:
-    'bg-[--color-bg-surface] text-[--color-text-primary] border border-[--color-border] hover:bg-[--color-border-subtle] disabled:bg-[--color-border-subtle] disabled:text-[--color-text-disabled]',
+    'bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-border-subtle)] disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-disabled)]',
   tertiary:
-    'bg-transparent text-[--color-primary] border border-transparent hover:text-[--color-primary-hover] disabled:text-[--color-text-disabled]',
+    'bg-transparent text-[var(--color-primary)] border border-transparent hover:text-[var(--color-primary-hover)] disabled:text-[var(--color-text-disabled)]',
   destructive:
-    'bg-[--color-bg-surface] text-[--color-error] border border-[--color-error] hover:bg-[--color-rx-cancelled-bg] disabled:bg-[--color-border-subtle] disabled:text-[--color-text-disabled] disabled:border-[--color-border]',
+    'bg-[var(--color-bg-surface)] text-[var(--color-error)] border border-[var(--color-error)] hover:bg-[var(--color-rx-cancelled-bg)] disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-disabled)] disabled:border-[var(--color-border)]',
 }
 
 const SIZE_CLASSES: Record<Size, string> = {
@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       className={[
         'inline-flex items-center justify-center gap-2 font-medium font-sans whitespace-nowrap',
-        'rounded-[--radius-control] transition-colors',
+        'rounded-[var(--radius-control)] transition-colors',
         'focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(15,111,255,0.18)]',
         'disabled:cursor-not-allowed',
         VARIANT_CLASSES[variant],
