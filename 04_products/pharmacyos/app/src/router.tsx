@@ -19,6 +19,8 @@ const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'))
 const AuditLogPage = lazy(() => import('@/pages/admin/AuditLogPage'))
 const JobQueuePage = lazy(() => import('@/pages/ai/JobQueuePage'))
 const LoyaltyPage = lazy(() => import('@/pages/pos/LoyaltyPage'))
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const TwoFactorPage = lazy(() => import('@/pages/auth/TwoFactorPage'))
 
 function PageFallback() {
   return (
@@ -46,8 +48,8 @@ export const router = createBrowserRouter([
   {
     element: <AuthLayout />,
     children: [
-      { path: '/login', element: <Placeholder title="Sign in" /> },
-      { path: '/login/2fa', element: <Placeholder title="Two-factor verification" /> },
+      { path: '/login', element: lazyPage(LoginPage) },
+      { path: '/login/2fa', element: lazyPage(TwoFactorPage) },
     ],
   },
 
