@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { RoleGuard } from '@/components/auth/RoleGuard'
+import { RouteSkeleton } from '@/components/RouteSkeleton'
 
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { AdminPortalLayout } from '@/layouts/AdminPortalLayout'
@@ -51,17 +52,9 @@ const NewPrescriptionPage = lazy(() => import('@/pages/prescriptions/NewPrescrip
 const InvoiceScannerPage = lazy(() => import('@/pages/inventory/InvoiceScannerPage'))
 const RxScannerPage = lazy(() => import('@/pages/prescriptions/RxScannerPage'))
 
-function PageFallback() {
-  return (
-    <div className="flex flex-1 items-center justify-center text-text-secondary text-sm p-6">
-      Loading…
-    </div>
-  )
-}
-
 function lazyPage(Component: React.ComponentType) {
   return (
-    <Suspense fallback={<PageFallback />}>
+    <Suspense fallback={<RouteSkeleton />}>
       <Component />
     </Suspense>
   )
