@@ -31,11 +31,17 @@ export function ScheduleLogPage() {
       />
       <section className="flex-1 p-6 overflow-y-auto">
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-tag-schedule-bg/50 flex items-center gap-2">
-            <Lock size={14} className="text-tag-schedule-fg" />
-            <p className="type-body-xs font-medium text-tag-schedule-fg">
-              Pharmacy Act Regulated Record Â· entries cannot be modified or deleted
-            </p>
+          <div className="px-4 py-3 border-b border-border bg-tag-schedule-bg/50 flex items-start gap-2">
+            <Lock size={14} className="text-tag-schedule-fg shrink-0 mt-0.5" />
+            <div>
+              <p className="type-body-xs font-medium text-tag-schedule-fg">
+                Jamaica Pharmacy Act — Controlled Substance Register (Schedule Drug Log)
+              </p>
+              <p className="type-label text-tag-schedule-fg/80 mt-0.5">
+                Entries are append-only · Cannot be modified or deleted · Mandatory retention: 5 years minimum
+                · Pharmacy (Miscellaneous Provisions) Act 1996, Regulation 14
+              </p>
+            </div>
           </div>
           <table className="w-full">
             <caption className="sr-only">Controlled substance dispensing log</caption>

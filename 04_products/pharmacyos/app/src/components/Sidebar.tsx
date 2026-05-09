@@ -17,10 +17,15 @@ function openCommandPalette() {
  *
  * Role-aware filtering: each nav item's `path` is checked against the permissions store.
  * If the acting role doesn't have access to a route, the item is hidden. If a group has
- * zero accessible items, the entire group is hidden. The role switcher in the user zone
- * lets reviewers act as any role to verify the matrix; real session replaces this in
- * production.
+ * zero accessible items, the entire group is hidden.
+ *
+ * Demo mode (VITE_DEMO_MODE=true): role switcher is visible so reviewers can act as any
+ * role to verify the permissions matrix. In production (VITE_DEMO_MODE unset or false):
+ * the switcher is hidden and a read-only identity row is shown instead — real session
+ * data replaces this when auth wires (G2).
  */
+
+const IS_DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
 
 interface NavItemDef {
   label: string
@@ -270,31 +275,34 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
 
         {/* User account zone — Section 4.1, 64px sticky bottom */}
         <div className="border-t border-white/10 shrink-0">
-          {/* Acting-as role switcher (sample mode — replaced by real session.user when auth wires) */}
-          <div className="px-4 py-2 border-b border-white/5 bg-bg-sidebar-hover/40">
-            <label className="block">
-              <span className="type-tiny text-text-on-dark-dim uppercase tracking-wider">Acting as</span>
-              <div className="mt-1 relative">
-                <select
-                  value={actingRole}
-                  onChange={(e) => setActingRole(e.target.value as Role)}
-                  aria-label="Switch acting role for sample-mode permissions demo"
-                  className="w-full appearance-none h-8 pl-2 pr-7 type-body-sm bg-bg-sidebar text-white border border-white/10 rounded-control focus:outline-none focus:border-primary cursor-pointer"
-                >
-                  {ROLES.map((r) => (
-                    <option key={r} value={r} className="bg-bg-sidebar text-white">
-                      {ROLE_LABELS[r]}
-                    </option>
-                  ))}
-                </select>
-                <CaretDown
-                  size={12}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-on-dark-dim pointer-events-none"
-                  aria-hidden="true"
-                />
-              </div>
-            </label>
-          </div>
+          {/* Acting-as role switcher — demo mode only (VITE_DEMO_MODE=true).
+              Hidden in production; replaced by read-only role display from real session. */}
+          {IS_DEMO_MODE && (
+            <div className="px-4 py-2 border-b border-white/5 bg-bg-sidebar-hover/40">
+              <label className="block">
+                <span className="type-tiny text-text-on-dark-dim uppercase tracking-wider">Acting as (demo)</span>
+                <div className="mt-1 relative">
+                  <select
+                    value={actingRole}
+                    onChange={(e) => setActingRole(e.target.value as Role)}
+                    aria-label="Switch acting role for demo-mode permissions preview"
+                    className="w-full appearance-none h-8 pl-2 pr-7 type-body-sm bg-bg-sidebar text-white border border-white/10 rounded-control focus:outline-none focus:border-primary cursor-pointer"
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r} value={r} className="bg-bg-sidebar text-white">
+                        {ROLE_LABELS[r]}
+                      </option>
+                    ))}
+                  </select>
+                  <CaretDown
+                    size={12}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-text-on-dark-dim pointer-events-none"
+                    aria-hidden="true"
+                  />
+                </div>
+              </label>
+            </div>
+          )}
 
           {/* User identity row */}
           <div className="flex items-center gap-3 h-14 px-4">

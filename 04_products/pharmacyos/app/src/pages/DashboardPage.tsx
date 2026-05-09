@@ -1,4 +1,5 @@
 ﻿import { Warning } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
 import { PageHeader } from '@/components/PageHeader'
 import {
   DASHBOARD_METRICS,
@@ -26,15 +27,16 @@ const RX_STATUS_BADGE: Record<RxStatus, string> = {
 
 const RX_COLUMNS: RxStatus[] = ['Received', 'Verified', 'Filled', 'Dispensed']
 
-const METRICS = [
-  { label: 'Rx Queue', value: DASHBOARD_METRICS.rxQueue, note: 'active' },
-  { label: 'Stock Alerts', value: DASHBOARD_METRICS.stockAlerts, note: 'items low or expiring' },
+const METRICS: Array<{ label: string; value: string | number; note: string; to: string }> = [
+  { label: 'Rx Queue', value: DASHBOARD_METRICS.rxQueue, note: 'active', to: '/prescriptions' },
+  { label: 'Stock Alerts', value: DASHBOARD_METRICS.stockAlerts, note: 'items low or expiring', to: '/inventory/alerts' },
   {
     label: 'Sales Today',
     value: `JMD ${DASHBOARD_METRICS.salesTodayJmd.toLocaleString()}`,
     note: 'as of 10:00 AM',
+    to: '/pos/reports',
   },
-  { label: 'Patients Served', value: DASHBOARD_METRICS.patientsServed, note: 'today' },
+  { label: 'Patients Served', value: DASHBOARD_METRICS.patientsServed, note: 'today', to: '/patients' },
 ]
 
 export function DashboardPage() {
@@ -46,19 +48,20 @@ export function DashboardPage() {
       <PageHeader title="Dashboard" subtitle="Winchester Global Pharmacy Â· Kingston" />
 
       <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
-        {/* Metric cards */}
+        {/* Metric cards — each links to its module */}
         <div className="grid grid-cols-4 gap-6">
           {METRICS.map((m) => (
-            <div
+            <Link
               key={m.label}
-              className="bg-bg-surface rounded-card shadow-card p-4 flex flex-col justify-between h-24"
+              to={m.to}
+              className="bg-bg-surface rounded-card shadow-card p-4 flex flex-col justify-between h-24 hover:shadow-card-hover hover:border-primary/30 border border-transparent transition-all no-underline group"
             >
-              <p className="type-caption text-text-secondary">{m.label}</p>
+              <p className="type-caption text-text-secondary group-hover:text-text-primary transition-colors">{m.label}</p>
               <div>
                 <p className="type-mono-metric text-text-primary leading-none">{m.value}</p>
                 <p className="type-label text-text-secondary mt-0.5">{m.note}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -88,9 +91,10 @@ export function DashboardPage() {
                         <p className="type-label text-text-disabled italic">None</p>
                       )}
                       {items.map((rx) => (
-                        <article
+                        <Link
                           key={rx.id}
-                          className="rounded-control border border-border p-2 shadow-card hover:shadow-card-hover transition-shadow cursor-default"
+                          to={`/prescriptions/${rx.id}`}
+                          className="block rounded-control border border-border p-2 shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all no-underline"
                         >
                           <p className="type-label font-semibold text-text-primary leading-tight">
                             {rx.patient}
@@ -112,7 +116,7 @@ export function DashboardPage() {
                               )}
                             </div>
                           )}
-                        </article>
+                        </Link>
                       ))}
                     </div>
                   </div>

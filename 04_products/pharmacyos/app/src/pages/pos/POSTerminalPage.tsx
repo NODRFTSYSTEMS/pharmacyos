@@ -189,7 +189,7 @@ export function POSTerminalPage() {
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           <div className="space-y-2">
             <Row label="Subtotal" value={`JMD ${sub.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
-            <Row label="GCT (15%)" value={`JMD ${tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+            <Row label="GCT (General Consumption Tax) 15%" value={`JMD ${tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
           </div>
           <div className="border-t border-border pt-3">
             <div className="flex items-center justify-between">

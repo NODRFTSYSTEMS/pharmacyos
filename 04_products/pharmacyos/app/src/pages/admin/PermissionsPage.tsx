@@ -206,6 +206,11 @@ export function PermissionsPage() {
             <p className="type-body-xs text-text-secondary mt-2">
               Authority: ADR Decision 7 — three-layer enforcement (RLS → Edge Function → UI guard).
             </p>
+            <p className="type-body-xs text-text-secondary mt-1">
+              Default permissions are set by role and match the matrix below. Overrides apply to this
+              pharmacy instance only and persist locally until Supabase wires. Clearing overrides
+              returns all routes to their role defaults.
+            </p>
           </div>
         </div>
 

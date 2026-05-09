@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react'
+import { Plus, Repeat } from '@phosphor-icons/react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
@@ -69,7 +69,18 @@ export function QueuePage() {
                         <span className="type-label text-text-secondary">{rx.prescriber}</span>
                         {rx.isNhf && <StatusPill variant="nhf">NHF</StatusPill>}
                       </div>
-                      <p className="type-mono-data text-text-disabled type-tiny mt-1">{rx.received}</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <p className="type-mono-data text-text-disabled type-tiny">{rx.received}</p>
+                        {rx.refills !== undefined && (
+                          <span className={[
+                            'inline-flex items-center gap-1 type-tiny',
+                            (rx.refillsRemaining ?? rx.refills) === 0 ? 'text-warning' : 'text-text-disabled',
+                          ].join(' ')}>
+                            <Repeat size={10} aria-hidden="true" />
+                            {rx.refillsRemaining ?? rx.refills} refill{(rx.refillsRemaining ?? rx.refills) !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
                     </Link>
                   ))}
                 </div>

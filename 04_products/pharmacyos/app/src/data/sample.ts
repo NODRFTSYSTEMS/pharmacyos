@@ -17,6 +17,10 @@ export interface Prescription {
   id: string; rxNumber: string; patient: string; patientId: string
   drugs: string[]; prescriber: string; received: string
   status: RxStatus; isSchedule: boolean; isNhf: boolean
+  /** Total refills authorised by prescriber (0 = no refills). */
+  refills?: number
+  /** Refills remaining. Decremented each time the prescription is filled. */
+  refillsRemaining?: number
 }
 
 export interface StockItem {
@@ -90,14 +94,14 @@ export const SAMPLE_PATIENTS: Patient[] = [
 // ─── Prescriptions ────────────────────────────────────────────────────────────
 
 export const SAMPLE_PRESCRIPTIONS: Prescription[] = [
-  { id: 'RX001', rxNumber: 'RX-2026-0847', patient: 'Marcus Reid',     patientId: 'P001', drugs: ['Metformin 500mg × 60'],                        prescriber: 'Dr. K. Patterson', received: '2026-05-07 08:14', status: 'Received',  isSchedule: false, isNhf: false },
-  { id: 'RX002', rxNumber: 'RX-2026-0846', patient: 'Yvette Campbell', patientId: 'P002', drugs: ['Amlodipine 10mg × 30'],                         prescriber: 'Dr. J. Brown',     received: '2026-05-07 08:31', status: 'Verified',  isSchedule: false, isNhf: true  },
-  { id: 'RX003', rxNumber: 'RX-2026-0845', patient: 'Devon Williams',  patientId: 'P003', drugs: ['Amoxicillin 500mg × 21'],                        prescriber: 'Dr. M. Singh',     received: '2026-05-07 09:02', status: 'Filled',    isSchedule: false, isNhf: false },
-  { id: 'RX004', rxNumber: 'RX-2026-0844', patient: 'Marcia Brown',    patientId: 'P004', drugs: ['Atorvastatin 20mg × 30', 'Lisinopril 10mg × 30'], prescriber: 'Dr. K. Patterson', received: '2026-05-07 09:18', status: 'Verified',  isSchedule: false, isNhf: true  },
-  { id: 'RX005', rxNumber: 'RX-2026-0843', patient: 'Trevor Thompson', patientId: 'P005', drugs: ['Oxycodone 5mg × 30'],                            prescriber: 'Dr. R. Lewis',     received: '2026-05-07 09:45', status: 'Received',  isSchedule: true,  isNhf: false },
-  { id: 'RX006', rxNumber: 'RX-2026-0842', patient: 'Sandra Clarke',   patientId: 'P006', drugs: ['Omeprazole 20mg × 30'],                          prescriber: 'Dr. J. Brown',     received: '2026-05-07 10:03', status: 'Filled',    isSchedule: false, isNhf: false },
-  { id: 'RX007', rxNumber: 'RX-2026-0841', patient: 'Rohan Stewart',   patientId: 'P007', drugs: ['Metformin 500mg × 90'],                          prescriber: 'Dr. K. Patterson', received: '2026-05-06 14:22', status: 'Dispensed', isSchedule: false, isNhf: true  },
-  { id: 'RX008', rxNumber: 'RX-2026-0840', patient: 'Keisha Morgan',   patientId: 'P008', drugs: ['Hydrochlorothiazide 25mg × 30'],                  prescriber: 'Dr. M. Singh',     received: '2026-05-06 15:47', status: 'Dispensed', isSchedule: false, isNhf: false },
+  { id: 'RX001', rxNumber: 'RX-2026-0847', patient: 'Marcus Reid',     patientId: 'P001', drugs: ['Metformin 500mg × 60'],                        prescriber: 'Dr. K. Patterson', received: '2026-05-07 08:14', status: 'Received',  isSchedule: false, isNhf: false, refills: 3, refillsRemaining: 3 },
+  { id: 'RX002', rxNumber: 'RX-2026-0846', patient: 'Yvette Campbell', patientId: 'P002', drugs: ['Amlodipine 10mg × 30'],                         prescriber: 'Dr. J. Brown',     received: '2026-05-07 08:31', status: 'Verified',  isSchedule: false, isNhf: true,  refills: 5, refillsRemaining: 5 },
+  { id: 'RX003', rxNumber: 'RX-2026-0845', patient: 'Devon Williams',  patientId: 'P003', drugs: ['Amoxicillin 500mg × 21'],                        prescriber: 'Dr. M. Singh',     received: '2026-05-07 09:02', status: 'Filled',    isSchedule: false, isNhf: false, refills: 0, refillsRemaining: 0 },
+  { id: 'RX004', rxNumber: 'RX-2026-0844', patient: 'Marcia Brown',    patientId: 'P004', drugs: ['Atorvastatin 20mg × 30', 'Lisinopril 10mg × 30'], prescriber: 'Dr. K. Patterson', received: '2026-05-07 09:18', status: 'Verified',  isSchedule: false, isNhf: true,  refills: 11, refillsRemaining: 11 },
+  { id: 'RX005', rxNumber: 'RX-2026-0843', patient: 'Trevor Thompson', patientId: 'P005', drugs: ['Oxycodone 5mg × 30'],                            prescriber: 'Dr. R. Lewis',     received: '2026-05-07 09:45', status: 'Received',  isSchedule: true,  isNhf: false, refills: 0, refillsRemaining: 0 },
+  { id: 'RX006', rxNumber: 'RX-2026-0842', patient: 'Sandra Clarke',   patientId: 'P006', drugs: ['Omeprazole 20mg × 30'],                          prescriber: 'Dr. J. Brown',     received: '2026-05-07 10:03', status: 'Filled',    isSchedule: false, isNhf: false, refills: 2, refillsRemaining: 1 },
+  { id: 'RX007', rxNumber: 'RX-2026-0841', patient: 'Rohan Stewart',   patientId: 'P007', drugs: ['Metformin 500mg × 90'],                          prescriber: 'Dr. K. Patterson', received: '2026-05-06 14:22', status: 'Dispensed', isSchedule: false, isNhf: true,  refills: 3, refillsRemaining: 2 },
+  { id: 'RX008', rxNumber: 'RX-2026-0840', patient: 'Keisha Morgan',   patientId: 'P008', drugs: ['Hydrochlorothiazide 25mg × 30'],                  prescriber: 'Dr. M. Singh',     received: '2026-05-06 15:47', status: 'Dispensed', isSchedule: false, isNhf: false, refills: 5, refillsRemaining: 4 },
 ]
 
 // ─── Stock ────────────────────────────────────────────────────────────────────
