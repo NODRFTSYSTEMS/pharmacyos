@@ -75,6 +75,9 @@ export const ROUTE_PERMISSIONS = {
 
   // Admin — admin only (BAP module description)
   '/admin/users': { path: '/admin/users', roles: ['admin'] },
+  '/admin/users/new': { path: '/admin/users/new', roles: ['admin'] },
+  '/admin/users/:id': { path: '/admin/users/:id', roles: ['admin', 'manager'] },
+  '/admin/users/:id/edit': { path: '/admin/users/:id/edit', roles: ['admin'] },
   '/admin/audit': { path: '/admin/audit', roles: ['admin'] },
   '/admin/settings': { path: '/admin/settings', roles: ['admin'] },
   '/admin/security': { path: '/admin/security', roles: ['admin'] },

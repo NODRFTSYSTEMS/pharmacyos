@@ -52,6 +52,9 @@ const NewLoyaltyMemberPage = lazy(() => import('@/pages/pos/NewLoyaltyMemberPage
 const NewPrescriptionPage = lazy(() => import('@/pages/prescriptions/NewPrescriptionPage'))
 const InvoiceScannerPage = lazy(() => import('@/pages/inventory/InvoiceScannerPage'))
 const RxScannerPage = lazy(() => import('@/pages/prescriptions/RxScannerPage'))
+const NewStaffPage = lazy(() => import('@/pages/admin/NewStaffPage'))
+const StaffDetailPage = lazy(() => import('@/pages/admin/StaffDetailPage'))
+const EditStaffPage = lazy(() => import('@/pages/admin/EditStaffPage'))
 
 function lazyPage(Component: React.ComponentType) {
   return (
@@ -231,10 +234,22 @@ export const router = createBrowserRouter([
         path: '/ai/queue',
       },
 
-      // Admin (4)
+      // Admin (7)
       {
         element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users'].roles}>{lazyPage(UsersPage)}</RoleGuard>,
         path: '/admin/users',
+      },
+      {
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users/new'].roles}>{lazyPage(NewStaffPage)}</RoleGuard>,
+        path: '/admin/users/new',
+      },
+      {
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users/:id'].roles}>{lazyPage(StaffDetailPage)}</RoleGuard>,
+        path: '/admin/users/:id',
+      },
+      {
+        element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/users/:id/edit'].roles}>{lazyPage(EditStaffPage)}</RoleGuard>,
+        path: '/admin/users/:id/edit',
       },
       {
         element: <RoleGuard roles={ROUTE_PERMISSIONS['/admin/audit'].roles}>{lazyPage(AuditLogPage)}</RoleGuard>,
