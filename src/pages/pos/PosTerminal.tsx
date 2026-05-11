@@ -191,7 +191,11 @@ export default function PosTerminal() {
   // ── Product search / browse ──────────────────────────────────────────────
   // Shows ALL active products by default; filtered by search when a query is entered.
 
-  const { data: products = [], isFetching: searching } = useQuery<ProductRow[]>({
+  const {
+    data: products = [],
+    isFetching: searching,
+    isError: productsError,
+  } = useQuery<ProductRow[]>({
     queryKey: ['pos-products', search],
     queryFn: async () => {
       let q = supabase
@@ -208,6 +212,7 @@ export default function PosTerminal() {
       return (data ?? []) as ProductRow[]
     },
     staleTime: 15_000,
+    retry: 1,
   })
 
   // ── Cart state operations ────────────────────────────────────────────────
@@ -274,7 +279,7 @@ export default function PosTerminal() {
     }])
     setCustomName('')
     setCustomPrice('')
-    setShowCustomAdd(false)
+    // keep form open so user can add another custom item immediately
   }
 
   // ── Payment method preference ────────────────────────────────────────────
@@ -286,10 +291,11 @@ export default function PosTerminal() {
 
   // ── Totals ───────────────────────────────────────────────────────────────
 
-  const subtotal      = cart.reduce((s, i) => s + i.unit_price * i.qty, 0)
+  const r2            = (n: number) => Math.round(n * 100) / 100
+  const subtotal      = r2(cart.reduce((s, i) => s + i.unit_price * i.qty, 0))
   const gctRate       = gctRatePct / 100
-  const tax           = subtotal * gctRate
-  const total         = subtotal + tax
+  const tax           = r2(subtotal * gctRate)
+  const total         = r2(subtotal + tax)
   const totalQty      = cart.reduce((s, i) => s + i.qty, 0)
   const cashTendered  = parseFloat(cashInput) || 0
   const changeDue     = cashTendered - total
@@ -299,8 +305,8 @@ export default function PosTerminal() {
 
   const processSale = useMutation({
     mutationFn: async () => {
-      // Generate ref number: TXN-YYYYMMDD-<last-8 of UUID>
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+      // Generate ref number using Jamaica local date (UTC-5) — avoids UTC date mismatch for evening sales
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' }).replace(/-/g, '')
       const refNumber = `TXN-${today}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
 
       // Insert transaction header
@@ -337,7 +343,7 @@ export default function PosTerminal() {
             barcode:        i.barcode,
             quantity:       i.qty,
             unit_price:     i.unit_price,
-            line_total:     i.unit_price * i.qty,
+            line_total:     r2(i.unit_price * i.qty),
           }))
         )
 
@@ -684,7 +690,6 @@ export default function PosTerminal() {
               <input
                 ref={searchRef}
                 type="search"
-                autoFocus
                 placeholder="Search name or scan barcode…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -703,14 +708,21 @@ export default function PosTerminal() {
               )}
             </div>
 
-            {/* Product list */}
-            <div className="divide-y divide-gray-100 max-h-[500px] overflow-y-auto rounded">
-              {!searching && products.length === 0 && (
+            {/* Connection / query error */}
+            {productsError && (
+              <div className="mb-3 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
+                Could not load products — check Supabase connection. Use <strong>Custom item</strong> in the cart panel to add items manually.
+              </div>
+            )}
+
+            {/* Product list — entire row is the click target */}
+            <div className="divide-y divide-gray-100 max-h-[520px] overflow-y-auto">
+              {!searching && !productsError && products.length === 0 && (
                 <div className="py-8 text-center">
                   <p className="text-sm text-gray-400">
                     {search
                       ? `No products match "${search}"`
-                      : 'No products in catalog. Add products via Product Catalog first.'}
+                      : 'No active products found. Run migration 005 or add products via Product Catalog.'}
                   </p>
                 </div>
               )}
@@ -721,61 +733,53 @@ export default function PosTerminal() {
                 const inCart     = cart.find(i => i.product_id === p.id)
 
                 return (
-                  <div
+                  <button
                     key={p.id}
-                    className={`flex items-center gap-3 px-2 py-2.5 rounded transition-colors ${
-                      outOfStock ? 'opacity-50' : inCart ? 'bg-blue-50/70' : 'hover:bg-gray-50'
+                    type="button"
+                    onClick={() => addToCart(p)}
+                    disabled={outOfStock}
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors ${
+                      outOfStock
+                        ? 'opacity-40 cursor-not-allowed bg-transparent'
+                        : inCart
+                        ? 'bg-blue-50 hover:bg-blue-100'
+                        : 'hover:bg-gray-50 active:bg-gray-100'
                     }`}
+                    aria-label={outOfStock ? `${p.name} — out of stock` : `Add ${p.name} to cart`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
-                      <p className="text-xs text-gray-500 font-mono">
-                        {fmtCurrency(p.unit_price)}
-                        {p.barcode && (
-                          <span className="text-gray-400 ml-2 text-xs">{p.barcode}</span>
-                        )}
-                      </p>
+                    {/* + indicator */}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-lg leading-none transition-colors ${
+                      outOfStock
+                        ? 'bg-gray-100 text-gray-300'
+                        : inCart
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-500 group-hover:bg-blue-600 group-hover:text-white'
+                    }`}>
+                      {inCart ? `${inCart.qty}` : '+'}
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      {inCart && (
-                        <span className="text-xs text-blue-600 font-semibold font-mono">
-                          ×{inCart.qty}
-                        </span>
-                      )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
+                      <p className="text-xs text-gray-500 font-mono">{fmtCurrency(p.unit_price)}</p>
+                    </div>
+
+                    <div className="shrink-0">
                       {outOfStock ? (
                         <span className="pill pill-red text-xs">Out of stock</span>
                       ) : lowStock ? (
-                        <span className="pill pill-yellow text-xs">Low ({p.stock_qty})</span>
+                        <span className="pill pill-yellow text-xs">Low: {p.stock_qty}</span>
                       ) : (
                         <span className="pill pill-green text-xs">{p.stock_qty}</span>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => addToCart(p)}
-                        disabled={outOfStock}
-                        className={`w-7 h-7 rounded flex items-center justify-center transition-colors shrink-0 ${
-                          outOfStock
-                            ? 'text-gray-300 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                        }`}
-                        aria-label={
-                          outOfStock
-                            ? `${p.name} — out of stock`
-                            : `Add ${p.name} to cart`
-                        }
-                      >
-                        <Plus size={13} weight="bold" />
-                      </button>
                     </div>
-                  </div>
+                  </button>
                 )
               })}
             </div>
 
             {products.length > 0 && (
               <p className="text-xs text-gray-400 text-center mt-2 pt-2 border-t border-gray-100">
-                {products.length} product{products.length !== 1 ? 's' : ''} · press + to add · click + again to increment
+                {products.length} product{products.length !== 1 ? 's' : ''} · tap row to add · tap again to increment
               </p>
             )}
           </div>
