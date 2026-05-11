@@ -19,11 +19,12 @@ interface ProductRow {
 }
 
 interface CartItem {
-  product_id: string
+  product_id:   string       // real UUID for DB products; random UUID for custom items
   product_name: string
-  barcode: string | null
-  unit_price: number
-  qty: number
+  barcode:      string | null
+  unit_price:   number
+  qty:          number
+  is_custom?:   boolean      // true → null product_id in DB + skip stock decrement
 }
 
 type PayMethod = 'CASH' | 'CARD' | 'LYNK'
@@ -264,11 +265,12 @@ export default function PosTerminal() {
     const price = parseFloat(customPrice)
     if (!name || isNaN(price) || price <= 0) return
     setCart(prev => [...prev, {
-      product_id:   `custom-${Date.now()}`,
+      product_id:   crypto.randomUUID(),
       product_name: name,
       barcode:      null,
       unit_price:   price,
       qty:          1,
+      is_custom:    true,
     }])
     setCustomName('')
     setCustomPrice('')
@@ -297,10 +299,15 @@ export default function PosTerminal() {
 
   const processSale = useMutation({
     mutationFn: async () => {
+      // Generate ref number: TXN-YYYYMMDD-<last-8 of UUID>
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+      const refNumber = `TXN-${today}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+
       // Insert transaction header
       const { data: txn, error: e1 } = await supabase
         .from('retail_transactions')
         .insert({
+          ref_number:              refNumber,
           transaction_type:        'RETAIL',
           payment_method:          payMethod,
           cashier_id:              cashier?.id ?? null,
@@ -319,13 +326,13 @@ export default function PosTerminal() {
 
       if (e1 || !txn) throw e1 ?? new Error('Transaction insert returned no data')
 
-      // Insert line items
+      // Insert line items — custom items send null product_id (no FK)
       const { error: e2 } = await supabase
         .from('retail_transaction_items')
         .insert(
           cart.map(i => ({
             transaction_id: txn.id,
-            product_id:     i.product_id,
+            product_id:     i.is_custom ? null : i.product_id,
             product_name:   i.product_name,
             barcode:        i.barcode,
             quantity:       i.qty,
@@ -336,8 +343,8 @@ export default function PosTerminal() {
 
       if (e2) throw e2
 
-      // Atomically decrement stock for each cart line
-      for (const item of cart) {
+      // Decrement stock — only for real catalog products, not custom items
+      for (const item of cart.filter(i => !i.is_custom)) {
         const { error: e3 } = await supabase.rpc('decrement_product_stock', {
           p_product_id: item.product_id,
           p_qty:        item.qty,
