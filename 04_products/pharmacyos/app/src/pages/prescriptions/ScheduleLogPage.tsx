@@ -12,9 +12,14 @@ function getScheduleClass(rxNumber: string): string | null {
 }
 
 /**
- * Schedule Drug Log â€” Jamaica Pharmacy Act regulated record.
+ * Schedule Drug Log — supplemental digital record of controlled-substance dispensing.
  * Append-only per DSS schema plan; no edit/delete affordances on UI.
  * Pharmacist sign-off required for every entry (verified column).
+ *
+ * LEGAL NOTE: This digital log is a supplemental record only. The legally required
+ * bound (manual) controlled-substance register must be maintained in parallel until
+ * a qualified Jamaican legal reviewer confirms this digital record satisfies
+ * statutory obligations under the Pharmacy Act and Pharmacy Regulations.
  */
 export function ScheduleLogPage() {
   const toast = useToast()
@@ -28,7 +33,7 @@ export function ScheduleLogPage() {
     <div className="flex flex-col h-full">
       <PageHeader
         title="Schedule Drug Log"
-        subtitle={`Regulatory record Â· ${SAMPLE_SCHEDULE_LOG.length} entries Â· ${verified} pharmacist-verified Â· append-only`}
+        subtitle={`Supplemental digital record · ${SAMPLE_SCHEDULE_LOG.length} entries · ${verified} pharmacist-verified · append-only`}
         cta={
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="md" onClick={() => handleExport('PDF')}>
@@ -48,11 +53,15 @@ export function ScheduleLogPage() {
             <Lock size={14} className="text-tag-schedule-fg shrink-0 mt-0.5" />
             <div>
               <p className="type-body-xs font-medium text-tag-schedule-fg">
-                Jamaica Pharmacy Act — Controlled Substance Register (Schedule Drug Log)
+                Jamaica Pharmacy Act — Controlled Substance Register · Supplemental Digital Record
               </p>
               <p className="type-label text-tag-schedule-fg/80 mt-0.5">
                 Entries are append-only · Cannot be modified or deleted · Mandatory retention: 5 years minimum
                 · Pharmacy (Miscellaneous Provisions) Act 1996, Regulation 14
+              </p>
+              <p className="type-label text-warning/80 mt-1">
+                Bound manual register must be maintained in parallel until qualified legal review confirms
+                this digital record satisfies statutory obligations.
               </p>
             </div>
           </div>
@@ -61,7 +70,7 @@ export function ScheduleLogPage() {
             <thead>
               <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Log #</th>
-                <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Date Â· Time</th>
+                <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Date · Time</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Drug</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Class</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">DIN</th>

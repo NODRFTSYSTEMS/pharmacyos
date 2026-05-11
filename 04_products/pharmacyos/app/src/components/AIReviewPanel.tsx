@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
-import { Warning, CheckCircle, XCircle, FileImage } from '@phosphor-icons/react'
+import { Warning, CheckCircle, XCircle, FileImage, ShieldWarning } from '@phosphor-icons/react'
 
 export interface AIField {
   label: string
@@ -32,7 +32,19 @@ export function AIReviewPanel({
   }
 
   return (
-    <div className="h-full grid grid-cols-[1fr_1fr] divide-x divide-border bg-bg-base">
+    <div className="h-full flex flex-col bg-bg-base">
+      {/* Regulatory compliance notice — Ministry of Health & Wellness guidance */}
+      <div className="flex items-start gap-3 px-6 py-3 bg-warning/8 border-b border-warning/25 shrink-0">
+        <ShieldWarning size={15} className="text-warning shrink-0 mt-px" aria-hidden="true" />
+        <p className="type-label text-warning leading-snug">
+          <span className="font-semibold">AI-assisted extraction only.</span>{' '}
+          Pharmacist must verify all fields before any clinical or dispensing record is created.
+          Original paper document must be retained as the primary record until a qualified legal
+          reviewer confirms digital records meet statutory requirements (Pharmacy Regulations, Regulation 20).
+        </p>
+      </div>
+
+      <div className="flex-1 grid grid-cols-[1fr_1fr] divide-x divide-border min-h-0">
       {/* Left — image placeholder */}
       <div className="flex flex-col items-center justify-center p-8 bg-bg-subtle">
         <div className="w-24 h-24 rounded-card bg-bg-surface border-2 border-dashed border-border flex items-center justify-center mb-4">
@@ -120,6 +132,7 @@ export function AIReviewPanel({
             </Button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
