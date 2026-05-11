@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
 import { StatusPill } from '@/components/StatusPill'
-import { SAMPLE_PRESCRIPTIONS, type RxStatus } from '@/data/sample'
+import { usePrescriptionStore } from '@/stores/prescriptions'
+import { type RxStatus } from '@/data/sample'
 
 const RX_COLUMNS: { key: RxStatus; label: string; description: string }[] = [
   { key: 'Received',  label: 'Received',  description: 'Awaiting pharmacist verification' },
@@ -14,8 +15,9 @@ const RX_COLUMNS: { key: RxStatus; label: string; description: string }[] = [
 
 export function QueuePage() {
   const navigate = useNavigate()
+  const prescriptions = usePrescriptionStore((s) => s.prescriptions)
   const counts = RX_COLUMNS.reduce<Record<RxStatus, number>>((acc, c) => {
-    acc[c.key] = SAMPLE_PRESCRIPTIONS.filter((r) => r.status === c.key).length
+    acc[c.key] = prescriptions.filter((r) => r.status === c.key).length
     return acc
   }, {} as Record<RxStatus, number>)
 
@@ -23,7 +25,7 @@ export function QueuePage() {
     <div className="flex flex-col h-full">
       <PageHeader
         title="Prescription Queue"
-        subtitle={`${SAMPLE_PRESCRIPTIONS.length} active prescriptions across 4 stages`}
+        subtitle={`${prescriptions.length} prescriptions across 4 stages`}
         cta={
           <Button variant="primary" size="md" onClick={() => navigate('/prescriptions/new')}>
             <Plus size={16} weight="bold" />
@@ -34,7 +36,7 @@ export function QueuePage() {
       <section className="flex-1 p-6 overflow-hidden">
         <div className="grid grid-cols-4 gap-4 h-full">
           {RX_COLUMNS.map((col) => {
-            const items = SAMPLE_PRESCRIPTIONS.filter((r) => r.status === col.key)
+            const items = prescriptions.filter((r) => r.status === col.key)
             return (
               <div key={col.key} className="flex flex-col bg-bg-surface rounded-card shadow-card overflow-hidden">
                 <div className="px-4 py-3 border-b border-border">
