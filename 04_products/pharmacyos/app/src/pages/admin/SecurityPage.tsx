@@ -2,7 +2,7 @@
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
 import { StatusPill } from '@/components/StatusPill'
-import { SAMPLE_STAFF, SAMPLE_ACTIVITY } from '@/data/sample'
+import { SAMPLE_STAFF, SAMPLE_ACTIVITY, SAMPLE_SESSIONS } from '@/data/sample'
 
 export function SecurityPage() {
   const without2fa = SAMPLE_STAFF.filter((u) => !u.twoFa && u.status === 'Active')
@@ -12,15 +12,8 @@ export function SecurityPage() {
     .filter((a) => /login|2fa|password|locked/i.test(a.action) || /sign/i.test(a.action))
     .slice(0, 6)
 
-  // Active sessions â€” synthesize from staff + last login
-  const activeSessions = SAMPLE_STAFF
-    .filter((u) => u.status === 'Active')
-    .slice(0, 5)
-    .map((u, i) => ({
-      ...u,
-      device: i % 2 === 0 ? 'Windows Â· Chrome 142' : 'macOS Â· Safari 18',
-      ip: '10.0.1.' + (i + 12),
-    }))
+  // Active sessions — sourced from SAMPLE_SESSIONS (stub; integration pending: Supabase)
+  const activeSessions = SAMPLE_SESSIONS
 
   return (
     <div className="flex flex-col h-full">
@@ -39,7 +32,7 @@ export function SecurityPage() {
             icon={<Desktop size={20} className="text-rx-received-fg" />}
             title="Active Sessions"
             value={activeSessions.length.toString()}
-            note="across managed devices"
+            note="across managed devices · stub data"
             tone="good"
           />
           <PostureCard
@@ -88,14 +81,16 @@ export function SecurityPage() {
 
         {/* Active sessions */}
         <div className="bg-bg-surface rounded-card shadow-card overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
+          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
             <h2 className="type-caption text-text-secondary">Active Sessions</h2>
+            <span className="type-tiny text-text-disabled">Integration Pending: Supabase auth</span>
           </div>
           <table className="w-full">
             <caption className="sr-only">Active user sessions</caption>
             <thead>
               <tr className="sticky top-0 z-10 bg-bg-subtle border-b border-border">
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">User</th>
+                <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Role</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Device</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">IP</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Last Activity</th>
@@ -105,12 +100,22 @@ export function SecurityPage() {
             <tbody>
               {activeSessions.map((s) => (
                 <tr key={s.id} className="h-11 border-b border-border-subtle hover:bg-bg-subtle">
-                  <td className="px-4 type-body-sm text-text-primary">{s.name}</td>
+                  <td className="px-4 type-body-sm text-text-primary">
+                    {s.user}
+                    {s.current && (
+                      <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded type-tiny font-medium bg-primary/10 text-primary">you</span>
+                    )}
+                  </td>
+                  <td className="px-4 type-body-xs text-text-secondary">{s.role}</td>
                   <td className="px-4 type-body-xs text-text-secondary">{s.device}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{s.ip}</td>
-                  <td className="px-4 type-mono-data text-text-secondary">{s.lastLogin}</td>
+                  <td className="px-4 type-mono-data text-text-secondary">{s.lastActivity}</td>
                   <td className="px-4 text-right">
-                    <Button variant="tertiary" size="sm">Revoke</Button>
+                    {s.current ? (
+                      <span className="type-tiny text-text-disabled">current</span>
+                    ) : (
+                      <Button variant="tertiary" size="sm">Revoke</Button>
+                    )}
                   </td>
                 </tr>
               ))}

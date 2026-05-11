@@ -1,16 +1,37 @@
 // Sample data — demo accuracy layer for Winchester Global Pharmacy
 // Replace with live Supabase queries once G2 (Supabase provisioning) is closed
+// Every metric, count, and table in the UI derives from these arrays.
+// Swap-readiness rule: changing any array value propagates automatically to all pages.
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type RxStatus     = 'Received' | 'Verified' | 'Filled' | 'Dispensed'
-export type JobStatus    = 'Processing' | 'Completed' | 'Failed' | 'Review Required'
-export type UserRole     = 'Pharmacist' | 'Technician' | 'Front Desk' | 'Manager' | 'Admin'
+export type RxStatus      = 'Received' | 'Verified' | 'Filled' | 'Dispensed'
+export type JobStatus     = 'Processing' | 'Completed' | 'Failed' | 'Review Required'
+export type UserRole      = 'Pharmacist' | 'Technician' | 'Front Desk' | 'Manager' | 'Admin'
 export type PaymentMethod = 'Cash' | 'Card' | 'Lynk'
+
+/** Domain-specific AI agent types. Each maps to a job category in SAMPLE_AI_JOBS. */
+export type AgentType =
+  | 'rx-ocr'             // Prescription image scanning & field extraction
+  | 'invoice-ocr'        // Supplier invoice scanning & receive-record creation
+  | 'drug-interaction'   // OpenFDA multi-drug interaction check
+  | 'inventory-intel'    // Stock optimisation analysis & reorder recommendations
+  | 'compliance-monitor' // Regulatory & credential gap monitoring
+  | 'report-synthesis'   // Narrative summary generation from pharmacy data
+  | 'patient-risk'       // Allergy + interaction risk flagging per patient
+
+export type Department = 'Dispensary' | 'Front Office' | 'Retail' | 'Management' | 'Administration'
+export type EmploymentType = 'Full-time' | 'Part-time' | 'Contract'
 
 export interface Patient {
   id: string; name: string; dob: string; nhfNumber: string
   phone: string; allergies: string[]; lastVisit: string
+}
+
+/** Audit trail entry for prescription workflow transitions. */
+export interface RxAuditEntry {
+  from: RxStatus; to: RxStatus
+  actor: string; role: UserRole; timestamp: string; note?: string
 }
 
 export interface Prescription {
@@ -21,6 +42,8 @@ export interface Prescription {
   refills?: number
   /** Refills remaining. Decremented each time the prescription is filled. */
   refillsRemaining?: number
+  /** Regulated evidence trail — every status transition is logged here. */
+  auditTrail?: RxAuditEntry[]
 }
 
 export interface StockItem {
@@ -57,14 +80,59 @@ export interface ScheduleLogEntry {
 }
 
 export interface AIJob {
-  id: string; jobNumber: string; type: 'Rx Scan' | 'Invoice Scan' | 'Drug Lookup'
-  target: string; status: JobStatus; confidence?: number
-  createdAt: string; completedAt?: string; flagged?: string
+  id: string
+  jobNumber: string
+  type: AgentType
+  /** Short human-readable label for the job type. */
+  label: string
+  target: string
+  status: JobStatus
+  /** Confidence score 0–1. Display as percentage. */
+  confidence?: number
+  createdAt: string
+  completedAt?: string
+  /** True if this job requires human review beyond standard QA. */
+  flagged?: boolean
+  /** Explanation of why the job was flagged. */
+  flagNote?: string
+  /** One-line description of input data processed. */
+  inputSummary: string
+  /** One-line summary of what the agent produced. */
+  outputSummary?: string
+  /** ID of the linked entity (RxID, PatientID, StaffID, etc.) */
+  linkedEntityId?: string
+  linkedEntityType?: 'prescription' | 'patient' | 'staff' | 'inventory' | 'report'
+  /** External services this job is waiting on before it can complete. */
+  integrationPending?: string[]
 }
 
 export interface StaffUser {
-  id: string; name: string; role: UserRole; email: string
-  status: 'Active' | 'Inactive'; twoFa: boolean; lastLogin: string
+  id: string
+  name: string
+  role: UserRole
+  email: string
+  status: 'Active' | 'Inactive'
+  twoFa: boolean
+  lastLogin: string
+  // ── Extended fields (Phase B) ─────────────────────────────────────────────
+  firstName?: string
+  lastName?: string
+  phone?: string
+  /** Auto-generated on staff creation. Format: EMP-NNN */
+  employeeNumber?: string
+  hireDate?: string
+  department?: Department
+  employmentType?: EmploymentType
+  /** ID of the supervising staff member. */
+  supervisorId?: string
+  /** Pharmacy Council of Jamaica registration number (Pharmacist/Tech roles). */
+  licenseNumber?: string
+  /** ISO date: YYYY-MM-DD. Compliance agent flags within 90-day window. */
+  licenseExpiry?: string
+  /** Per-user permission overrides. true = grant, false = deny, undefined = inherit role. */
+  permissionOverrides?: Partial<Record<string, boolean>>
+  notes?: string
+  createdAt?: string
 }
 
 export interface ReceiveRecord {
@@ -76,6 +144,31 @@ export interface ReceiveRecord {
 export interface ActivityEntry {
   id: string; timestamp: string; user: string; role: string
   action: string; target: string
+}
+
+/** Active session record — stub until Supabase auth session management is live. */
+export interface SessionEntry {
+  id: string
+  userId: string
+  user: string
+  role: UserRole
+  device: string
+  ip: string
+  location: string
+  lastActivity: string
+  /** True if this is the currently logged-in session. */
+  current: boolean
+}
+
+/** Shift schedule entry — stub for staff scheduling module. */
+export interface ShiftEntry {
+  id: string
+  staffId: string
+  date: string
+  startTime: string
+  endTime: string
+  role: UserRole
+  location: 'Dispensary' | 'Front Desk' | 'POS'
 }
 
 // ─── Patients ─────────────────────────────────────────────────────────────────
@@ -97,23 +190,154 @@ export const SAMPLE_PATIENTS: Patient[] = [
 // ─── Prescriptions ────────────────────────────────────────────────────────────
 
 export const SAMPLE_PRESCRIPTIONS: Prescription[] = [
-  { id: 'RX001', rxNumber: 'RX-2026-0847', patient: 'Marcus Reid',      patientId: 'P001', drugs: ['Metformin 500mg × 60'],                              prescriber: 'Dr. K. Patterson', received: '2026-05-07 08:14', status: 'Received',  isSchedule: false, isNhf: false, refills: 3,  refillsRemaining: 3  },
-  { id: 'RX002', rxNumber: 'RX-2026-0846', patient: 'Yvette Campbell',  patientId: 'P002', drugs: ['Amlodipine 10mg × 30'],                               prescriber: 'Dr. J. Brown',     received: '2026-05-07 08:31', status: 'Verified',  isSchedule: false, isNhf: true,  refills: 5,  refillsRemaining: 5  },
-  { id: 'RX003', rxNumber: 'RX-2026-0845', patient: 'Devon Williams',   patientId: 'P003', drugs: ['Amoxicillin 500mg × 21'],                              prescriber: 'Dr. M. Singh',     received: '2026-05-07 09:02', status: 'Filled',    isSchedule: false, isNhf: false, refills: 0,  refillsRemaining: 0  },
-  { id: 'RX004', rxNumber: 'RX-2026-0844', patient: 'Marcia Brown',     patientId: 'P004', drugs: ['Atorvastatin 20mg × 30', 'Lisinopril 10mg × 30'],       prescriber: 'Dr. K. Patterson', received: '2026-05-07 09:18', status: 'Verified',  isSchedule: false, isNhf: true,  refills: 11, refillsRemaining: 11 },
-  { id: 'RX005', rxNumber: 'RX-2026-0843', patient: 'Trevor Thompson',  patientId: 'P005', drugs: ['Oxycodone 5mg × 30'],                                  prescriber: 'Dr. R. Lewis',     received: '2026-05-07 09:45', status: 'Received',  isSchedule: true,  isNhf: false, refills: 0,  refillsRemaining: 0  },
-  { id: 'RX006', rxNumber: 'RX-2026-0842', patient: 'Sandra Clarke',    patientId: 'P006', drugs: ['Omeprazole 20mg × 30'],                                prescriber: 'Dr. J. Brown',     received: '2026-05-07 10:03', status: 'Filled',    isSchedule: false, isNhf: false, refills: 2,  refillsRemaining: 1  },
-  { id: 'RX007', rxNumber: 'RX-2026-0841', patient: 'Rohan Stewart',    patientId: 'P007', drugs: ['Metformin 500mg × 90'],                                prescriber: 'Dr. K. Patterson', received: '2026-05-06 14:22', status: 'Dispensed', isSchedule: false, isNhf: true,  refills: 3,  refillsRemaining: 2  },
-  { id: 'RX008', rxNumber: 'RX-2026-0840', patient: 'Keisha Morgan',    patientId: 'P008', drugs: ['Hydrochlorothiazide 25mg × 30'],                       prescriber: 'Dr. M. Singh',     received: '2026-05-06 15:47', status: 'Dispensed', isSchedule: false, isNhf: false, refills: 5,  refillsRemaining: 4  },
-  // Extended sample set — richer demo coverage across all stages
-  { id: 'RX009', rxNumber: 'RX-2026-0839', patient: 'Neville Grant',    patientId: 'P009', drugs: ['Metformin 500mg × 60', 'Aspirin 81mg × 30'],            prescriber: 'Dr. K. Patterson', received: '2026-05-08 07:55', status: 'Received',  isSchedule: false, isNhf: true,  refills: 5,  refillsRemaining: 5  },
-  { id: 'RX010', rxNumber: 'RX-2026-0838', patient: 'Camille Francis',  patientId: 'P010', drugs: ['Amlodipine 10mg × 30', 'Omeprazole 20mg × 30'],         prescriber: 'Dr. J. Brown',     received: '2026-05-08 08:12', status: 'Verified',  isSchedule: false, isNhf: false, refills: 3,  refillsRemaining: 3  },
-  { id: 'RX011', rxNumber: 'RX-2026-0837', patient: 'Omar Chin',        patientId: 'P011', drugs: ['Diazepam 5mg × 14'],                                    prescriber: 'Dr. R. Lewis',     received: '2026-05-08 08:30', status: 'Received',  isSchedule: true,  isNhf: false, refills: 0,  refillsRemaining: 0  },
-  { id: 'RX012', rxNumber: 'RX-2026-0836', patient: 'Marcus Reid',      patientId: 'P001', drugs: ['Atorvastatin 20mg × 30'],                               prescriber: 'Dr. K. Patterson', received: '2026-05-08 08:45', status: 'Filled',    isSchedule: false, isNhf: false, refills: 11, refillsRemaining: 10 },
-  { id: 'RX013', rxNumber: 'RX-2026-0835', patient: 'Yvette Campbell',  patientId: 'P002', drugs: ['Lisinopril 10mg × 30', 'Hydrochlorothiazide 25mg × 30'], prescriber: 'Dr. M. Singh',     received: '2026-05-08 09:10', status: 'Verified',  isSchedule: false, isNhf: true,  refills: 5,  refillsRemaining: 4  },
-  { id: 'RX014', rxNumber: 'RX-2026-0834', patient: 'Neville Grant',    patientId: 'P009', drugs: ['Omeprazole 20mg × 30'],                                 prescriber: 'Dr. J. Brown',     received: '2026-05-08 09:30', status: 'Filled',    isSchedule: false, isNhf: true,  refills: 2,  refillsRemaining: 2  },
-  { id: 'RX015', rxNumber: 'RX-2026-0833', patient: 'Devon Williams',   patientId: 'P003', drugs: ['Metformin 500mg × 60', 'Amlodipine 10mg × 30'],          prescriber: 'Dr. K. Patterson', received: '2026-05-08 10:02', status: 'Dispensed', isSchedule: false, isNhf: false, refills: 3,  refillsRemaining: 2  },
-  { id: 'RX016', rxNumber: 'RX-2026-0832', patient: 'Omar Chin',        patientId: 'P011', drugs: ['Amoxicillin 500mg × 21'],                               prescriber: 'Dr. M. Singh',     received: '2026-05-08 10:18', status: 'Dispensed', isSchedule: false, isNhf: false, refills: 0,  refillsRemaining: 0  },
+  {
+    id: 'RX001', rxNumber: 'RX-2026-0847', patient: 'Marcus Reid', patientId: 'P001',
+    drugs: ['Metformin 500mg × 60'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-07 08:14', status: 'Received', isSchedule: false, isNhf: false,
+    refills: 3, refillsRemaining: 3,
+    auditTrail: [],
+  },
+  {
+    id: 'RX002', rxNumber: 'RX-2026-0846', patient: 'Yvette Campbell', patientId: 'P002',
+    drugs: ['Amlodipine 10mg × 30'], prescriber: 'Dr. J. Brown',
+    received: '2026-05-07 08:31', status: 'Verified', isSchedule: false, isNhf: true,
+    refills: 5, refillsRemaining: 5,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-07 08:45', note: 'NHF eligibility confirmed' },
+    ],
+  },
+  {
+    id: 'RX003', rxNumber: 'RX-2026-0845', patient: 'Devon Williams', patientId: 'P003',
+    drugs: ['Amoxicillin 500mg × 21'], prescriber: 'Dr. M. Singh',
+    received: '2026-05-07 09:02', status: 'Filled', isSchedule: false, isNhf: false,
+    refills: 0, refillsRemaining: 0,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-07 09:15' },
+      { from: 'Verified', to: 'Filled', actor: 'Sandra M.', role: 'Technician', timestamp: '2026-05-07 09:48' },
+    ],
+  },
+  {
+    id: 'RX004', rxNumber: 'RX-2026-0844', patient: 'Marcia Brown', patientId: 'P004',
+    drugs: ['Atorvastatin 20mg × 30', 'Lisinopril 10mg × 30'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-07 09:18', status: 'Verified', isSchedule: false, isNhf: true,
+    refills: 11, refillsRemaining: 11,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-07 09:30', note: 'NHF · drug interaction check passed' },
+    ],
+  },
+  {
+    id: 'RX005', rxNumber: 'RX-2026-0843', patient: 'Trevor Thompson', patientId: 'P005',
+    drugs: ['Oxycodone 5mg × 30'], prescriber: 'Dr. R. Lewis',
+    received: '2026-05-07 09:45', status: 'Received', isSchedule: true, isNhf: false,
+    refills: 0, refillsRemaining: 0,
+    auditTrail: [],
+  },
+  {
+    id: 'RX006', rxNumber: 'RX-2026-0842', patient: 'Sandra Clarke', patientId: 'P006',
+    drugs: ['Omeprazole 20mg × 30'], prescriber: 'Dr. J. Brown',
+    received: '2026-05-07 10:03', status: 'Filled', isSchedule: false, isNhf: false,
+    refills: 2, refillsRemaining: 1,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-07 10:10' },
+      { from: 'Verified', to: 'Filled', actor: 'Sandra M.', role: 'Technician', timestamp: '2026-05-07 10:35' },
+    ],
+  },
+  {
+    id: 'RX007', rxNumber: 'RX-2026-0841', patient: 'Rohan Stewart', patientId: 'P007',
+    drugs: ['Metformin 500mg × 90'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-06 14:22', status: 'Dispensed', isSchedule: false, isNhf: true,
+    refills: 3, refillsRemaining: 2,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-06 14:30' },
+      { from: 'Verified', to: 'Filled', actor: 'Sandra M.', role: 'Technician', timestamp: '2026-05-06 15:10' },
+      { from: 'Filled', to: 'Dispensed', actor: 'Tanya R.', role: 'Front Desk', timestamp: '2026-05-06 16:05', note: 'NHF co-pay collected' },
+    ],
+  },
+  {
+    id: 'RX008', rxNumber: 'RX-2026-0840', patient: 'Keisha Morgan', patientId: 'P008',
+    drugs: ['Hydrochlorothiazide 25mg × 30'], prescriber: 'Dr. M. Singh',
+    received: '2026-05-06 15:47', status: 'Dispensed', isSchedule: false, isNhf: false,
+    refills: 5, refillsRemaining: 4,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-06 15:55' },
+      { from: 'Verified', to: 'Filled', actor: 'Sandra M.', role: 'Technician', timestamp: '2026-05-06 16:20' },
+      { from: 'Filled', to: 'Dispensed', actor: 'Tanya R.', role: 'Front Desk', timestamp: '2026-05-06 16:48' },
+    ],
+  },
+  {
+    id: 'RX009', rxNumber: 'RX-2026-0839', patient: 'Neville Grant', patientId: 'P009',
+    drugs: ['Metformin 500mg × 60', 'Aspirin 81mg × 30'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-08 07:55', status: 'Received', isSchedule: false, isNhf: true,
+    refills: 5, refillsRemaining: 5,
+    auditTrail: [],
+  },
+  {
+    id: 'RX010', rxNumber: 'RX-2026-0838', patient: 'Camille Francis', patientId: 'P010',
+    drugs: ['Amlodipine 10mg × 30', 'Omeprazole 20mg × 30'], prescriber: 'Dr. J. Brown',
+    received: '2026-05-08 08:12', status: 'Verified', isSchedule: false, isNhf: false,
+    refills: 3, refillsRemaining: 3,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 08:25', note: 'Allergy check: Penicillin/Cephalosporin — drugs clear' },
+    ],
+  },
+  {
+    id: 'RX011', rxNumber: 'RX-2026-0837', patient: 'Omar Chin', patientId: 'P011',
+    drugs: ['Diazepam 5mg × 14'], prescriber: 'Dr. R. Lewis',
+    received: '2026-05-08 08:30', status: 'Received', isSchedule: true, isNhf: false,
+    refills: 0, refillsRemaining: 0,
+    auditTrail: [],
+  },
+  {
+    id: 'RX012', rxNumber: 'RX-2026-0836', patient: 'Marcus Reid', patientId: 'P001',
+    drugs: ['Atorvastatin 20mg × 30'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-08 08:45', status: 'Filled', isSchedule: false, isNhf: false,
+    refills: 11, refillsRemaining: 10,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 09:00' },
+      { from: 'Verified', to: 'Filled', actor: 'Nadine F.', role: 'Technician', timestamp: '2026-05-08 09:30' },
+    ],
+  },
+  {
+    id: 'RX013', rxNumber: 'RX-2026-0835', patient: 'Yvette Campbell', patientId: 'P002',
+    drugs: ['Lisinopril 10mg × 30', 'Hydrochlorothiazide 25mg × 30'], prescriber: 'Dr. M. Singh',
+    received: '2026-05-08 09:10', status: 'Verified', isSchedule: false, isNhf: true,
+    refills: 5, refillsRemaining: 4,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 09:22', note: 'NHF confirmed · interaction check clear' },
+    ],
+  },
+  {
+    id: 'RX014', rxNumber: 'RX-2026-0834', patient: 'Neville Grant', patientId: 'P009',
+    drugs: ['Omeprazole 20mg × 30'], prescriber: 'Dr. J. Brown',
+    received: '2026-05-08 09:30', status: 'Filled', isSchedule: false, isNhf: true,
+    refills: 2, refillsRemaining: 2,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 09:40' },
+      { from: 'Verified', to: 'Filled', actor: 'Sandra M.', role: 'Technician', timestamp: '2026-05-08 10:05' },
+    ],
+  },
+  {
+    id: 'RX015', rxNumber: 'RX-2026-0833', patient: 'Devon Williams', patientId: 'P003',
+    drugs: ['Metformin 500mg × 60', 'Amlodipine 10mg × 30'], prescriber: 'Dr. K. Patterson',
+    received: '2026-05-08 10:02', status: 'Dispensed', isSchedule: false, isNhf: false,
+    refills: 3, refillsRemaining: 2,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 10:12' },
+      { from: 'Verified', to: 'Filled', actor: 'Nadine F.', role: 'Technician', timestamp: '2026-05-08 10:40' },
+      { from: 'Filled', to: 'Dispensed', actor: 'Patrice M.', role: 'Front Desk', timestamp: '2026-05-08 11:15' },
+    ],
+  },
+  {
+    id: 'RX016', rxNumber: 'RX-2026-0832', patient: 'Omar Chin', patientId: 'P011',
+    drugs: ['Amoxicillin 500mg × 21'], prescriber: 'Dr. M. Singh',
+    received: '2026-05-08 10:18', status: 'Dispensed', isSchedule: false, isNhf: false,
+    refills: 0, refillsRemaining: 0,
+    auditTrail: [
+      { from: 'Received', to: 'Verified', actor: 'Dr. K. Powell', role: 'Pharmacist', timestamp: '2026-05-08 10:25' },
+      { from: 'Verified', to: 'Filled', actor: 'Winston C.', role: 'Technician', timestamp: '2026-05-08 10:55' },
+      { from: 'Filled', to: 'Dispensed', actor: 'Tanya R.', role: 'Front Desk', timestamp: '2026-05-08 11:30' },
+    ],
+  },
 ]
 
 // ─── Stock ────────────────────────────────────────────────────────────────────
@@ -156,17 +380,31 @@ export const SAMPLE_POS_PRODUCTS: POSProduct[] = [
 ]
 
 // ─── POS Transactions ─────────────────────────────────────────────────────────
+// 15 transactions across 3 days. Source of truth for all POS metrics.
 
 export const SAMPLE_TRANSACTIONS: POSTransaction[] = [
-  { id: 'TX001', txNumber: 'POS-2026-0315', time: '10:45', cashier: 'Tanya R.', items: 2, totalJmd: 1240, method: 'Cash',  patient: 'Marcus Reid' },
-  { id: 'TX002', txNumber: 'POS-2026-0314', time: '10:22', cashier: 'Tanya R.', items: 1, totalJmd: 280,  method: 'Card'  },
-  { id: 'TX003', txNumber: 'POS-2026-0313', time: '09:58', cashier: 'Tanya R.', items: 1, totalJmd: 12000,method: 'Lynk', patient: 'Rohan Stewart' },
-  { id: 'TX004', txNumber: 'POS-2026-0312', time: '09:31', cashier: 'Tanya R.', items: 2, totalJmd: 1070, method: 'Cash'  },
-  { id: 'TX005', txNumber: 'POS-2026-0311', time: '09:15', cashier: 'Tanya R.', items: 2, totalJmd: 630,  method: 'Cash'  },
-  { id: 'TX006', txNumber: 'POS-2026-0310', time: '08:52', cashier: 'Tanya R.', items: 3, totalJmd: 3200, method: 'Card', patient: 'Yvette Campbell' },
-  { id: 'TX007', txNumber: 'POS-2026-0309', time: '08:34', cashier: 'Tanya R.', items: 1, totalJmd: 890,  method: 'Cash'  },
-  { id: 'TX008', txNumber: 'POS-2026-0308', time: '08:11', cashier: 'Tanya R.', items: 1, totalJmd: 450,  method: 'Lynk'  },
+  // 2026-05-09
+  { id: 'TX001', txNumber: 'POS-2026-0315', time: '2026-05-09 10:45', cashier: 'Tanya R.',   items: 2, totalJmd: 1240,  method: 'Cash',  patient: 'Marcus Reid' },
+  { id: 'TX002', txNumber: 'POS-2026-0314', time: '2026-05-09 10:22', cashier: 'Tanya R.',   items: 1, totalJmd: 280,   method: 'Card'  },
+  { id: 'TX003', txNumber: 'POS-2026-0313', time: '2026-05-09 09:58', cashier: 'Tanya R.',   items: 1, totalJmd: 12000, method: 'Lynk',  patient: 'Rohan Stewart' },
+  { id: 'TX004', txNumber: 'POS-2026-0312', time: '2026-05-09 09:31', cashier: 'Tanya R.',   items: 2, totalJmd: 1070,  method: 'Cash'  },
+  { id: 'TX005', txNumber: 'POS-2026-0311', time: '2026-05-09 09:15', cashier: 'Tanya R.',   items: 2, totalJmd: 630,   method: 'Cash'  },
+  { id: 'TX006', txNumber: 'POS-2026-0310', time: '2026-05-09 08:52', cashier: 'Tanya R.',   items: 3, totalJmd: 3200,  method: 'Card',  patient: 'Yvette Campbell' },
+  { id: 'TX007', txNumber: 'POS-2026-0309', time: '2026-05-09 08:34', cashier: 'Tanya R.',   items: 1, totalJmd: 890,   method: 'Cash'  },
+  { id: 'TX008', txNumber: 'POS-2026-0308', time: '2026-05-09 08:11', cashier: 'Tanya R.',   items: 1, totalJmd: 450,   method: 'Lynk'  },
+  // 2026-05-10
+  { id: 'TX009', txNumber: 'POS-2026-0307', time: '2026-05-10 14:20', cashier: 'Patrice M.', items: 2, totalJmd: 2090,  method: 'Card',  patient: 'Neville Grant' },
+  { id: 'TX010', txNumber: 'POS-2026-0306', time: '2026-05-10 13:05', cashier: 'Patrice M.', items: 3, totalJmd: 4750,  method: 'Cash'  },
+  { id: 'TX011', txNumber: 'POS-2026-0305', time: '2026-05-10 11:30', cashier: 'Patrice M.', items: 1, totalJmd: 350,   method: 'Cash'  },
+  { id: 'TX012', txNumber: 'POS-2026-0304', time: '2026-05-10 10:12', cashier: 'Patrice M.', items: 4, totalJmd: 6800,  method: 'Lynk',  patient: 'Camille Francis' },
+  // 2026-05-11
+  { id: 'TX013', txNumber: 'POS-2026-0303', time: '2026-05-11 11:00', cashier: 'Tanya R.',   items: 2, totalJmd: 1620,  method: 'Card'  },
+  { id: 'TX014', txNumber: 'POS-2026-0302', time: '2026-05-11 09:45', cashier: 'Tanya R.',   items: 1, totalJmd: 880,   method: 'Cash',  patient: 'Marcus Reid' },
+  { id: 'TX015', txNumber: 'POS-2026-0301', time: '2026-05-11 08:30', cashier: 'Tanya R.',   items: 2, totalJmd: 1470,  method: 'Lynk'  },
 ]
+
+/** Today's transactions (2026-05-11) for Dashboard "Sales Today" metric. */
+export const TODAY_TRANSACTIONS = SAMPLE_TRANSACTIONS.filter((t) => t.time.startsWith('2026-05-11'))
 
 // ─── Loyalty Members ──────────────────────────────────────────────────────────
 
@@ -188,25 +426,352 @@ export const SAMPLE_SCHEDULE_LOG: ScheduleLogEntry[] = [
   { id: 'SL005', logNumber: 'LOG-2026-0039', date: '2026-05-04', time: '09:45', drug: 'Oxycodone 5mg',  din: '02213494', qty: 30, rxNumber: 'RX-2026-0824', patient: 'Albert Moore',     prescriber: 'Dr. R. Lewis',     dispensedBy: 'Dr. K. Powell', verified: true  },
 ]
 
-// ─── AI Jobs ─────────────────────────────────────────────────────────────────
+// ─── AI Jobs ──────────────────────────────────────────────────────────────────
+// Covers all 7 agent types. confidence values are 0–1 (display as %).
+// integrationPending lists external services blocking full execution.
 
 export const SAMPLE_AI_JOBS: AIJob[] = [
-  { id: 'JOB001', jobNumber: 'JOB-2026-0021', type: 'Rx Scan',      target: 'RX-2026-0847 · Marcus Reid',            status: 'Completed',       confidence: 98, createdAt: '2026-05-07 08:14', completedAt: '2026-05-07 08:14' },
-  { id: 'JOB002', jobNumber: 'JOB-2026-0020', type: 'Rx Scan',      target: 'RX-2026-0843 · Trevor Thompson',        status: 'Review Required', confidence: 71, createdAt: '2026-05-07 09:45', completedAt: '2026-05-07 09:46', flagged: 'Low confidence on dosage field — manual review required' },
-  { id: 'JOB003', jobNumber: 'JOB-2026-0019', type: 'Invoice Scan', target: 'PharmSource INV-2026-0441',             status: 'Completed',       confidence: 99, createdAt: '2026-05-07 09:02', completedAt: '2026-05-07 09:02' },
-  { id: 'JOB004', jobNumber: 'JOB-2026-0018', type: 'Rx Scan',      target: 'RX-2026-0846 · Yvette Campbell',       status: 'Completed',       confidence: 94, createdAt: '2026-05-07 08:31', completedAt: '2026-05-07 08:31' },
-  { id: 'JOB005', jobNumber: 'JOB-2026-0017', type: 'Drug Lookup',  target: 'Metformin + Lisinopril interaction',    status: 'Completed',       createdAt: '2026-05-07 10:10', completedAt: '2026-05-07 10:10' },
-  { id: 'JOB006', jobNumber: 'JOB-2026-0016', type: 'Invoice Scan', target: 'Caribbean Drug INV-2026-0318',         status: 'Failed',          createdAt: '2026-05-06 15:30', completedAt: '2026-05-06 15:31', flagged: 'Image quality too low — rescan required' },
+  // ── rx-ocr ──
+  {
+    id: 'JOB001', jobNumber: 'JOB-2026-0021', type: 'rx-ocr', label: 'Rx Scan',
+    target: 'RX-2026-0847 · Marcus Reid',
+    status: 'Completed', confidence: 0.98,
+    createdAt: '2026-05-07 08:14', completedAt: '2026-05-07 08:14',
+    inputSummary: 'Handwritten prescription — 1 page, 3 fields',
+    outputSummary: 'Metformin 500mg × 60 · Dr. K. Patterson · refills 3',
+    linkedEntityId: 'RX001', linkedEntityType: 'prescription',
+  },
+  {
+    id: 'JOB002', jobNumber: 'JOB-2026-0020', type: 'rx-ocr', label: 'Rx Scan',
+    target: 'RX-2026-0843 · Trevor Thompson',
+    status: 'Review Required', confidence: 0.71,
+    createdAt: '2026-05-07 09:45', completedAt: '2026-05-07 09:46',
+    flagged: true, flagNote: 'Low confidence on dosage field — manual review required',
+    inputSummary: 'Printed prescription — 1 page, Schedule II',
+    outputSummary: 'Oxycodone 5mg × 30 (dosage field uncertain)',
+    linkedEntityId: 'RX005', linkedEntityType: 'prescription',
+  },
+  // ── invoice-ocr ──
+  {
+    id: 'JOB003', jobNumber: 'JOB-2026-0019', type: 'invoice-ocr', label: 'Invoice Scan',
+    target: 'PharmSource INV-2026-0441',
+    status: 'Completed', confidence: 0.99,
+    createdAt: '2026-05-07 09:02', completedAt: '2026-05-07 09:02',
+    inputSummary: 'PharmSource Ltd invoice — 2 pages, 6 line items',
+    outputSummary: 'Amoxicillin 500mg × 250 · RCV-2026-0112 created',
+    linkedEntityId: 'RCV01', linkedEntityType: 'inventory',
+  },
+  {
+    id: 'JOB004', jobNumber: 'JOB-2026-0018', type: 'rx-ocr', label: 'Rx Scan',
+    target: 'RX-2026-0846 · Yvette Campbell',
+    status: 'Completed', confidence: 0.94,
+    createdAt: '2026-05-07 08:31', completedAt: '2026-05-07 08:31',
+    inputSummary: 'Printed prescription — 1 page, NHF eligible',
+    outputSummary: 'Amlodipine 10mg × 30 · NHF flag applied',
+    linkedEntityId: 'RX002', linkedEntityType: 'prescription',
+  },
+  {
+    id: 'JOB006', jobNumber: 'JOB-2026-0016', type: 'invoice-ocr', label: 'Invoice Scan',
+    target: 'Caribbean Drug INV-2026-0318',
+    status: 'Failed', confidence: 0.34,
+    createdAt: '2026-05-06 15:30', completedAt: '2026-05-06 15:31',
+    flagged: true, flagNote: 'Image quality too low — rescan required',
+    inputSummary: 'Caribbean Drug Supply invoice — image blurred',
+    outputSummary: undefined,
+    linkedEntityId: 'SUP02', linkedEntityType: 'inventory',
+  },
+  // ── drug-interaction ──
+  {
+    id: 'JOB005', jobNumber: 'JOB-2026-0017', type: 'drug-interaction', label: 'Drug Interaction',
+    target: 'Metformin + Lisinopril · RX004',
+    status: 'Completed', confidence: 0.97,
+    createdAt: '2026-05-07 10:10', completedAt: '2026-05-07 10:10',
+    inputSummary: '2-drug check: Metformin 500mg + Lisinopril 10mg',
+    outputSummary: 'No critical interactions found · minor: monitor renal function',
+    linkedEntityId: 'RX004', linkedEntityType: 'prescription',
+    integrationPending: ['OpenFDA — live data'],
+  },
+  {
+    id: 'JOB013', jobNumber: 'JOB-2026-0009', type: 'drug-interaction', label: 'Drug Interaction',
+    target: 'Amlodipine + Omeprazole · RX010',
+    status: 'Completed', confidence: 0.95,
+    createdAt: '2026-05-08 08:30', completedAt: '2026-05-08 08:30',
+    inputSummary: '2-drug check: Amlodipine 10mg + Omeprazole 20mg',
+    outputSummary: 'No significant interaction. Monitor BP response.',
+    linkedEntityId: 'RX010', linkedEntityType: 'prescription',
+    integrationPending: ['OpenFDA — live data'],
+  },
+  // ── inventory-intel ──
+  {
+    id: 'JOB007', jobNumber: 'JOB-2026-0015', type: 'inventory-intel', label: 'Inventory Intel',
+    target: 'Full stock sweep · 10 SKUs',
+    status: 'Completed',
+    createdAt: '2026-05-11 06:00', completedAt: '2026-05-11 06:01',
+    inputSummary: '10 SKUs analysed — qty, reorder points, expiry, receive history',
+    outputSummary: '3 critical reorders (Amoxicillin, HCTZ, Oxycodone) · 2 expiring within 90 days',
+    linkedEntityType: 'inventory',
+    integrationPending: ['Supplier PO API'],
+  },
+  // ── compliance-monitor ──
+  {
+    id: 'JOB008', jobNumber: 'JOB-2026-0014', type: 'compliance-monitor', label: 'Compliance Monitor',
+    target: 'Staff credentials + schedule log · 2026-05-11',
+    status: 'Completed',
+    createdAt: '2026-05-11 06:05', completedAt: '2026-05-11 06:05',
+    inputSummary: '12 staff records · 5 schedule log entries · audit gap check',
+    outputSummary: '2 flags: USR06 license expires in 47 days · Sandra M. 2FA not enrolled',
+    flagged: true, flagNote: '2 compliance gaps require attention',
+    linkedEntityType: 'staff',
+    integrationPending: ['MoH API', 'Pharmacy Council registry'],
+  },
+  // ── report-synthesis ──
+  {
+    id: 'JOB009', jobNumber: 'JOB-2026-0013', type: 'report-synthesis', label: 'Report Synthesis',
+    target: '7-day summary · 2026-05-05 to 2026-05-11',
+    status: 'Completed',
+    createdAt: '2026-05-11 07:00', completedAt: '2026-05-11 07:01',
+    inputSummary: '16 prescriptions · 15 POS transactions · 10 stock items',
+    outputSummary: 'Winchester Pharmacy filled 16 Rx (4 dispensed, 3 filled, 5 active). Revenue JMD 37,970 over 3 days. 3 stock items below reorder threshold.',
+    linkedEntityType: 'report',
+    integrationPending: ['Email/SMTP', 'PDF export'],
+  },
+  // ── patient-risk ──
+  {
+    id: 'JOB010', jobNumber: 'JOB-2026-0012', type: 'patient-risk', label: 'Patient Risk',
+    target: 'Camille Francis · P010',
+    status: 'Completed',
+    createdAt: '2026-05-08 08:12', completedAt: '2026-05-08 08:12',
+    inputSummary: 'Patient P010 · allergies: Penicillin, Cephalosporin · 1 active prescription',
+    outputSummary: 'No active allergy conflict detected. RX010 drugs clear.',
+    linkedEntityId: 'P010', linkedEntityType: 'patient',
+  },
+  {
+    id: 'JOB011', jobNumber: 'JOB-2026-0011', type: 'patient-risk', label: 'Patient Risk',
+    target: 'Marcus Reid · P001',
+    status: 'Review Required',
+    flagged: true, flagNote: 'Penicillin allergy on file — verify RX drugs do not contain beta-lactam class',
+    createdAt: '2026-05-07 08:14', completedAt: '2026-05-07 08:14',
+    inputSummary: 'Patient P001 · allergy: Penicillin · 2 active prescriptions',
+    outputSummary: 'Current drugs Metformin + Atorvastatin are clear. Alert logged for future fills.',
+    linkedEntityId: 'P001', linkedEntityType: 'patient',
+  },
+  {
+    id: 'JOB012', jobNumber: 'JOB-2026-0010', type: 'compliance-monitor', label: 'Compliance Monitor',
+    target: 'Schedule V log completeness · May 2026',
+    status: 'Completed',
+    createdAt: '2026-05-10 06:00', completedAt: '2026-05-10 06:01',
+    inputSummary: '5 schedule log entries reviewed for completeness',
+    outputSummary: 'LOG-2026-0043 missing verification signature — 1 action required',
+    flagged: true, flagNote: 'LOG-2026-0043 unverified',
+    linkedEntityType: 'report',
+    integrationPending: ['MoH regulatory submission'],
+  },
+  {
+    id: 'JOB014', jobNumber: 'JOB-2026-0008', type: 'inventory-intel', label: 'Inventory Intel',
+    target: 'Expiry sweep · Q3 2026',
+    status: 'Processing',
+    createdAt: '2026-05-11 11:30',
+    inputSummary: 'Checking all lots expiring before 2026-09-01',
+    linkedEntityType: 'inventory',
+  },
+  {
+    id: 'JOB015', jobNumber: 'JOB-2026-0007', type: 'report-synthesis', label: 'Report Synthesis',
+    target: 'Monthly revenue summary · April 2026',
+    status: 'Completed',
+    createdAt: '2026-05-01 07:00', completedAt: '2026-05-01 07:02',
+    inputSummary: 'April 2026 POS + Rx fill data',
+    outputSummary: 'April revenue JMD 312,400 · 94 Rx dispensed · avg daily sales JMD 10,413',
+    linkedEntityType: 'report',
+    integrationPending: ['Email/SMTP'],
+  },
+  {
+    id: 'JOB016', jobNumber: 'JOB-2026-0006', type: 'invoice-ocr', label: 'Invoice Scan',
+    target: 'Caribbean Drug INV-2026-0409',
+    status: 'Completed', confidence: 0.96,
+    createdAt: '2026-04-28 10:00', completedAt: '2026-04-28 10:00',
+    inputSummary: 'Caribbean Drug Supply invoice — 3 line items',
+    outputSummary: 'Atorvastatin 20mg × 300 · RCV-2026-0110 created',
+    linkedEntityId: 'RCV03', linkedEntityType: 'inventory',
+  },
 ]
 
 // ─── Staff Users ──────────────────────────────────────────────────────────────
+// 12 staff members. Backfilled fields on original 5; 7 new staff added.
+// All emails: firstname-initial + lastname @winchester.com.jm
 
 export const SAMPLE_STAFF: StaffUser[] = [
-  { id: 'USR01', name: 'Dr. Kezia Powell',  role: 'Pharmacist',  email: 'kpowell@winchester.com.jm',   status: 'Active',   twoFa: true,  lastLogin: '2026-05-07 07:58' },
-  { id: 'USR02', name: 'Sandra Mitchell',   role: 'Technician',  email: 'smitchell@winchester.com.jm', status: 'Active',   twoFa: false, lastLogin: '2026-05-07 08:02' },
-  { id: 'USR03', name: 'Tanya Richards',    role: 'Front Desk',  email: 'trichards@winchester.com.jm', status: 'Active',   twoFa: false, lastLogin: '2026-05-07 08:05' },
-  { id: 'USR04', name: 'Michael Thompson',  role: 'Manager',     email: 'mthompson@winchester.com.jm', status: 'Active',   twoFa: true,  lastLogin: '2026-05-06 09:14' },
-  { id: 'USR05', name: 'Admin Account',     role: 'Admin',       email: 'admin@winchester.com.jm',     status: 'Active',   twoFa: true,  lastLogin: '2026-05-07 06:30' },
+  {
+    id: 'USR01', name: 'Dr. Kezia Powell', role: 'Pharmacist',
+    email: 'kpowell@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-11 07:58',
+    firstName: 'Kezia', lastName: 'Powell', phone: '876-554-7701',
+    employeeNumber: 'EMP-001', hireDate: '2021-03-15',
+    department: 'Dispensary', employmentType: 'Full-time',
+    licenseNumber: 'PCJ-2021-0041', licenseExpiry: '2027-06-30',
+    createdAt: '2021-03-15',
+  },
+  {
+    id: 'USR02', name: 'Sandra Mitchell', role: 'Technician',
+    email: 'smitchell@winchester.com.jm', status: 'Active', twoFa: false,
+    lastLogin: '2026-05-11 08:02',
+    firstName: 'Sandra', lastName: 'Mitchell', phone: '876-442-3310',
+    employeeNumber: 'EMP-002', hireDate: '2022-08-01',
+    department: 'Dispensary', employmentType: 'Full-time',
+    licenseNumber: 'PCJ-TECH-0089', licenseExpiry: '2027-03-15',
+    createdAt: '2022-08-01',
+  },
+  {
+    id: 'USR03', name: 'Tanya Richards', role: 'Front Desk',
+    email: 'trichards@winchester.com.jm', status: 'Active', twoFa: false,
+    lastLogin: '2026-05-11 08:05',
+    firstName: 'Tanya', lastName: 'Richards', phone: '876-776-8820',
+    employeeNumber: 'EMP-003', hireDate: '2023-01-16',
+    department: 'Front Office', employmentType: 'Full-time',
+    supervisorId: 'USR04',
+    createdAt: '2023-01-16',
+  },
+  {
+    id: 'USR04', name: 'Michael Thompson', role: 'Manager',
+    email: 'mthompson@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-10 09:14',
+    firstName: 'Michael', lastName: 'Thompson', phone: '876-931-0045',
+    employeeNumber: 'EMP-004', hireDate: '2019-06-01',
+    department: 'Management', employmentType: 'Full-time',
+    createdAt: '2019-06-01',
+  },
+  {
+    id: 'USR05', name: 'Admin Account', role: 'Admin',
+    email: 'admin@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-11 06:30',
+    firstName: 'System', lastName: 'Admin',
+    employeeNumber: 'EMP-005', hireDate: '2019-01-01',
+    department: 'Administration', employmentType: 'Full-time',
+    createdAt: '2019-01-01',
+  },
+  // ── 7 new staff ──────────────────────────────────────────────────────────────
+  {
+    id: 'USR06', name: 'Dr. Delroy Campbell', role: 'Pharmacist',
+    email: 'dcampbell@winchester.com.jm', status: 'Inactive', twoFa: true,
+    lastLogin: '2026-03-15 09:22',
+    firstName: 'Delroy', lastName: 'Campbell', phone: '876-882-5512',
+    employeeNumber: 'EMP-006', hireDate: '2020-11-01',
+    department: 'Dispensary', employmentType: 'Full-time',
+    licenseNumber: 'PCJ-2020-0033',
+    licenseExpiry: '2026-06-27', // Expires in 47 days → compliance flag
+    supervisorId: 'USR04',
+    notes: 'On leave. License renewal pending. Compliance agent flag active.',
+    createdAt: '2020-11-01',
+  },
+  {
+    id: 'USR07', name: 'Nadine Foster', role: 'Technician',
+    email: 'nfoster@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-11 08:15',
+    firstName: 'Nadine', lastName: 'Foster', phone: '876-501-7843',
+    employeeNumber: 'EMP-007', hireDate: '2024-05-15',
+    department: 'Dispensary', employmentType: 'Full-time',
+    licenseNumber: 'PCJ-TECH-0112', licenseExpiry: '2028-05-15',
+    supervisorId: 'USR01',
+    createdAt: '2024-05-15',
+  },
+  {
+    id: 'USR08', name: 'Winston Clarke', role: 'Technician',
+    email: 'wclarke@winchester.com.jm', status: 'Active', twoFa: false,
+    lastLogin: '2026-05-10 08:05',
+    firstName: 'Winston', lastName: 'Clarke', phone: '876-643-2290',
+    employeeNumber: 'EMP-008', hireDate: '2024-11-01',
+    department: 'Dispensary', employmentType: 'Full-time',
+    licenseNumber: 'PCJ-TECH-0124', licenseExpiry: '2026-11-01',
+    supervisorId: 'USR01',
+    createdAt: '2024-11-01',
+  },
+  {
+    id: 'USR09', name: 'Patrice Morgan', role: 'Front Desk',
+    email: 'pmorgan@winchester.com.jm', status: 'Active', twoFa: false,
+    lastLogin: '2026-05-09 10:30',
+    firstName: 'Patrice', lastName: 'Morgan', phone: '876-719-4401',
+    employeeNumber: 'EMP-009', hireDate: '2025-02-01',
+    department: 'Front Office', employmentType: 'Part-time',
+    supervisorId: 'USR04',
+    createdAt: '2025-02-01',
+  },
+  {
+    id: 'USR10', name: 'Beverley Reid', role: 'Manager',
+    email: 'breed@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-10 07:45',
+    firstName: 'Beverley', lastName: 'Reid', phone: '876-365-9921',
+    employeeNumber: 'EMP-010', hireDate: '2023-09-01',
+    department: 'Management', employmentType: 'Full-time',
+    supervisorId: 'USR04',
+    createdAt: '2023-09-01',
+  },
+  {
+    id: 'USR11', name: 'Ingrid Bryan', role: 'Admin',
+    email: 'ibryan@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-11 06:55',
+    firstName: 'Ingrid', lastName: 'Bryan', phone: '876-443-8870',
+    employeeNumber: 'EMP-011', hireDate: '2020-06-15',
+    department: 'Administration', employmentType: 'Full-time',
+    createdAt: '2020-06-15',
+  },
+  {
+    id: 'USR12', name: 'Clifton Henry', role: 'Admin',
+    email: 'chenry@winchester.com.jm', status: 'Active', twoFa: true,
+    lastLogin: '2026-05-08 08:10',
+    firstName: 'Clifton', lastName: 'Henry', phone: '876-554-0033',
+    employeeNumber: 'EMP-012', hireDate: '2021-09-01',
+    department: 'Administration', employmentType: 'Full-time',
+    createdAt: '2021-09-01',
+  },
+]
+
+// ─── Active Sessions (stub — integration pending: Supabase auth) ──────────────
+
+export const SAMPLE_SESSIONS: SessionEntry[] = [
+  {
+    id: 'SES001', userId: 'USR01', user: 'Dr. Kezia Powell', role: 'Pharmacist',
+    device: 'Windows · Chrome 142', ip: '10.0.1.12', location: 'Kingston, JA',
+    lastActivity: '2026-05-11 10:45', current: false,
+  },
+  {
+    id: 'SES002', userId: 'USR03', user: 'Tanya Richards', role: 'Front Desk',
+    device: 'Windows · Chrome 142', ip: '10.0.1.14', location: 'Kingston, JA',
+    lastActivity: '2026-05-11 10:50', current: false,
+  },
+  {
+    id: 'SES003', userId: 'USR05', user: 'Admin Account', role: 'Admin',
+    device: 'macOS · Safari 18', ip: '10.0.1.10', location: 'Kingston, JA',
+    lastActivity: '2026-05-11 11:05', current: true,
+  },
+  {
+    id: 'SES004', userId: 'USR07', user: 'Nadine Foster', role: 'Technician',
+    device: 'Windows · Edge 125', ip: '10.0.1.16', location: 'Kingston, JA',
+    lastActivity: '2026-05-11 09:30', current: false,
+  },
+]
+
+// ─── Shift Schedule (stub — scheduling module pending) ────────────────────────
+
+export const SAMPLE_SHIFTS: ShiftEntry[] = [
+  { id: 'SHF001', staffId: 'USR01', date: '2026-05-11', startTime: '08:00', endTime: '17:00', role: 'Pharmacist',  location: 'Dispensary'  },
+  { id: 'SHF002', staffId: 'USR02', date: '2026-05-11', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF003', staffId: 'USR03', date: '2026-05-11', startTime: '08:00', endTime: '16:00', role: 'Front Desk',  location: 'Front Desk'  },
+  { id: 'SHF004', staffId: 'USR07', date: '2026-05-11', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF005', staffId: 'USR09', date: '2026-05-11', startTime: '10:00', endTime: '15:00', role: 'Front Desk',  location: 'POS'         },
+  { id: 'SHF006', staffId: 'USR01', date: '2026-05-12', startTime: '08:00', endTime: '17:00', role: 'Pharmacist',  location: 'Dispensary'  },
+  { id: 'SHF007', staffId: 'USR02', date: '2026-05-12', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF008', staffId: 'USR08', date: '2026-05-12', startTime: '09:00', endTime: '18:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF009', staffId: 'USR03', date: '2026-05-12', startTime: '08:00', endTime: '16:00', role: 'Front Desk',  location: 'Front Desk'  },
+  { id: 'SHF010', staffId: 'USR01', date: '2026-05-13', startTime: '08:00', endTime: '17:00', role: 'Pharmacist',  location: 'Dispensary'  },
+  { id: 'SHF011', staffId: 'USR07', date: '2026-05-13', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF012', staffId: 'USR09', date: '2026-05-13', startTime: '10:00', endTime: '15:00', role: 'Front Desk',  location: 'POS'         },
+  { id: 'SHF013', staffId: 'USR02', date: '2026-05-14', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF014', staffId: 'USR08', date: '2026-05-14', startTime: '09:00', endTime: '18:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF015', staffId: 'USR03', date: '2026-05-14', startTime: '08:00', endTime: '16:00', role: 'Front Desk',  location: 'Front Desk'  },
+  { id: 'SHF016', staffId: 'USR01', date: '2026-05-15', startTime: '08:00', endTime: '17:00', role: 'Pharmacist',  location: 'Dispensary'  },
+  { id: 'SHF017', staffId: 'USR07', date: '2026-05-15', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF018', staffId: 'USR09', date: '2026-05-15', startTime: '10:00', endTime: '15:00', role: 'Front Desk',  location: 'POS'         },
+  { id: 'SHF019', staffId: 'USR02', date: '2026-05-16', startTime: '08:00', endTime: '17:00', role: 'Technician',  location: 'Dispensary'  },
+  { id: 'SHF020', staffId: 'USR03', date: '2026-05-16', startTime: '08:00', endTime: '16:00', role: 'Front Desk',  location: 'Front Desk'  },
 ]
 
 // ─── Receive Records ──────────────────────────────────────────────────────────
@@ -222,23 +787,29 @@ export const SAMPLE_RECEIVES: ReceiveRecord[] = [
 // ─── Activity Log ─────────────────────────────────────────────────────────────
 
 export const SAMPLE_ACTIVITY: ActivityEntry[] = [
-  { id: 'A01',  timestamp: '2026-05-07 10:10', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Drug lookup',    target: 'Metformin + Lisinopril interaction check' },
-  { id: 'A02',  timestamp: '2026-05-07 10:03', user: 'Sandra M.',   role: 'Technician', action: 'Rx filled',      target: 'RX-2026-0842 · Sandra Clarke' },
-  { id: 'A03',  timestamp: '2026-05-07 09:55', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Schedule log',   target: 'LOG-2026-0043 · Oxycodone 5mg · Trevor Thompson' },
-  { id: 'A04',  timestamp: '2026-05-07 09:45', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx received',    target: 'RX-2026-0843 · Trevor Thompson (Schedule II)' },
-  { id: 'A05',  timestamp: '2026-05-07 09:30', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx verified',    target: 'RX-2026-0844 · Marcia Brown (NHF)' },
-  { id: 'A06',  timestamp: '2026-05-07 09:02', user: 'Sandra M.',   role: 'Technician', action: 'Stock received', target: 'Amoxicillin 500mg × 250 · LOT-25-3341 · RCV-2026-0112' },
-  { id: 'A07',  timestamp: '2026-05-07 08:52', user: 'Tanya R.',    role: 'Front Desk', action: 'Sale completed', target: 'POS-2026-0310 · JMD 3,200 · Card' },
-  { id: 'A08',  timestamp: '2026-05-07 08:31', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx verified',    target: 'RX-2026-0846 · Yvette Campbell (NHF)' },
-  { id: 'A09',  timestamp: '2026-05-07 08:14', user: 'Tanya R.',    role: 'Front Desk', action: 'Patient checked in', target: 'Marcus Reid · P001' },
-  { id: 'A10',  timestamp: '2026-05-07 08:05', user: 'Tanya R.',    role: 'Front Desk', action: 'User login',     target: 'Tanya Richards · Front Desk · 192.168.1.12' },
+  { id: 'A01',  timestamp: '2026-05-11 10:10', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Drug lookup',        target: 'Metformin + Lisinopril interaction check' },
+  { id: 'A02',  timestamp: '2026-05-11 10:03', user: 'Sandra M.',   role: 'Technician', action: 'Rx filled',          target: 'RX-2026-0842 · Sandra Clarke' },
+  { id: 'A03',  timestamp: '2026-05-11 09:55', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Schedule log',       target: 'LOG-2026-0043 · Oxycodone 5mg · Trevor Thompson' },
+  { id: 'A04',  timestamp: '2026-05-11 09:45', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx received',        target: 'RX-2026-0843 · Trevor Thompson (Schedule II)' },
+  { id: 'A05',  timestamp: '2026-05-11 09:30', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx verified',        target: 'RX-2026-0844 · Marcia Brown (NHF)' },
+  { id: 'A06',  timestamp: '2026-05-11 09:02', user: 'Sandra M.',   role: 'Technician', action: 'Stock received',     target: 'Amoxicillin 500mg × 250 · LOT-25-3341 · RCV-2026-0112' },
+  { id: 'A07',  timestamp: '2026-05-11 08:52', user: 'Tanya R.',    role: 'Front Desk', action: 'Sale completed',     target: 'POS-2026-0310 · JMD 3,200 · Card' },
+  { id: 'A08',  timestamp: '2026-05-11 08:31', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx verified',        target: 'RX-2026-0846 · Yvette Campbell (NHF)' },
+  { id: 'A09',  timestamp: '2026-05-11 08:14', user: 'Tanya R.',    role: 'Front Desk', action: 'Patient checked in', target: 'Marcus Reid · P001' },
+  { id: 'A10',  timestamp: '2026-05-11 08:05', user: 'Tanya R.',    role: 'Front Desk', action: 'User login',         target: 'Tanya Richards · Front Desk · 192.168.1.12' },
+  { id: 'A11',  timestamp: '2026-05-10 16:30', user: 'Nadine F.',   role: 'Technician', action: 'Rx filled',          target: 'RX-2026-0836 · Marcus Reid' },
+  { id: 'A12',  timestamp: '2026-05-10 15:45', user: 'Dr. Powell',  role: 'Pharmacist', action: 'Rx verified',        target: 'RX-2026-0835 · Yvette Campbell (NHF)' },
+  { id: 'A13',  timestamp: '2026-05-10 14:20', user: 'Patrice M.',  role: 'Front Desk', action: 'Sale completed',     target: 'POS-2026-0307 · JMD 2,090 · Card' },
+  { id: 'A14',  timestamp: '2026-05-09 10:45', user: 'Tanya R.',    role: 'Front Desk', action: 'Sale completed',     target: 'POS-2026-0315 · JMD 1,240 · Cash' },
+  { id: 'A15',  timestamp: '2026-05-09 08:05', user: 'Admin',       role: 'Admin',      action: 'User login',         target: 'Admin Account · Admin · 10.0.1.10' },
 ]
 
 // ─── Dashboard metrics ────────────────────────────────────────────────────────
+// All values derived from sample arrays above. No hardcoded numbers.
 
 export const DASHBOARD_METRICS = {
-  rxQueue:         SAMPLE_PRESCRIPTIONS.filter(r => r.status !== 'Dispensed').length,
-  stockAlerts:     SAMPLE_STOCK.filter(s => s.qtyOnHand <= s.reorderPoint).length,
-  salesTodayJmd:   SAMPLE_TRANSACTIONS.reduce((s, t) => s + t.totalJmd, 0),
-  patientsServed:  28,
+  rxQueue:        SAMPLE_PRESCRIPTIONS.filter(r => r.status !== 'Dispensed').length,
+  stockAlerts:    SAMPLE_STOCK.filter(s => s.qtyOnHand <= s.reorderPoint).length,
+  salesTodayJmd:  TODAY_TRANSACTIONS.reduce((s, t) => s + t.totalJmd, 0),
+  patientsServed: SAMPLE_PATIENTS.length,
 }

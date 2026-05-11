@@ -2,6 +2,7 @@
 import { DownloadSimple, MagnifyingGlass } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
+import { useToast } from '@/components/Toast'
 import { SAMPLE_ACTIVITY } from '@/data/sample'
 
 const ROLE_OPTIONS = ['All', 'Pharmacist', 'Technician', 'Front Desk', 'Manager', 'Admin'] as const
@@ -10,6 +11,11 @@ type RoleFilter = (typeof ROLE_OPTIONS)[number]
 export function AuditLogPage() {
   const [query, setQuery] = useState('')
   const [role, setRole] = useState<RoleFilter>('All')
+  const toast = useToast()
+
+  function handleExport() {
+    toast.show('Export requires Supabase backend — integration in progress', { variant: 'info' })
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -29,7 +35,7 @@ export function AuditLogPage() {
         title="Audit Log"
         subtitle={`${SAMPLE_ACTIVITY.length} entries Â· all state-changing actions logged via database triggers${query || role !== 'All' ? ` Â· ${filtered.length} matching` : ''}`}
         cta={
-          <Button variant="secondary" size="md">
+          <Button variant="secondary" size="md" onClick={handleExport}>
             <DownloadSimple size={16} weight="bold" />
             Export
           </Button>
