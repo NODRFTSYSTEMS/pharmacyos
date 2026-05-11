@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: #F5F7FA;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-sidebar: #111827;
+  --color-primary: #0F6FFF;
+  --color-primary-hover: #0A5FE8;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --radius-card: 6px;
+  --radius-control: 4px;
+  --radius-pill: 9999px;
+
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--color-bg-base);
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ---- Table density ---- */
+.table-compact th,
+.table-compact td {
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ---- Status pills ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.pill-green  { background: #D1FAE5; color: #065F46; }
+.pill-yellow { background: #FEF3C7; color: #92400E; }
+.pill-red    { background: #FEE2E2; color: #991B1B; }
+.pill-blue   { background: #DBEAFE; color: #1E40AF; }
+.pill-gray   { background: #F3F4F6; color: #374151; }
+.pill-purple { background: #EDE9FE; color: #5B21B6; }
+
+/* ---- Card ---- */
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---- Form controls ---- */
+.input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: var(--radius-control);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgb(15 111 255 / 0.12); }
+.input-mono  { font-family: var(--font-mono); }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-control);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary  { background: var(--color-primary); color: #fff; }
+.btn-primary:hover:not(:disabled)  { background: var(--color-primary-hover); }
+.btn-success  { background: var(--color-success); color: #fff; }
+.btn-success:hover:not(:disabled)  { background: #0D9668; }
+.btn-danger   { background: var(--color-error); color: #fff; }
+.btn-danger:hover:not(:disabled)   { background: #DC2626; }
+.btn-ghost    { background: transparent; color: #374151; border: 1px solid #D1D5DB; }
+.btn-ghost:hover:not(:disabled)    { background: #F9FAFB; }
+.btn-lg { height: 44px; padding: 0 20px; font-size: 14px; }
+
+/* ---- POS terminal: larger targets ---- */
+.btn-pos {
+  height: 56px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s;
+}
+
+/* ---- Section header ---- */
+.page-title { font-size: 20px; font-weight: 700; color: #111827; }
+.section-title { font-size: 14px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ---- Numeric mono data ---- */
+.num { font-family: var(--font-mono); font-size: 13px; }
+.num-lg { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+.num-xl { font-family: var(--font-mono); font-size: 32px; font-weight: 700; }
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
