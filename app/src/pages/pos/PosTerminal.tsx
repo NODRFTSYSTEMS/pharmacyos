@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Receipt, Plus, Minus, X, ShoppingCart,
   MagnifyingGlass, ArrowRight, User, Trash,
-  Tag, Clock, PencilSimple,
+  Tag, Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
@@ -148,9 +148,10 @@ export default function PosTerminal() {
   const [payMethod,      setPayMethod]      = useState<PayMethod>(prefs.payMethod)
   const [cashInput,      setCashInput]      = useState('')
   const [toast,          setToast]          = useState<{ msg: string; ok: boolean; key: number } | null>(null)
-  const [showCustomAdd,  setShowCustomAdd]  = useState(false)
+  const [rightTab,       setRightTab]       = useState<'catalog' | 'add'>('catalog')
   const [customName,     setCustomName]     = useState('')
   const [customPrice,    setCustomPrice]    = useState('')
+  const customNameRef    = useRef<HTMLInputElement>(null)
 
   // ── Cashier identity ─────────────────────────────────────────────────────
 
@@ -279,7 +280,7 @@ export default function PosTerminal() {
     }])
     setCustomName('')
     setCustomPrice('')
-    // keep form open so user can add another custom item immediately
+    setTimeout(() => customNameRef.current?.focus(), 0)
   }
 
   // ── Payment method preference ────────────────────────────────────────────
@@ -448,77 +449,30 @@ export default function PosTerminal() {
                   {totalQty} item{totalQty !== 1 ? 's' : ''}
                 </span>
               )}
-              <div className="ml-auto flex items-center gap-2">
+              {cart.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setShowCustomAdd(v => !v)}
-                  className={`flex items-center gap-1 text-xs font-medium transition-colors ${
-                    showCustomAdd
-                      ? 'text-blue-600'
-                      : 'text-gray-500 hover:text-blue-600'
-                  }`}
-                  aria-label="Add custom item"
+                  onClick={clearCart}
+                  className="ml-auto flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors"
                 >
-                  <PencilSimple size={12} />
-                  Custom item
+                  <Trash size={12} />
+                  Clear all
                 </button>
-                {cart.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={clearCart}
-                    className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors"
-                  >
-                    <Trash size={12} />
-                    Clear all
-                  </button>
-                )}
-              </div>
+              )}
             </div>
-
-            {/* Custom item quick-add */}
-            {showCustomAdd && (
-              <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-end gap-2">
-                <div className="flex-1 min-w-0">
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Item name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Paracetamol 500mg"
-                    value={customName}
-                    onChange={e => setCustomName(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && addCustomItem()}
-                    className="input w-full text-sm"
-                    autoFocus
-                  />
-                </div>
-                <div className="w-28 shrink-0">
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Price (JMD)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    placeholder="0.00"
-                    value={customPrice}
-                    onChange={e => setCustomPrice(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && addCustomItem()}
-                    className="input w-full font-mono text-sm"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={addCustomItem}
-                  disabled={!customName.trim() || !customPrice || parseFloat(customPrice) <= 0}
-                  className="btn btn-primary h-9 px-3 shrink-0 gap-1 text-sm"
-                >
-                  <Plus size={13} weight="bold" />
-                  Add
-                </button>
-              </div>
-            )}
 
             {cart.length === 0 ? (
               <div className="py-10 text-center">
                 <ShoppingCart size={36} className="mx-auto text-gray-200 mb-3" />
-                <p className="text-sm text-gray-400">Browse or search products on the right, then press + to add</p>
+                <p className="text-sm text-gray-400 mb-4">Cart is empty</p>
+                <button
+                  type="button"
+                  onClick={() => { setRightTab('add'); setTimeout(() => customNameRef.current?.focus(), 50) }}
+                  className="btn btn-primary gap-2 text-sm"
+                >
+                  <Plus size={14} weight="bold" />
+                  Add Item
+                </button>
               </div>
             ) : (
               <div>
@@ -670,118 +624,211 @@ export default function PosTerminal() {
           </div>
         </div>
 
-        {/* RIGHT — Product browse + search ─────────────────────────────── */}
+        {/* RIGHT — tabbed panel ────────────────────────────────────────── */}
         <div className="flex-[9] min-w-0">
-          <div className="card p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Tag size={15} weight="duotone" className="text-gray-500" />
-              <h2 className="section-title mb-0">Products</h2>
-              {searching && (
-                <span className="text-xs text-gray-400 ml-auto animate-pulse">Searching…</span>
-              )}
+          <div className="card overflow-hidden">
+
+            {/* Tab bar */}
+            <div className="flex border-b border-gray-200">
+              <button
+                type="button"
+                onClick={() => setRightTab('catalog')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
+                  rightTab === 'catalog'
+                    ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50/40'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <Tag size={14} />
+                Catalog
+                {searching && <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setRightTab('add'); setTimeout(() => customNameRef.current?.focus(), 50) }}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
+                  rightTab === 'add'
+                    ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50/40'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <Plus size={14} weight="bold" />
+                Add Item
+              </button>
             </div>
 
-            {/* Search input */}
-            <div className="relative mb-3">
-              <MagnifyingGlass
-                size={14}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                ref={searchRef}
-                type="search"
-                placeholder="Search name or scan barcode…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="input pl-8 w-full text-sm"
-                aria-label="Search products by name or barcode"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => { setSearch(''); searchRef.current?.focus() }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label="Clear search"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+            {/* ── CATALOG TAB ── */}
+            {rightTab === 'catalog' && (
+              <div className="p-4">
+                {/* Search */}
+                <div className="relative mb-3">
+                  <MagnifyingGlass size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    placeholder="Search name or scan barcode…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="input pl-8 w-full text-sm"
+                    aria-label="Search products"
+                  />
+                  {search && (
+                    <button
+                      type="button"
+                      onClick={() => { setSearch(''); searchRef.current?.focus() }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
 
-            {/* Connection / query error */}
-            {productsError && (
-              <div className="mb-3 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
-                Could not load products — check Supabase connection. Use <strong>Custom item</strong> in the cart panel to add items manually.
+                {productsError && (
+                  <div className="mb-3 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
+                    Cannot reach database. Switch to the <button type="button" className="underline font-medium" onClick={() => { setRightTab('add'); setTimeout(() => customNameRef.current?.focus(), 50) }}>Add Item</button> tab to add items manually.
+                  </div>
+                )}
+
+                <div className="divide-y divide-gray-100 max-h-[520px] overflow-y-auto -mx-4 px-4">
+                  {!searching && !productsError && products.length === 0 && (
+                    <div className="py-10 text-center">
+                      <Tag size={32} className="mx-auto text-gray-200 mb-3" />
+                      <p className="text-sm text-gray-400 mb-4">
+                        {search ? `No products match "${search}"` : 'No products in catalog yet.'}
+                      </p>
+                      {!search && (
+                        <button
+                          type="button"
+                          onClick={() => { setRightTab('add'); setTimeout(() => customNameRef.current?.focus(), 50) }}
+                          className="btn btn-primary gap-2 text-sm"
+                        >
+                          <Plus size={14} weight="bold" />
+                          Add Item manually
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {products.map(p => {
+                    const outOfStock = p.stock_qty <= 0
+                    const lowStock   = !outOfStock && p.stock_qty <= p.reorder_level
+                    const inCart     = cart.find(i => i.product_id === p.id)
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => addToCart(p)}
+                        disabled={outOfStock}
+                        className={`w-full flex items-center gap-3 px-1 py-3 text-left transition-colors ${
+                          outOfStock
+                            ? 'opacity-40 cursor-not-allowed'
+                            : inCart
+                            ? 'bg-blue-50 hover:bg-blue-100'
+                            : 'hover:bg-gray-50 active:bg-gray-100'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold ${
+                          outOfStock ? 'bg-gray-100 text-gray-300'
+                          : inCart   ? 'bg-blue-600 text-white'
+                                     : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {inCart ? inCart.qty : '+'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
+                          <p className="text-xs text-gray-500 font-mono">{fmtCurrency(p.unit_price)}</p>
+                        </div>
+                        <div className="shrink-0">
+                          {outOfStock
+                            ? <span className="pill pill-red text-xs">Out of stock</span>
+                            : lowStock
+                            ? <span className="pill pill-yellow text-xs">Low: {p.stock_qty}</span>
+                            : <span className="pill pill-green text-xs">{p.stock_qty}</span>}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {products.length > 0 && (
+                  <p className="text-xs text-gray-400 text-center mt-3 pt-2 border-t border-gray-100">
+                    {products.length} product{products.length !== 1 ? 's' : ''} · click row to add
+                  </p>
+                )}
               </div>
             )}
 
-            {/* Product list — entire row is the click target */}
-            <div className="divide-y divide-gray-100 max-h-[520px] overflow-y-auto">
-              {!searching && !productsError && products.length === 0 && (
-                <div className="py-8 text-center">
-                  <p className="text-sm text-gray-400">
-                    {search
-                      ? `No products match "${search}"`
-                      : 'No active products found. Run migration 005 or add products via Product Catalog.'}
-                  </p>
-                </div>
-              )}
+            {/* ── ADD ITEM TAB ── */}
+            {rightTab === 'add' && (
+              <div className="p-6">
+                <p className="text-sm text-gray-500 mb-5">
+                  Enter any item name and price — no database product required.
+                </p>
 
-              {products.map(p => {
-                const outOfStock = p.stock_qty <= 0
-                const lowStock   = !outOfStock && p.stock_qty <= p.reorder_level
-                const inCart     = cart.find(i => i.product_id === p.id)
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Item name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      ref={customNameRef}
+                      type="text"
+                      placeholder="e.g. Paracetamol 500mg × 24"
+                      value={customName}
+                      onChange={e => setCustomName(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && addCustomItem()}
+                      className="input w-full text-sm"
+                    />
+                  </div>
 
-                return (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Price (JMD) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      placeholder="0.00"
+                      value={customPrice}
+                      onChange={e => setCustomPrice(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && addCustomItem()}
+                      className="input w-full font-mono text-sm"
+                    />
+                  </div>
+
                   <button
-                    key={p.id}
                     type="button"
-                    onClick={() => addToCart(p)}
-                    disabled={outOfStock}
-                    className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors ${
-                      outOfStock
-                        ? 'opacity-40 cursor-not-allowed bg-transparent'
-                        : inCart
-                        ? 'bg-blue-50 hover:bg-blue-100'
-                        : 'hover:bg-gray-50 active:bg-gray-100'
-                    }`}
-                    aria-label={outOfStock ? `${p.name} — out of stock` : `Add ${p.name} to cart`}
+                    onClick={addCustomItem}
+                    disabled={!customName.trim() || !customPrice || parseFloat(customPrice) <= 0}
+                    className="btn btn-primary w-full gap-2 text-sm"
+                    style={{ minHeight: '48px' }}
                   >
-                    {/* + indicator */}
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-lg leading-none transition-colors ${
-                      outOfStock
-                        ? 'bg-gray-100 text-gray-300'
-                        : inCart
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-500 group-hover:bg-blue-600 group-hover:text-white'
-                    }`}>
-                      {inCart ? `${inCart.qty}` : '+'}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
-                      <p className="text-xs text-gray-500 font-mono">{fmtCurrency(p.unit_price)}</p>
-                    </div>
-
-                    <div className="shrink-0">
-                      {outOfStock ? (
-                        <span className="pill pill-red text-xs">Out of stock</span>
-                      ) : lowStock ? (
-                        <span className="pill pill-yellow text-xs">Low: {p.stock_qty}</span>
-                      ) : (
-                        <span className="pill pill-green text-xs">{p.stock_qty}</span>
-                      )}
-                    </div>
+                    <Plus size={16} weight="bold" />
+                    Add to Cart
                   </button>
-                )
-              })}
-            </div>
+                </div>
 
-            {products.length > 0 && (
-              <p className="text-xs text-gray-400 text-center mt-2 pt-2 border-t border-gray-100">
-                {products.length} product{products.length !== 1 ? 's' : ''} · tap row to add · tap again to increment
-              </p>
+                {cart.length > 0 && (
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">In cart</p>
+                    <div className="space-y-1">
+                      {cart.map(i => (
+                        <div key={i.product_id} className="flex justify-between text-xs text-gray-600">
+                          <span className="truncate mr-2">{i.product_name} ×{i.qty}</span>
+                          <span className="font-mono shrink-0">{fmtCurrency(i.unit_price * i.qty)}</span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-sm font-bold text-gray-800 pt-1 border-t border-gray-100 mt-1">
+                        <span>Total</span>
+                        <span className="font-mono">{fmtCurrency(total)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
+
           </div>
         </div>
 
