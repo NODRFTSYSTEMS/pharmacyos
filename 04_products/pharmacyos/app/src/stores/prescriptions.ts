@@ -16,6 +16,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import {
   SAMPLE_PRESCRIPTIONS,
+  SAMPLE_PATIENTS,
   type Prescription,
   type RxStatus,
   type RxAuditEntry,
@@ -26,8 +27,18 @@ import {
 
 export interface PrescriptionStore {
   prescriptions: Prescription[]
-  /** Advance status by one step. Appends audit trail entry. */
-  advance: (id: string, actor: string, actorRole: UserRole) => void
+  /**
+   * Advance status by one step. Appends audit trail entry.
+   *
+   * Safety gate (Received → Verified):
+   * If the patient has known allergies that may conflict with the Rx drugs,
+   * a pharmacist override reason is required. Pass it in `overrideReason`.
+   * If a conflict exists and no reason is provided, the advance is blocked
+   * (returns without mutating state) — the UI layer must collect the reason first.
+   *
+   * @param overrideReason - Documented pharmacist override reason (required when allergy conflict detected).
+   */
+  advance: (id: string, actor: string, actorRole: UserRole, overrideReason?: string) => boolean
   /** Reject back to Received with a reason note. */
   reject: (id: string, actor: string, actorRole: UserRole, reason: string) => void
   /** Look up by id or rxNumber. */
@@ -52,6 +63,19 @@ function nextStatus(current: RxStatus): RxStatus | null {
   return NEXT_STATUS[current] ?? null
 }
 
+/**
+ * Basic allergy conflict check — text match between drug string and allergy name.
+ * This is the demo-layer guard. Production will use a drug database cross-reference.
+ */
+function hasAllergyConflict(drugs: string[], allergies: string[]): boolean {
+  for (const allergy of allergies) {
+    for (const drug of drugs) {
+      if (drug.toLowerCase().includes(allergy.toLowerCase())) return true
+    }
+  }
+  return false
+}
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 export const usePrescriptionStore = create<PrescriptionStore>()(
@@ -59,7 +83,9 @@ export const usePrescriptionStore = create<PrescriptionStore>()(
     (set, get) => ({
       prescriptions: structuredClone(SAMPLE_PRESCRIPTIONS) as Prescription[],
 
-      advance(id, actor, actorRole) {
+      advance(id, actor, actorRole, overrideReason) {
+        let blocked = false
+
         set((state) => {
           const idx = state.prescriptions.findIndex(
             (p) => p.id === id || p.rxNumber === id,
@@ -70,12 +96,32 @@ export const usePrescriptionStore = create<PrescriptionStore>()(
           const to = nextStatus(rx.status)
           if (!to) return state // Already Dispensed — no-op
 
+          // ─── Allergy enforcement gate (Received → Verified) ───────────────────
+          // If the patient has known allergies that may conflict with Rx drugs,
+          // a documented pharmacist override reason is required before verifying.
+          if (rx.status === 'Received') {
+            const patient = SAMPLE_PATIENTS.find((p) => p.id === rx.patientId)
+            if (patient && patient.allergies.length > 0) {
+              const conflict = hasAllergyConflict(rx.drugs, patient.allergies)
+              if (conflict && !overrideReason?.trim()) {
+                // Block advance — UI must collect override reason first
+                blocked = true
+                return state
+              }
+            }
+          }
+
+          const noteText = overrideReason?.trim()
+            ? `PHARMACIST OVERRIDE — ${overrideReason.trim()}`
+            : undefined
+
           const entry: RxAuditEntry = {
             from: rx.status,
             to,
             actor,
             role: actorRole,
             timestamp: now(),
+            note: noteText,
           }
 
           const updated: Prescription = {
@@ -93,6 +139,8 @@ export const usePrescriptionStore = create<PrescriptionStore>()(
           prescriptions[idx] = updated
           return { prescriptions }
         })
+
+        return !blocked
       },
 
       reject(id, actor, actorRole, reason) {

@@ -23,9 +23,28 @@ export type AgentType =
 export type Department = 'Dispensary' | 'Front Office' | 'Retail' | 'Management' | 'Administration'
 export type EmploymentType = 'Full-time' | 'Part-time' | 'Contract'
 
+/** JDPA 2020 consent record — captured on patient registration. */
+export interface JDPAConsent {
+  given: boolean
+  /** ISO date string when consent was captured. */
+  timestamp: string
+  /** Consent form version, e.g. '1.2' */
+  version: string
+  method: 'verbal' | 'written' | 'digital'
+  /** Staff name or employee number who witnessed / collected consent. */
+  collectedBy?: string
+  /** ISO date string if consent was subsequently withdrawn. */
+  withdrawnAt?: string
+}
+
 export interface Patient {
   id: string; name: string; dob: string; nhfNumber: string
   phone: string; allergies: string[]; lastVisit: string
+  /**
+   * JDPA 2020 consent record.
+   * Absent on pre-system records — must be obtained at next visit.
+   */
+  jdpaConsent?: JDPAConsent
 }
 
 /** Audit trail entry for prescription workflow transitions. */
@@ -38,6 +57,12 @@ export interface Prescription {
   id: string; rxNumber: string; patient: string; patientId: string
   drugs: string[]; prescriber: string; received: string
   status: RxStatus; isSchedule: boolean; isNhf: boolean
+  /**
+   * Jamaican Dangerous Drugs Act schedule class (II–V).
+   * null = non-scheduled drug.
+   * Relationship: isSchedule (legacy boolean) === scheduleClass !== null.
+   */
+  scheduleClass?: 'II' | 'III' | 'IV' | 'V' | null
   /** Total refills authorised by prescriber (0 = no refills). */
   refills?: number
   /** Refills remaining. Decremented each time the prescription is filled. */
@@ -50,6 +75,8 @@ export interface StockItem {
   id: string; drug: string; din: string; lot: string
   qtyOnHand: number; reorderPoint: number; expiryDate: string
   supplier: string; unitCostJmd: number; isSchedule: boolean
+  /** Jamaican Dangerous Drugs Act schedule class. null = non-scheduled. */
+  scheduleClass?: 'II' | 'III' | 'IV' | 'V' | null
 }
 
 export interface Supplier {
@@ -229,6 +256,7 @@ export const SAMPLE_PRESCRIPTIONS: Prescription[] = [
     id: 'RX005', rxNumber: 'RX-2026-0843', patient: 'Trevor Thompson', patientId: 'P005',
     drugs: ['Oxycodone 5mg × 30'], prescriber: 'Dr. R. Lewis',
     received: '2026-05-07 09:45', status: 'Received', isSchedule: true, isNhf: false,
+    scheduleClass: 'II', // Oxycodone — Dangerous Drugs Act Schedule II
     refills: 0, refillsRemaining: 0,
     auditTrail: [],
   },
@@ -284,6 +312,7 @@ export const SAMPLE_PRESCRIPTIONS: Prescription[] = [
     id: 'RX011', rxNumber: 'RX-2026-0837', patient: 'Omar Chin', patientId: 'P011',
     drugs: ['Diazepam 5mg × 14'], prescriber: 'Dr. R. Lewis',
     received: '2026-05-08 08:30', status: 'Received', isSchedule: true, isNhf: false,
+    scheduleClass: 'IV', // Diazepam — Dangerous Drugs Act Schedule IV
     refills: 0, refillsRemaining: 0,
     auditTrail: [],
   },
@@ -348,8 +377,8 @@ export const SAMPLE_STOCK: StockItem[] = [
   { id: 'S03', drug: 'Amoxicillin 500mg (250ct)',          din: '02177846', lot: 'LOT-25-3341', qtyOnHand: 15,  reorderPoint: 50,  expiryDate: '2026-08-31', supplier: 'PharmSource Ltd',            unitCostJmd: 2100,  isSchedule: false },
   { id: 'S04', drug: 'Atorvastatin 20mg (100ct)',          din: '02230711', lot: 'LOT-24-7712', qtyOnHand: 220, reorderPoint: 75,  expiryDate: '2027-03-31', supplier: 'Caribbean Drug Supply',      unitCostJmd: 4200,  isSchedule: false },
   { id: 'S05', drug: 'Lisinopril 10mg (100ct)',            din: '02145782', lot: 'LOT-25-0045', qtyOnHand: 165, reorderPoint: 60,  expiryDate: '2027-01-31', supplier: 'PharmSource Ltd',            unitCostJmd: 2900,  isSchedule: false },
-  { id: 'S06', drug: 'Oxycodone 5mg (30ct)',               din: '02213494', lot: 'LOT-25-2201', qtyOnHand: 30,  reorderPoint: 30,  expiryDate: '2026-12-31', supplier: 'Restricted Narcotics Dist.', unitCostJmd: 8500,  isSchedule: true  },
-  { id: 'S07', drug: 'Diazepam 5mg (50ct)',                din: '02216426', lot: 'LOT-24-9910', qtyOnHand: 25,  reorderPoint: 20,  expiryDate: '2026-07-15', supplier: 'Restricted Narcotics Dist.', unitCostJmd: 6100,  isSchedule: true  },
+  { id: 'S06', drug: 'Oxycodone 5mg (30ct)',               din: '02213494', lot: 'LOT-25-2201', qtyOnHand: 30,  reorderPoint: 30,  expiryDate: '2026-12-31', supplier: 'Restricted Narcotics Dist.', unitCostJmd: 8500,  isSchedule: true,  scheduleClass: 'II'  },
+  { id: 'S07', drug: 'Diazepam 5mg (50ct)',                din: '02216426', lot: 'LOT-24-9910', qtyOnHand: 25,  reorderPoint: 20,  expiryDate: '2026-07-15', supplier: 'Restricted Narcotics Dist.', unitCostJmd: 6100,  isSchedule: true,  scheduleClass: 'IV'  },
   { id: 'S08', drug: 'Omeprazole 20mg (100ct)',            din: '02245565', lot: 'LOT-25-1876', qtyOnHand: 178, reorderPoint: 80,  expiryDate: '2027-04-30', supplier: 'PharmSource Ltd',            unitCostJmd: 3400,  isSchedule: false },
   { id: 'S09', drug: 'Hydrochlorothiazide 25mg (100ct)',   din: '02245676', lot: 'LOT-24-6634', qtyOnHand: 42,  reorderPoint: 50,  expiryDate: '2026-06-30', supplier: 'Caribbean Drug Supply',      unitCostJmd: 1800,  isSchedule: false },
   { id: 'S10', drug: 'Aspirin 81mg (500ct)',               din: '02190117', lot: 'LOT-25-0891', qtyOnHand: 612, reorderPoint: 200, expiryDate: '2027-08-31', supplier: 'PharmSource Ltd',            unitCostJmd: 950,   isSchedule: false },

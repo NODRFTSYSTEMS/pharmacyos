@@ -88,15 +88,23 @@ export function PrescriptionDetailPage() {
   )
   const actorName = actorStaff?.name ?? ROLE_DISPLAY[actingRole] ?? actingRole
 
-  function handleAdvance() {
+  function handleAdvance(overrideReason?: string) {
     const userRole: UserRole = ROLE_DISPLAY[actingRole] ?? 'Admin'
-    advance(rx!.id, actorName, userRole)
+    const succeeded = advance(rx!.id, actorName, userRole, overrideReason)
     setConfirmOpen(false)
-    toast.show(`${nextAction?.label ?? 'Action'} recorded for ${rx!.rxNumber}`, { variant: 'success' })
+    if (succeeded) {
+      toast.show(`${nextAction?.label ?? 'Action'} recorded for ${rx!.rxNumber}`, { variant: 'success' })
+    } else {
+      toast.show('Override reason required before verifying — allergy conflict detected', { variant: 'error' })
+    }
   }
 
-  const confirmBody = allergyConflicts.length > 0
-    ? `Warning: ${allergyConflicts[0]}. Do you still want to proceed with ${nextAction?.label?.toLowerCase() ?? 'this action'}?`
+  const hasConflict = allergyConflicts.length > 0
+  // Require documented reason when: allergy conflict + moving from Received (initial verify step)
+  const requireOverrideReason = hasConflict && rx.status === 'Received'
+
+  const confirmBody = hasConflict
+    ? `⚠ ${allergyConflicts[0]}. Document your clinical justification below before proceeding.`
     : `${nextAction?.description ?? ''} — confirm for ${rx.rxNumber} (${rx.patient}).`
 
   return (
@@ -111,14 +119,14 @@ export function PrescriptionDetailPage() {
         cta={
           nextAction ? (
             <div className="flex items-center gap-2">
-              {allergyConflicts.length > 0 && (
+              {hasConflict && (
                 <span className="inline-flex items-center gap-1 type-tiny text-warning font-medium">
                   <ShieldWarning size={14} weight="bold" />
-                  Allergy conflict — review required
+                  Allergy conflict — override required
                 </span>
               )}
               <Button
-                variant={allergyConflicts.length > 0 ? 'secondary' : 'primary'}
+                variant={hasConflict ? 'secondary' : 'primary'}
                 size="md"
                 onClick={() => setConfirmOpen(true)}
               >
@@ -137,7 +145,9 @@ export function PrescriptionDetailPage() {
         title={`${nextAction?.label ?? 'Confirm'} ${rx.rxNumber}?`}
         body={confirmBody}
         confirmLabel={nextAction?.label ?? 'Confirm'}
-        variant={allergyConflicts.length > 0 ? 'warning' : 'default'}
+        variant={hasConflict ? 'warning' : 'default'}
+        requireReason={requireOverrideReason}
+        reasonLabel="Pharmacist override reason (logged to audit trail)"
         onConfirm={handleAdvance}
         onCancel={() => setConfirmOpen(false)}
       />

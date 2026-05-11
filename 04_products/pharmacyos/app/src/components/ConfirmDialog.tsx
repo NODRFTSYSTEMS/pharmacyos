@@ -9,6 +9,12 @@
  *   warning     — needs caution (amber button)
  *   destructive — irreversible action (red button)
  *
+ * Override reason (requireReason):
+ *   When requireReason=true, a required textarea is shown.
+ *   The confirm button is disabled until ≥10 chars are entered.
+ *   The typed reason is passed back via onConfirm(reason).
+ *   Used for pharmacist override documentation on allergy/interaction conflicts.
+ *
  * Usage:
  *   <ConfirmDialog
  *     open={open}
@@ -19,7 +25,7 @@
  *     onCancel={() => setOpen(false)}
  *   />
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { X, Warning, Trash } from '@phosphor-icons/react'
 
 export interface ConfirmDialogProps {
@@ -28,7 +34,15 @@ export interface ConfirmDialogProps {
   body: string
   confirmLabel: string
   variant?: 'default' | 'warning' | 'destructive'
-  onConfirm: () => void
+  /**
+   * When true, shows a required reason textarea before confirm is enabled.
+   * The reason is passed to onConfirm(reason). Use for clinical override documentation.
+   */
+  requireReason?: boolean
+  /** Label shown above the reason textarea. */
+  reasonLabel?: string
+  /** Called with optional reason string (present when requireReason=true). */
+  onConfirm: (reason?: string) => void
   onCancel: () => void
 }
 
@@ -44,15 +58,19 @@ export function ConfirmDialog({
   body,
   confirmLabel,
   variant = 'default',
+  requireReason = false,
+  reasonLabel = 'Override reason',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
+  const [reason, setReason] = useState('')
 
-  // Focus confirm button on open
+  // Reset reason state whenever dialog opens
   useEffect(() => {
     if (open) {
+      setReason('')
       setTimeout(() => confirmRef.current?.focus(), 50)
     }
   }, [open])
@@ -70,6 +88,8 @@ export function ConfirmDialog({
   if (!open) return null
 
   const Icon = variant === 'destructive' ? Trash : variant === 'warning' ? Warning : null
+  const reasonTrimmed = reason.trim()
+  const reasonValid = !requireReason || reasonTrimmed.length >= 10
 
   return (
     /* Backdrop — no aria-hidden; the dialog inside manages its own ARIA */
@@ -129,6 +149,34 @@ export function ConfirmDialog({
           </div>
         </div>
 
+        {/* Override reason input — shown when requireReason=true */}
+        {requireReason && (
+          <div className="flex flex-col gap-1.5">
+            <label className="type-label-strong text-text-primary">
+              {reasonLabel} <span className="text-error" aria-hidden="true">*</span>
+              <span className="sr-only">(required)</span>
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Document the clinical justification — minimum 10 characters required"
+              rows={3}
+              aria-required="true"
+              aria-describedby="confirm-reason-hint"
+              className="w-full px-3 py-2 text-sm border border-border rounded-control bg-bg-subtle text-text-primary resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
+            />
+            <p id="confirm-reason-hint" className="type-label text-text-disabled">
+              {reasonTrimmed.length > 0 && reasonTrimmed.length < 10 ? (
+                <span className="text-error">{10 - reasonTrimmed.length} more characters required</span>
+              ) : reasonValid ? (
+                <span className="text-success">Reason documented — proceed with override</span>
+              ) : (
+                'This override will be recorded in the prescription audit trail'
+              )}
+            </p>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex items-center justify-end gap-3">
           <button
@@ -141,10 +189,14 @@ export function ConfirmDialog({
           <button
             ref={confirmRef}
             type="button"
-            onClick={onConfirm}
+            onClick={() => onConfirm(requireReason ? reasonTrimmed : undefined)}
+            disabled={!reasonValid}
+            aria-disabled={!reasonValid}
             className={[
               'px-5 py-2 type-label-strong rounded-control transition-colors',
-              CONFIRM_STYLES[variant],
+              !reasonValid
+                ? 'opacity-40 cursor-not-allowed bg-bg-subtle text-text-disabled border border-border'
+                : CONFIRM_STYLES[variant],
             ].join(' ')}
           >
             {confirmLabel}

@@ -25,11 +25,12 @@ export function NewPatientPage() {
   const [allergies, setAllergies] = useState<string[]>([])
   const [allergyOther, setAllergyOther] = useState('')
   const [consent, setConsent] = useState(false)
+  const [consentMethod, setConsentMethod] = useState<'verbal' | 'written' | 'digital' | ''>('')
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const errFor = (value: string) => (submitAttempted && !value ? 'Required' : undefined)
-  const canSubmit = firstName && lastName && dob && sex && phone && consent
+  const canSubmit = firstName && lastName && dob && sex && phone && consent && consentMethod
 
   const toggleAllergy = (a: string) => {
     setAllergies((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]))
@@ -42,6 +43,13 @@ export function NewPatientPage() {
       return
     }
     setSubmitting(true)
+    // jdpaConsent record that would be saved to Supabase (G2)
+    const _jdpaRecord = {
+      given: true,
+      timestamp: new Date().toISOString().slice(0, 10),
+      version: '1.2',
+      method: consentMethod,
+    }
     setTimeout(() => {
       toast.show(`Patient ${firstName} ${lastName} saved`, { variant: 'success' })
       setSubmitting(false)
@@ -105,22 +113,47 @@ export function NewPatientPage() {
       </section>
 
       <section className="bg-bg-surface rounded-card shadow-card border border-border p-6 space-y-4">
-        <h2 className="type-card-title text-text-primary">JDPA Consent</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="type-card-title text-text-primary">JDPA Consent</h2>
+          <StatusPill variant="info">Version 1.2</StatusPill>
+        </div>
         <div className="bg-bg-subtle rounded-control p-4 text-sm text-text-secondary leading-relaxed">
           I consent to Winchester Global Pharmacy collecting, processing, and storing my personal
           health information in accordance with the Jamaica Data Protection Act 2020. I understand
           that I may request access to, correction of, or deletion of my data at any time by
           speaking with a pharmacist or administrator.
         </div>
-        <Checkbox label="Consent given by patient" checked={consent} onChange={() => setConsent((v) => !v)} />
+
+        {/* Consent method — required for JDPA compliance record */}
+        <FormField
+          label="Consent method"
+          required
+          error={submitAttempted && !consentMethod ? 'Required — select how consent was obtained' : undefined}
+        >
+          {(p) => (
+            <Select
+              {...p}
+              value={consentMethod}
+              onChange={(e) => setConsentMethod(e.target.value as 'verbal' | 'written' | 'digital' | '')}
+            >
+              <option value="">Select method…</option>
+              <option value="verbal">Verbal — patient confirmed verbally in person</option>
+              <option value="written">Written — patient signed a consent form</option>
+              <option value="digital">Digital — patient signed on-screen or via portal</option>
+            </Select>
+          )}
+        </FormField>
+
+        <Checkbox label="Patient confirms consent to data collection and storage" checked={consent} onChange={() => setConsent((v) => !v)} />
         {submitAttempted && !consent && (
           <p className="text-xs text-error" role="alert">Patient consent must be confirmed before saving.</p>
         )}
-        <div className="flex items-center gap-3">
-          <p className="type-body-xs text-text-secondary">
-            Date: <span className="type-mono-data">{new Date().toISOString().slice(0, 10)}</span>
-          </p>
-          <StatusPill variant="info">Version 1.2</StatusPill>
+        <div className="flex items-center gap-3 text-xs text-text-disabled">
+          <span>Consent date: <span className="type-mono-data">{new Date().toISOString().slice(0, 10)}</span></span>
+          <span aria-hidden="true">·</span>
+          <span>Collected by: staff on duty</span>
+          <span aria-hidden="true">·</span>
+          <span>Record stored per JDPA 2020 §16</span>
         </div>
       </section>
 

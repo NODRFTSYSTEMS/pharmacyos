@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { List, Info, X } from '@phosphor-icons/react'
 import { Sidebar } from '@/components/Sidebar'
 import { SkipLink } from '@/components/SkipLink'
+import { NotificationCenter } from '@/components/NotificationCenter'
 
 const IS_DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
 
@@ -39,21 +40,29 @@ export function AdminPortalLayout() {
       <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
 
       <main id="main-content" className="flex-1 flex flex-col overflow-y-auto min-w-0">
-        {/* Mobile top bar — hamburger + logo mark */}
-        <div className="md:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-bg-sidebar border-b border-white/10 shrink-0">
+        {/* Top bar — mobile: hamburger + logo; desktop: notification bell */}
+        <div className="sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-bg-sidebar border-b border-white/10 shrink-0">
+          {/* Mobile: hamburger */}
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation menu"
-            className="flex items-center justify-center w-9 h-9 rounded-control text-white hover:bg-white/10 transition-colors"
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-control text-white hover:bg-white/10 transition-colors"
           >
             <List size={20} aria-hidden="true" />
           </button>
-          <div className="flex items-center gap-2">
+          {/* Mobile: logo mark */}
+          <div className="md:hidden flex items-center gap-2">
             <div className="flex items-center justify-center w-7 h-7 rounded bg-primary/20 text-primary font-bold text-xs">
               ℞
             </div>
             <p className="type-card-title text-white leading-tight">PharmacyOS</p>
+          </div>
+          {/* Spacer */}
+          <div className="flex-1" />
+          {/* Notification bell — visible on all breakpoints */}
+          <div className="text-white [&_button]:text-white [&_button:hover]:text-white [&_button:hover]:bg-white/10">
+            <NotificationCenter />
           </div>
         </div>
 

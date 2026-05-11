@@ -3,7 +3,13 @@ import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
 import { StatusPill } from '@/components/StatusPill'
 import { useToast } from '@/components/Toast'
-import { SAMPLE_SCHEDULE_LOG } from '@/data/sample'
+import { SAMPLE_SCHEDULE_LOG, SAMPLE_PRESCRIPTIONS } from '@/data/sample'
+
+/** Map Rx number → schedule class for display in the log table. */
+function getScheduleClass(rxNumber: string): string | null {
+  const rx = SAMPLE_PRESCRIPTIONS.find((r) => r.rxNumber === rxNumber)
+  return rx?.scheduleClass ?? null
+}
 
 /**
  * Schedule Drug Log â€” Jamaica Pharmacy Act regulated record.
@@ -57,6 +63,7 @@ export function ScheduleLogPage() {
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Log #</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Date Â· Time</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Drug</th>
+                <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Class</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">DIN</th>
                 <th scope="col" className="h-9 px-4 text-right type-caption text-text-secondary">Qty</th>
                 <th scope="col" className="h-9 px-4 text-left type-caption text-text-secondary">Rx #</th>
@@ -72,6 +79,18 @@ export function ScheduleLogPage() {
                   <td className="px-4 type-mono-data text-text-primary font-medium">{entry.logNumber}</td>
                   <td className="px-4 type-mono-data text-text-secondary whitespace-nowrap">{entry.date} {entry.time}</td>
                   <td className="px-4 type-body-sm text-text-primary">{entry.drug}</td>
+                  <td className="px-4">
+                    {(() => {
+                      const cls = getScheduleClass(entry.rxNumber)
+                      return cls ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded type-tiny font-semibold bg-tag-schedule-bg text-tag-schedule-fg">
+                          Sch {cls}
+                        </span>
+                      ) : (
+                        <span className="type-label text-text-disabled">—</span>
+                      )
+                    })()}
+                  </td>
                   <td className="px-4 type-mono-data text-text-secondary">{entry.din}</td>
                   <td className="px-4 type-mono-data text-text-primary text-right">{entry.qty}</td>
                   <td className="px-4 type-mono-data text-text-secondary">{entry.rxNumber}</td>

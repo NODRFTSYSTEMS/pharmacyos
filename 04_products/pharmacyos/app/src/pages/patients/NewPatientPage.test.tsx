@@ -59,6 +59,6 @@ describe('NewPatientPage (smoke)', () => {
 
   it('renders a JDPA consent checkbox', () => {
     renderPage()
-    expect(screen.getByRole('checkbox', { name: /consent given by patient/i })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: /patient confirms consent/i })).toBeInTheDocument()
   })
 })
