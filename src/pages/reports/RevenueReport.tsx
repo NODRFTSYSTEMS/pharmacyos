@@ -4,7 +4,8 @@ import {
   Export, CurrencyDollar, Receipt, Pill as PillIcon, Printer,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
-import { PageHeader, MetricCard } from '../../components/Shell'
+import { toJamaicaBounds } from '../../lib/date'
+import { PageHeader, MetricCard, PrintHeader } from '../../components/Shell'
 import type { RetailTransaction, RxTransaction, PaymentMethod } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -53,26 +54,16 @@ export function RevenueReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
 
-  // Pharmacy name for print header
-  const { data: settingsRows = [] } = useQuery<{ key: string; value: string }[]>({
-    queryKey: ['pharmacy_settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('pharmacy_settings').select('key, value')
-      if (error) throw error
-      return data ?? []
-    },
-    staleTime: 300_000,
-  })
-  const pharmacyName = settingsRows.find(r => r.key === 'pharmacy_name')?.value || 'Winchester Global Pharmacy'
-
   const retailQuery = useQuery<RetailTransaction[]>({
     queryKey: ['report-retail', from, to],
     queryFn: async () => {
+      // I-22: Jamaica-aware bounds (UTC-5, no DST)
+      const bounds = toJamaicaBounds(from, to)
       const { data, error } = await supabase
         .from('retail_transactions')
         .select('*')
-        .gte('created_at', `${from}T00:00:00`)
-        .lte('created_at', `${to}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .eq('voided', false)
       if (error) throw error
       return (data ?? []) as RetailTransaction[]
@@ -82,11 +73,13 @@ export function RevenueReport() {
   const rxQuery = useQuery<RxTransaction[]>({
     queryKey: ['report-rx', from, to],
     queryFn: async () => {
+      // I-22: Jamaica-aware bounds (UTC-5, no DST)
+      const bounds = toJamaicaBounds(from, to)
       const { data, error } = await supabase
         .from('rx_transactions')
         .select('*')
-        .gte('created_at', `${from}T00:00:00`)
-        .lte('created_at', `${to}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .eq('voided', false)
       if (error) throw error
       return (data ?? []) as RxTransaction[]
@@ -182,30 +175,16 @@ export function RevenueReport() {
     URL.revokeObjectURL(url)
   }
 
-  const generatedAt = new Date().toLocaleString('en-JM', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-
   return (
     <div>
       {/* ── Print-only header ─────────────────────────────────────────── */}
-      <div className="print-only mb-6 border-b-2 border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">{pharmacyName}</h1>
-        <h2 className="text-lg font-semibold text-gray-700 mt-1">Revenue Report</h2>
-        <div className="flex gap-8 mt-2 text-sm text-gray-600">
-          <span>Period: <strong>{from}</strong> to <strong>{to}</strong></span>
-          <span>Generated: {generatedAt}</span>
-        </div>
-      </div>
+      <PrintHeader reportTitle="Revenue Report" period={`${from} to ${to}`} />
 
-      <div className="no-print">
-        <PageHeader
-          title="Revenue Report"
-          subtitle="Retail and Rx revenue by date range"
-          breadcrumb={['Reports', 'Revenue']}
-        />
-      </div>
+      <PageHeader
+        title="Revenue Report"
+        subtitle="Retail and Rx revenue by date range"
+        breadcrumb={['Reports', 'Revenue']}
+      />
 
       {/* Date range + export row */}
       <div className="card p-3 mb-6 flex flex-wrap items-center gap-3 no-print">

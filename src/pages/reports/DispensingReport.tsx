@@ -4,7 +4,8 @@ import {
   Export, Pill as PillIcon, CurrencyDollar, Warning, Printer,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
-import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
+import { toJamaicaBounds } from '../../lib/date'
+import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import type { RxTransaction } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,26 +43,16 @@ export function DispensingReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
 
-  // Pharmacy name for print header
-  const { data: settingsRows = [] } = useQuery<{ key: string; value: string }[]>({
-    queryKey: ['pharmacy_settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('pharmacy_settings').select('key, value')
-      if (error) throw error
-      return data ?? []
-    },
-    staleTime: 300_000,
-  })
-  const pharmacyName = settingsRows.find(r => r.key === 'pharmacy_name')?.value || 'Winchester Global Pharmacy'
-
   const { data, isLoading, isError } = useQuery<RxTransaction[]>({
     queryKey: ['report-dispensing', from, to],
     queryFn: async () => {
+      // I-22: Jamaica-aware bounds (UTC-5, no DST)
+      const bounds = toJamaicaBounds(from, to)
       const { data, error } = await supabase
         .from('rx_transactions')
         .select('*')
-        .gte('created_at', `${from}T00:00:00`)
-        .lte('created_at', `${to}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []) as RxTransaction[]
@@ -75,11 +66,6 @@ export function DispensingReport() {
   const totalRevenue = nonVoided.reduce((s, r) => s + r.patient_copay, 0)
   const totalNhf = nonVoided.reduce((s, r) => s + r.nhf_subsidy, 0)
   const totalQty = nonVoided.reduce((s, r) => s + r.quantity_dispensed, 0)
-
-  const generatedAt = new Date().toLocaleString('en-JM', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
 
   // CSV export
   function exportCsv() {
@@ -109,27 +95,13 @@ export function DispensingReport() {
   return (
     <div>
       {/* ── Print-only header ─────────────────────────────────────────── */}
-      <div className="print-only mb-6 border-b-2 border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">{pharmacyName}</h1>
-        <h2 className="text-lg font-semibold text-gray-700 mt-1">Dispensing Report</h2>
-        <div className="flex gap-8 mt-2 text-sm text-gray-600">
-          <span>Period: <strong>{from}</strong> to <strong>{to}</strong></span>
-          <span>Generated: {generatedAt}</span>
-        </div>
-        <div className="flex gap-8 mt-1 text-sm text-gray-600">
-          <span>Total dispensings: <strong>{nonVoided.length}</strong></span>
-          <span>Voids: <strong>{voided.length}</strong></span>
-          <span>Total revenue: <strong>{fmtCurrency(totalRevenue)}</strong></span>
-        </div>
-      </div>
+      <PrintHeader reportTitle="Dispensing Report" period={`${from} to ${to}`} />
 
-      <div className="no-print">
-        <PageHeader
-          title="Dispensing Report"
-          subtitle="Prescription dispensing activity and Rx collections"
-          breadcrumb={['Reports', 'Dispensing']}
-        />
-      </div>
+      <PageHeader
+        title="Dispensing Report"
+        subtitle="Prescription dispensing activity and Rx collections"
+        breadcrumb={['Reports', 'Dispensing']}
+      />
 
       {/* Date range + export row */}
       <div className="card p-3 mb-6 flex flex-wrap items-center gap-3 no-print">

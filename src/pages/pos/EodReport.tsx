@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Printer, Export, CheckCircle, Warning,
-  CurrencyDollar, Receipt, Pill, CalendarBlank,
+  CurrencyDollar, Receipt, Pill, CalendarBlank, Seal,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
-import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
+import { todayJamaica, toJamaicaBounds } from '../../lib/date'
+import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
+import { usePermission } from '../../hooks/usePermission'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { EodCloseout } from '../../types/database'
 
 function fmtCurrency(n: number) {
@@ -30,8 +33,40 @@ function eodStatus(status: EodCloseout['status']) {
 }
 
 export default function EodReport() {
-  const today = new Date().toISOString().slice(0, 10)
+  // I-22: Use Jamaica timezone for default date — not UTC
+  const today = todayJamaica()
   const [date, setDate] = useState(today)
+
+  const qc = useQueryClient()
+  const canApprove = usePermission('eod_approve')
+
+  const approveMutation = useMutation({
+    mutationFn: async (closeoutId: string) => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      const { error: updateError } = await supabase
+        .from('eod_closeouts')
+        .update({
+          status: 'APPROVED' as const,
+          manager_approved_at: new Date().toISOString(),
+          manager_id: user.id,
+        })
+        .eq('id', closeoutId)
+      if (updateError) throw updateError
+
+      await supabase.from('audit_log').insert({
+        action: AUDIT_ACTIONS.EOD_APPROVE,
+        entity_type: 'eod_closeout',
+        entity_id: closeoutId,
+        performed_by: user.id,
+        metadata: { closeout_date: date },
+      })
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['eod-report', date] })
+    },
+  })
 
   const { data: closeouts, isLoading, isError } = useQuery({
     queryKey: ['eod-report', date],
@@ -49,17 +84,19 @@ export default function EodReport() {
   const { data: txnSummary } = useQuery({
     queryKey: ['eod-txn-summary', date],
     queryFn: async () => {
+      // I-22: Use Jamaica-aware bounds to avoid midnight off-by-one errors (UTC-5, no DST)
+      const bounds = toJamaicaBounds(date, date)
       const [retail, rx] = await Promise.all([
         supabase
           .from('retail_transactions')
           .select('total, payment_method, voided, created_at')
-          .gte('created_at', `${date}T00:00:00`)
-          .lte('created_at', `${date}T23:59:59`),
+          .gte('created_at', bounds.gte)
+          .lte('created_at', bounds.lte),
         supabase
           .from('rx_transactions')
           .select('patient_copay, nhf_subsidy, payment_method, voided, created_at')
-          .gte('created_at', `${date}T00:00:00`)
-          .lte('created_at', `${date}T23:59:59`),
+          .gte('created_at', bounds.gte)
+          .lte('created_at', bounds.lte),
       ])
 
       const rt = retail.data ?? []
@@ -116,6 +153,12 @@ export default function EodReport() {
 
   return (
     <div>
+      {/* ── Print-only header ─────────────────────────────────────────── */}
+      <PrintHeader
+        reportTitle="End-of-Day Report"
+        period={date}
+      />
+
       <PageHeader
         title="End-of-Day Report"
         subtitle="Daily summary of transactions, collections, and close-out status"
@@ -247,9 +290,23 @@ export default function EodReport() {
                     <p className="text-xs text-emerald-600">Approved: {fmtDateTime(c.manager_approved_at)}</p>
                   )}
                 </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider">Total Collected</p>
-                  <p className="num-lg text-gray-900">{fmtCurrency(c.system_total)}</p>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider">Total Collected</p>
+                    <p className="num-lg text-gray-900">{fmtCurrency(c.system_total)}</p>
+                  </div>
+                  {canApprove && c.status === 'SUBMITTED' && (
+                    <button
+                      onClick={() => approveMutation.mutate(c.id)}
+                      disabled={approveMutation.isPending && approveMutation.variables === c.id}
+                      className="btn btn-primary gap-1.5 text-xs"
+                    >
+                      <Seal size={14} />
+                      {approveMutation.isPending && approveMutation.variables === c.id
+                        ? 'Approving…'
+                        : 'Approve Close-Out'}
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -1,0 +1,64 @@
+// ── Audit Action String Registry ──────────────────────────────────────────────
+// All audit_log writes MUST use these constants as the `action` value.
+// Adding new actions: add the constant here first, then use it at the write site.
+// The AuditLog admin page color map is keyed against these strings.
+
+export const AUDIT_ACTIONS = {
+  // ── POS / Retail ────────────────────────────────────────────────────────────
+  TRANSACTION_CREATE:       'transaction_create',
+  TRANSACTION_VOID:         'transaction_void',
+  LOYALTY_POINTS_EARN:      'loyalty_points_earn',
+  LOYALTY_POINTS_REDEEM:    'loyalty_points_redeem',
+  LOYALTY_CUSTOMER_CREATE:  'loyalty_customer_create',
+  LOYALTY_CUSTOMER_UPDATE:  'loyalty_customer_update',
+
+  // ── EOD ─────────────────────────────────────────────────────────────────────
+  EOD_SUBMIT:               'eod_submit',
+  EOD_APPROVE:              'eod_approve',
+  EOD_DISCREPANCY:          'eod_discrepancy',
+
+  // ── Prescriptions / Rx ──────────────────────────────────────────────────────
+  RX_CREATE:                'rx_create',
+  RX_STATUS_ADVANCE:        'rx_status_advance',
+  RX_DISPENSE:              'rx_dispense',
+  RX_CANCEL:                'rx_cancel',
+  RX_TRANSACTION_CREATE:    'rx_transaction_create',
+
+  // ── Schedule Drug Log ────────────────────────────────────────────────────────
+  SCHEDULE_DRUG_ENTRY:      'schedule_drug_entry',
+  SCHEDULE_DRUG_UPDATE:     'schedule_drug_update',
+  SCHEDULE_DRUG_DELETE:     'schedule_drug_delete',
+
+  // ── Inventory / Stock ────────────────────────────────────────────────────────
+  STOCK_DECREMENT:          'stock_decrement',
+  STOCK_RECEIVE:            'stock_receive',
+  STOCK_ADJUST:             'stock_adjust',
+  PRODUCT_CREATE:           'product_create',
+  PRODUCT_UPDATE:           'product_update',
+
+  // ── Patients ─────────────────────────────────────────────────────────────────
+  PATIENT_CREATE:           'patient_create',
+  PATIENT_UPDATE:           'patient_update',
+  PATIENT_JDPA_CONSENT:     'patient_jdpa_consent',
+  PATIENT_DATA_EXPORT:      'patient_data_export',
+  PATIENT_DATA_DELETE:      'patient_data_delete',
+
+  // ── AI Queue ─────────────────────────────────────────────────────────────────
+  AI_EXTRACTION_ACCEPT:     'ai_extraction_accept',
+  AI_EXTRACTION_REJECT:     'ai_extraction_reject',
+
+  // ── Staff / Auth ─────────────────────────────────────────────────────────────
+  STAFF_CREATE:             'staff_create',
+  STAFF_UPDATE:             'staff_update',
+  STAFF_DEACTIVATE:         'staff_deactivate',
+  STAFF_LOGIN:              'staff_login',
+  STAFF_LOGOUT:             'staff_logout',
+  STAFF_LOGIN_FAILED:       'staff_login_failed',
+  SESSION_TIMEOUT:          'session_timeout',
+
+  // ── Settings ─────────────────────────────────────────────────────────────────
+  SETTINGS_UPDATE:          'settings_update',
+  PERMISSIONS_UPDATE:       'permissions_update',
+} as const
+
+export type AuditAction = typeof AUDIT_ACTIONS[keyof typeof AUDIT_ACTIONS]

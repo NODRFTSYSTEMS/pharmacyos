@@ -65,10 +65,10 @@ function AdvanceButton({ rx, onAdvance, isPending, isPharmacist }: AdvanceButton
         onClick={() => onAdvance(rx.id, 'VERIFYING')}
         disabled={isPending}
         className="btn btn-ghost text-xs h-7 px-2.5 gap-1"
-        aria-label={`Begin verifying prescription ${rx.ref_number}`}
+        aria-label={`Begin verification of prescription ${rx.ref_number}`}
       >
         <ArrowClockwise size={12} aria-hidden="true" />
-        Verify
+        Begin Verification
       </button>
     )
   }
@@ -78,10 +78,10 @@ function AdvanceButton({ rx, onAdvance, isPending, isPharmacist }: AdvanceButton
         onClick={() => onAdvance(rx.id, 'READY')}
         disabled={isPending}
         className="btn btn-ghost text-xs h-7 px-2.5 gap-1"
-        aria-label={`Mark prescription ${rx.ref_number} as ready`}
+        aria-label={`Mark prescription ${rx.ref_number} as ready to dispense`}
       >
         <CheckCircle size={12} aria-hidden="true" />
-        Mark Ready
+        Mark Ready to Dispense
       </button>
     )
   }
@@ -340,8 +340,10 @@ export default function Queue() {
                 <tbody className="divide-y divide-gray-100">
                   {filtered.map(rx => (
                     <tr key={rx.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-mono text-xs font-medium text-gray-800">
-                        {rx.ref_number}
+                      <td className="px-4 py-3">
+                        <Link to={`/prescriptions/${rx.id}`} className="font-mono text-xs font-medium text-blue-600 hover:underline">
+                          {rx.ref_number}
+                        </Link>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-800">
                         {rx.patient_name}

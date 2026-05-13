@@ -4,7 +4,7 @@ import {
   Export, Package, Warning, MagnifyingGlass, Printer,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
-import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
+import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import type { Product } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -39,18 +39,6 @@ const TAB_LABELS: Record<FilterTab, string> = {
 export function InventoryReport() {
   const [tab, setTab] = useState<FilterTab>('ALL')
   const [search, setSearch] = useState('')
-
-  // Pharmacy name for print header
-  const { data: settingsRows = [] } = useQuery<{ key: string; value: string }[]>({
-    queryKey: ['pharmacy_settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('pharmacy_settings').select('key, value')
-      if (error) throw error
-      return data ?? []
-    },
-    staleTime: 300_000,
-  })
-  const pharmacyName = settingsRows.find(r => r.key === 'pharmacy_name')?.value || 'Winchester Global Pharmacy'
 
   const { data, isLoading, isError } = useQuery<Product[]>({
     queryKey: ['report-inventory'],
@@ -104,11 +92,6 @@ export function InventoryReport() {
   const totalStockQty   = filtered.reduce((s, p) => s + p.stock_qty, 0)
   const totalStockValue = filtered.reduce((s, p) => s + p.unit_price * p.stock_qty, 0)
 
-  const generatedAt = new Date().toLocaleString('en-JM', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-
   // CSV export (all products, not just filtered, for completeness)
   function exportCsv() {
     const rows = [
@@ -138,19 +121,7 @@ export function InventoryReport() {
   return (
     <div>
       {/* ── Print-only header ─────────────────────────────────────────── */}
-      <div className="print-only mb-6 border-b-2 border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">{pharmacyName}</h1>
-        <h2 className="text-lg font-semibold text-gray-700 mt-1">Inventory Report</h2>
-        <div className="flex gap-8 mt-2 text-sm text-gray-600">
-          <span>As at: <strong>{generatedAt}</strong></span>
-          <span>Products shown: <strong>{filtered.length}</strong> of <strong>{products.length}</strong></span>
-        </div>
-        <div className="flex gap-8 mt-1 text-sm text-gray-600">
-          <span>In stock: <strong>{inStockCount}</strong></span>
-          <span>Low stock: <strong>{lowStockCount}</strong></span>
-          <span>Out of stock: <strong>{outOfStockCount}</strong></span>
-        </div>
-      </div>
+      <PrintHeader reportTitle="Inventory Report" />
 
       <PageHeader
         title="Inventory Report"

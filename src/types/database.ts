@@ -155,6 +155,8 @@ export interface Patient {
   allergies: string | null
   notes: string | null
   is_active: boolean
+  // I-13: JDPA 2020 consent timestamp. null = not yet captured.
+  jdpa_consent_at: string | null
   created_at: string
   updated_at: string
 }

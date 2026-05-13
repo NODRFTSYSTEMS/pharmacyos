@@ -5,6 +5,7 @@ import {
   Pill, Warning, CheckCircle,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { toJamaicaBounds, todayJamaica } from '../../lib/date'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
 import type { RetailTransaction, RxTransaction, PaymentMethod } from '../../types/database'
 
@@ -27,8 +28,8 @@ function fmtDate(iso: string) {
 }
 
 function useTodayTransactions(date: string) {
-  const start = `${date}T00:00:00`
-  const end   = `${date}T23:59:59`
+  // I-22: Jamaica-aware bounds (UTC-5, no DST)
+  const bounds = toJamaicaBounds(date, date)
 
   const retail = useQuery({
     queryKey: ['retail-txns', date],
@@ -36,8 +37,8 @@ function useTodayTransactions(date: string) {
       const { data, error } = await supabase
         .from('retail_transactions')
         .select('*')
-        .gte('created_at', start)
-        .lte('created_at', end)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []) as RetailTransaction[]
@@ -51,8 +52,8 @@ function useTodayTransactions(date: string) {
       const { data, error } = await supabase
         .from('rx_transactions')
         .select('*')
-        .gte('created_at', start)
-        .lte('created_at', end)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []) as RxTransaction[]
@@ -64,7 +65,8 @@ function useTodayTransactions(date: string) {
 }
 
 export default function TransactionLog() {
-  const today = new Date().toISOString().slice(0, 10)
+  // I-22: Use Jamaica timezone for default date
+  const today = todayJamaica()
   const [date, setDate] = useState(today)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'ALL' | 'RETAIL' | 'RX' | 'VOID'>('ALL')

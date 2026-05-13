@@ -69,6 +69,7 @@ export function Settings() {
   const [form, setForm] = useState<SettingsFormState>(mapToForm({}));
   const [showSuccess, setShowSuccess] = useState(false);
   const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initializedRef = useRef(false);
 
   const { data: settingsRows = [], isLoading } = useQuery<PharmacySetting[]>({
     queryKey: ['pharmacy_settings'],
@@ -79,9 +80,18 @@ export function Settings() {
       if (error) throw error;
       return data as PharmacySetting[];
     },
+    staleTime: 30_000,
   });
 
   useEffect(() => {
+    // Only populate the form on the first successful data load.
+    // Subsequent query invalidations (e.g. after save) must not overwrite
+    // form state — that would cause an infinite re-render loop because
+    // every setForm call triggers a re-render, which produces a new
+    // settingsRows array reference, which re-fires this effect.
+    if (initializedRef.current) return;
+    if (settingsRows.length === 0) return;
+    initializedRef.current = true;
     const map: SettingsMap = {};
     for (const row of settingsRows) {
       map[row.key] = row.value;

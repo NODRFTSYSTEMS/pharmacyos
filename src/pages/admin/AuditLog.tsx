@@ -10,7 +10,9 @@ import {
   CaretRight,
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
+import { toJamaicaBounds, todayJamaica } from '../../lib/date';
 import { PageHeader } from '../../components/Shell';
+import { AUDIT_ACTIONS } from '../../constants/audit-actions';
 
 interface AuditLogEntry {
   id: string;
@@ -25,15 +27,15 @@ interface AuditLogEntry {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 function defaultDateRange(): { from: string; to: string } {
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - 6);
-  return { from: toDateString(from), to: toDateString(to) };
+  // I-22: Use Jamaica timezone for default date range
+  const today = todayJamaica()
+  const from = new Date(today)
+  from.setDate(from.getDate() - 6)
+  return {
+    from: from.toISOString().slice(0, 10),
+    to: today,
+  }
 }
 
 function fmtDateTime(iso: string): string {
@@ -48,27 +50,62 @@ function fmtDateTime(iso: string): string {
 }
 
 // Color-coded badge for action types
+// Keyed against AUDIT_ACTIONS registry — unknown actions fall through to gray.
 interface ActionBadge { label: string; cls: string }
 
+type BadgeVariant = 'pill-yellow' | 'pill-purple' | 'pill-blue' | 'pill-green' | 'pill-gray'
+
+const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
+  // EOD close-out
+  [AUDIT_ACTIONS.EOD_SUBMIT]:              'pill-yellow',
+  [AUDIT_ACTIONS.EOD_APPROVE]:             'pill-yellow',
+  [AUDIT_ACTIONS.EOD_DISCREPANCY]:         'pill-yellow',
+  // Rx / Prescriptions / Schedule Drug Log / AI
+  [AUDIT_ACTIONS.RX_CREATE]:               'pill-purple',
+  [AUDIT_ACTIONS.RX_STATUS_ADVANCE]:       'pill-purple',
+  [AUDIT_ACTIONS.RX_DISPENSE]:             'pill-purple',
+  [AUDIT_ACTIONS.RX_CANCEL]:               'pill-purple',
+  [AUDIT_ACTIONS.RX_TRANSACTION_CREATE]:   'pill-purple',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_ENTRY]:     'pill-purple',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_UPDATE]:    'pill-purple',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_DELETE]:    'pill-purple',
+  [AUDIT_ACTIONS.AI_EXTRACTION_ACCEPT]:    'pill-purple',
+  [AUDIT_ACTIONS.AI_EXTRACTION_REJECT]:    'pill-purple',
+  // Patients (JDPA-sensitive)
+  [AUDIT_ACTIONS.PATIENT_CREATE]:          'pill-purple',
+  [AUDIT_ACTIONS.PATIENT_UPDATE]:          'pill-purple',
+  [AUDIT_ACTIONS.PATIENT_JDPA_CONSENT]:    'pill-purple',
+  [AUDIT_ACTIONS.PATIENT_DATA_EXPORT]:     'pill-purple',
+  [AUDIT_ACTIONS.PATIENT_DATA_DELETE]:     'pill-purple',
+  // POS / Retail transactions
+  [AUDIT_ACTIONS.TRANSACTION_CREATE]:      'pill-blue',
+  [AUDIT_ACTIONS.TRANSACTION_VOID]:        'pill-blue',
+  [AUDIT_ACTIONS.LOYALTY_POINTS_EARN]:     'pill-blue',
+  [AUDIT_ACTIONS.LOYALTY_POINTS_REDEEM]:   'pill-blue',
+  [AUDIT_ACTIONS.LOYALTY_CUSTOMER_CREATE]: 'pill-blue',
+  [AUDIT_ACTIONS.LOYALTY_CUSTOMER_UPDATE]: 'pill-blue',
+  // Inventory / Stock
+  [AUDIT_ACTIONS.STOCK_DECREMENT]:         'pill-blue',
+  [AUDIT_ACTIONS.STOCK_RECEIVE]:           'pill-blue',
+  [AUDIT_ACTIONS.STOCK_ADJUST]:            'pill-blue',
+  [AUDIT_ACTIONS.PRODUCT_CREATE]:          'pill-blue',
+  [AUDIT_ACTIONS.PRODUCT_UPDATE]:          'pill-blue',
+  // Staff / Auth
+  [AUDIT_ACTIONS.STAFF_CREATE]:            'pill-green',
+  [AUDIT_ACTIONS.STAFF_UPDATE]:            'pill-green',
+  [AUDIT_ACTIONS.STAFF_DEACTIVATE]:        'pill-green',
+  [AUDIT_ACTIONS.STAFF_LOGIN]:             'pill-green',
+  [AUDIT_ACTIONS.STAFF_LOGOUT]:            'pill-green',
+  [AUDIT_ACTIONS.STAFF_LOGIN_FAILED]:      'pill-green',
+  [AUDIT_ACTIONS.SESSION_TIMEOUT]:         'pill-green',
+  // Settings / Permissions
+  [AUDIT_ACTIONS.SETTINGS_UPDATE]:         'pill-gray',
+  [AUDIT_ACTIONS.PERMISSIONS_UPDATE]:      'pill-gray',
+}
+
 function getActionBadge(action: string): ActionBadge {
-  const u = action.toUpperCase();
-  if (u.startsWith('EOD_') || u.includes('CLOSEOUT') || u.includes('SHIFT'))
-    return { label: action, cls: 'pill pill-yellow' };
-  if (u.startsWith('PRESCRIPTION_') || u.startsWith('RX_') || u.startsWith('DISPENS') || u.startsWith('SCHEDULE_'))
-    return { label: action, cls: 'pill pill-purple' };
-  if (u.startsWith('TRANSACTION_') || u.startsWith('SALE_') || u.startsWith('PAYMENT_') || u.startsWith('POS_'))
-    return { label: action, cls: 'pill pill-blue' };
-  if (u.startsWith('STAFF_') || u.startsWith('USER_') || u.includes('LOGIN') || u.includes('LOGOUT') || u.startsWith('AUTH_'))
-    return { label: action, cls: 'pill pill-green' };
-  if (u.startsWith('SETTING_') || u.startsWith('CONFIG_') || u.startsWith('SYSTEM_'))
-    return { label: action, cls: 'pill pill-gray' };
-  if (u.startsWith('INVENTORY_') || u.startsWith('STOCK_') || u.startsWith('PRODUCT_'))
-    return { label: action, cls: 'pill pill-blue' };
-  if (u.startsWith('PATIENT_'))
-    return { label: action, cls: 'pill pill-purple' };
-  if (u.startsWith('LOYALTY_'))
-    return { label: action, cls: 'pill pill-green' };
-  return { label: action, cls: 'pill pill-gray' };
+  const variant = ACTION_BADGE_MAP[action] ?? 'pill-gray'
+  return { label: action, cls: `pill ${variant}` }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -84,11 +121,13 @@ export function AuditLog() {
   const { data: entries = [], isLoading, isFetching } = useQuery<AuditLogEntry[]>({
     queryKey: ['audit_log', dateFrom, dateTo, refreshKey],
     queryFn: async () => {
+      // I-22: Jamaica-aware bounds (UTC-5, no DST)
+      const bounds = toJamaicaBounds(dateFrom, dateTo)
       const { data, error } = await supabase
         .from('audit_log')
         .select('*')
-        .gte('created_at', `${dateFrom}T00:00:00`)
-        .lte('created_at', `${dateTo}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .order('created_at', { ascending: false })
         .limit(500);
       if (error) throw error;

@@ -15,9 +15,16 @@ export default function Login() {
     setError(null)
     setLoading(true)
     const { error: authErr } = await supabase.auth.signInWithPassword({ email, password })
-    setLoading(false)
     if (authErr) {
+      setLoading(false)
       setError(authErr.message)
+      return
+    }
+    // I-09: Check if user has enrolled MFA — redirect to verify-mfa if AAL2 is required
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    setLoading(false)
+    if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
+      nav('/verify-mfa', { replace: true })
     } else {
       nav('/dashboard', { replace: true })
     }

@@ -353,6 +353,9 @@ export function PatientList() {
                     Status
                   </th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    JDPA Consent
+                  </th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -360,7 +363,7 @@ export function PatientList() {
               <tbody className="divide-y divide-gray-100">
                 {isLoading && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">
                       Loading patients…
                     </td>
                   </tr>
@@ -368,7 +371,7 @@ export function PatientList() {
 
                 {!isLoading && filtered.length === 0 && patients.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center">
+                    <td colSpan={7} className="px-4 py-12 text-center">
                       <div className="flex flex-col items-center gap-3">
                         <Users size={36} weight="duotone" className="text-gray-300" aria-hidden="true" />
                         <p className="text-sm text-gray-500">No patients registered yet.</p>
@@ -383,7 +386,7 @@ export function PatientList() {
 
                 {!isLoading && filtered.length === 0 && patients.length > 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">
                       No patients match your search.
                     </td>
                   </tr>
@@ -418,6 +421,19 @@ export function PatientList() {
                           label={patient.is_active ? 'Active' : 'Inactive'}
                           variant={patient.is_active ? 'green' : 'gray'}
                         />
+                      </td>
+                      <td className="px-4 py-3">
+                        {patient.jdpa_consent_at ? (
+                          <StatusPill
+                            label="Consented"
+                            variant="green"
+                          />
+                        ) : (
+                          <StatusPill
+                            label="Missing"
+                            variant="red"
+                          />
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <button

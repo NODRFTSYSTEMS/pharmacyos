@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Robot, Eye, CheckCircle, XCircle, ArrowClockwise,
-  FileImage, FilePdf, Warning, MagnifyingGlass, Sparkle,
+  FileImage, FilePdf, Warning, MagnifyingGlass, Sparkle, CloudArrowUp,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
@@ -54,6 +54,23 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
     invoice_date:   entry.invoice_date   ?? '',
   })
   const [reviewNotes, setReviewNotes] = useState(entry.review_notes ?? '')
+  // Confidence gate: track whether the pharmacist has manually edited any field.
+  // If confidence < 0.85 and no field has been edited, the accept button is blocked.
+  const [hasEdited, setHasEdited] = useState(false)
+
+  // Only the string-typed editable fields exposed in the review form
+  type EditableStringKey =
+    | 'patient_name' | 'prescriber_name' | 'prescriber_reg'
+    | 'drug_name' | 'dosage' | 'quantity' | 'issue_date'
+    | 'supplier_name' | 'invoice_number' | 'invoice_date'
+
+  function updateField(key: EditableStringKey, value: string) {
+    setEditedFields(p => ({ ...p, [key]: value } as Partial<ExtractionQueueEntry>))
+    if (!hasEdited) setHasEdited(true)
+  }
+
+  const lowConfidence = entry.confidence_score !== null && entry.confidence_score < 0.85
+  const requiresFieldReview = lowConfidence && !hasEdited
 
   const [docUrl, setDocUrl] = useState<string | null>(null)
   const [urlLoading, setUrlLoading] = useState(false)
@@ -194,19 +211,19 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
             <div className="grid grid-cols-2 gap-3">
               {isRx ? (
                 <>
-                  <Field label="Patient Name"   value={editedFields.patient_name ?? ''} onChange={v => setEditedFields(p => ({ ...p, patient_name: v }))} />
-                  <Field label="Drug Name"       value={editedFields.drug_name ?? ''} onChange={v => setEditedFields(p => ({ ...p, drug_name: v }))} />
-                  <Field label="Prescriber Name" value={editedFields.prescriber_name ?? ''} onChange={v => setEditedFields(p => ({ ...p, prescriber_name: v }))} />
-                  <Field label="Prescriber Reg." value={editedFields.prescriber_reg ?? ''} onChange={v => setEditedFields(p => ({ ...p, prescriber_reg: v }))} />
-                  <Field label="Dosage / Instructions" value={editedFields.dosage ?? ''} onChange={v => setEditedFields(p => ({ ...p, dosage: v }))} />
-                  <Field label="Quantity"        value={editedFields.quantity ?? ''} onChange={v => setEditedFields(p => ({ ...p, quantity: v }))} />
-                  <Field label="Issue Date"      value={editedFields.issue_date ?? ''} onChange={v => setEditedFields(p => ({ ...p, issue_date: v }))} type="date" />
+                  <Field label="Patient Name"   value={editedFields.patient_name ?? ''} onChange={v => updateField('patient_name', v)} />
+                  <Field label="Drug Name"       value={editedFields.drug_name ?? ''} onChange={v => updateField('drug_name', v)} />
+                  <Field label="Prescriber Name" value={editedFields.prescriber_name ?? ''} onChange={v => updateField('prescriber_name', v)} />
+                  <Field label="Prescriber Reg." value={editedFields.prescriber_reg ?? ''} onChange={v => updateField('prescriber_reg', v)} />
+                  <Field label="Dosage / Instructions" value={editedFields.dosage ?? ''} onChange={v => updateField('dosage', v)} />
+                  <Field label="Quantity"        value={editedFields.quantity ?? ''} onChange={v => updateField('quantity', v)} />
+                  <Field label="Issue Date"      value={editedFields.issue_date ?? ''} onChange={v => updateField('issue_date', v)} type="date" />
                 </>
               ) : (
                 <>
-                  <Field label="Supplier Name"   value={editedFields.supplier_name ?? ''} onChange={v => setEditedFields(p => ({ ...p, supplier_name: v }))} />
-                  <Field label="Invoice Number"  value={editedFields.invoice_number ?? ''} onChange={v => setEditedFields(p => ({ ...p, invoice_number: v }))} />
-                  <Field label="Invoice Date"    value={editedFields.invoice_date ?? ''} onChange={v => setEditedFields(p => ({ ...p, invoice_date: v }))} type="date" />
+                  <Field label="Supplier Name"   value={editedFields.supplier_name ?? ''} onChange={v => updateField('supplier_name', v)} />
+                  <Field label="Invoice Number"  value={editedFields.invoice_number ?? ''} onChange={v => updateField('invoice_number', v)} />
+                  <Field label="Invoice Date"    value={editedFields.invoice_date ?? ''} onChange={v => updateField('invoice_date', v)} type="date" />
                 </>
               )}
             </div>
@@ -228,23 +245,39 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
         </div>
 
         {/* Footer actions */}
-        <div className="px-5 py-4 border-t border-gray-200 flex gap-3">
-          <button
-            onClick={() => accept.mutate()}
-            disabled={accept.isPending || reject.isPending}
-            className="btn btn-success btn-lg flex-1 gap-2"
-          >
-            <CheckCircle size={16} />
-            {accept.isPending ? 'Accepting…' : 'Accept & Forward to Rx'}
-          </button>
-          <button
-            onClick={() => reject.mutate()}
-            disabled={accept.isPending || reject.isPending}
-            className="btn btn-danger btn-lg flex-1 gap-2"
-          >
-            <XCircle size={16} />
-            {reject.isPending ? 'Rejecting…' : 'Reject'}
-          </button>
+        <div className="px-5 py-4 border-t border-gray-200">
+          {requiresFieldReview && (
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-3 text-xs text-amber-800">
+              <Warning size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
+              <span>
+                AI confidence is below 85%. Edit at least one field to confirm you have reviewed the extraction before accepting.
+              </span>
+            </div>
+          )}
+          <div className="flex gap-3">
+            <button
+              onClick={() => { if (!requiresFieldReview) accept.mutate() }}
+              disabled={accept.isPending || reject.isPending || requiresFieldReview}
+              aria-disabled={requiresFieldReview}
+              title={requiresFieldReview ? 'Edit at least one field before accepting a low-confidence extraction.' : undefined}
+              className={`btn btn-success btn-lg flex-1 gap-2 ${requiresFieldReview ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <CheckCircle size={16} />
+              {accept.isPending
+                ? 'Accepting…'
+                : isRx
+                  ? 'Accept & Create Prescription Record'
+                  : 'Accept & Post to Inventory'}
+            </button>
+            <button
+              onClick={() => reject.mutate()}
+              disabled={accept.isPending || reject.isPending}
+              className="btn btn-danger btn-lg flex-1 gap-2"
+            >
+              <XCircle size={16} />
+              {reject.isPending ? 'Rejecting…' : 'Reject'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -270,6 +303,59 @@ export default function AiQueue() {
   const [statusFilter, setStatusFilter] = useState<ExtractionStatus | 'ALL'>('ALL')
   const [reviewing, setReviewing] = useState<ExtractionQueueEntry | null>(null)
   const qc = useQueryClient()
+
+  // ── Upload state ────────────────────────────────────────────────────────────
+  const [uploadOpen, setUploadOpen]         = useState(false)
+  const [uploadDocType, setUploadDocType]   = useState<'PRESCRIPTION' | 'INVOICE'>('PRESCRIPTION')
+  const [uploadFile, setUploadFile]         = useState<File | null>(null)
+  const [uploadDragging, setUploadDragging] = useState(false)
+
+  function closeUpload() {
+    setUploadOpen(false)
+    setUploadFile(null)
+    setUploadDragging(false)
+  }
+
+  const upload = useMutation({
+    mutationFn: async () => {
+      if (!uploadFile) throw new Error('No file selected')
+      const now      = new Date()
+      const y        = now.getFullYear()
+      const m        = String(now.getMonth() + 1).padStart(2, '0')
+      const safeName = uploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const storagePath = `${y}/${m}/${Date.now()}_${safeName}`
+
+      // 1. Upload file to storage
+      const { error: storErr } = await supabase.storage
+        .from('documents')
+        .upload(storagePath, uploadFile, { contentType: uploadFile.type, upsert: false })
+      if (storErr) throw new Error(`Upload failed: ${storErr.message}`)
+
+      // 2. Create extraction_queue row — status PENDING, ref_number auto-generated
+      const refNum = `${uploadDocType === 'PRESCRIPTION' ? 'RX' : 'INV'}-${Date.now()}`
+      const { data: entry, error: insertErr } = await supabase
+        .from('extraction_queue')
+        .insert({
+          ref_number:         refNum,
+          document_type:      uploadDocType,
+          file_name:          uploadFile.name,
+          storage_path:       storagePath,
+          mime_type:          uploadFile.type,
+          extraction_status:  'PENDING' as const,
+          updated_at:         new Date().toISOString(),
+        })
+        .select('id')
+        .single()
+      if (insertErr) throw new Error(`Queue insert failed: ${insertErr.message}`)
+      return entry.id as string
+    },
+    onSuccess: (entryId) => {
+      qc.invalidateQueries({ queryKey: ['extraction-queue'] })
+      closeUpload()
+      // Auto-trigger AI extraction immediately after successful upload
+      triggerExtraction.mutate(entryId)
+    },
+  })
 
   const { data: entries, isLoading, isError, refetch } = useQuery({
     queryKey: ['extraction-queue', statusFilter],
@@ -327,10 +413,16 @@ export default function AiQueue() {
         subtitle="AI-assisted prescription and invoice data extraction — pharmacist review required before use"
         breadcrumb={['AI Queue']}
         cta={
-          <button onClick={() => refetch()} className="btn btn-ghost gap-1.5">
-            <ArrowClockwise size={14} className={isLoading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setUploadOpen(true)} className="btn btn-primary gap-1.5">
+              <CloudArrowUp size={14} />
+              Upload Document
+            </button>
+            <button onClick={() => refetch()} className="btn btn-ghost gap-1.5">
+              <ArrowClockwise size={14} className={isLoading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
         }
       />
 
@@ -476,6 +568,115 @@ export default function AiQueue() {
 
       {reviewing && (
         <ReviewDrawer entry={reviewing} onClose={() => setReviewing(null)} />
+      )}
+
+      {/* ── Upload Document Modal ─────────────────────────────────────────── */}
+      {uploadOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40" onClick={closeUpload} />
+          <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md p-6 space-y-5">
+
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-800">Upload Document</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  AI extracts fields — pharmacist reviews before use
+                </p>
+              </div>
+              <button onClick={closeUpload} className="btn btn-ghost h-8 w-8 p-0">
+                <XCircle size={18} />
+              </button>
+            </div>
+
+            {/* Document type */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Document Type
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['PRESCRIPTION', 'INVOICE'] as const).map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setUploadDocType(t)}
+                    className={`py-2 px-3 rounded border text-sm font-medium transition-colors ${
+                      uploadDocType === t
+                        ? 'bg-blue-50 border-blue-400 text-blue-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {t === 'PRESCRIPTION' ? 'Prescription (Rx)' : 'Supplier Invoice'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Drop zone */}
+            <div
+              role="button"
+              aria-label="File drop zone — click or drag to select a document"
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('doc-file-input')?.click() }}
+              onDragOver={e  => { e.preventDefault(); setUploadDragging(true) }}
+              onDragLeave={() => setUploadDragging(false)}
+              onDrop={e => {
+                e.preventDefault()
+                setUploadDragging(false)
+                const f = e.dataTransfer.files[0]
+                if (f) setUploadFile(f)
+              }}
+              onClick={() => document.getElementById('doc-file-input')?.click()}
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer select-none ${
+                uploadDragging
+                  ? 'border-blue-400 bg-blue-50'
+                  : uploadFile
+                    ? 'border-emerald-400 bg-emerald-50'
+                    : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              }`}
+            >
+              <input
+                id="doc-file-input"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
+                className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) setUploadFile(f) }}
+              />
+              {uploadFile ? (
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-700">
+                  {uploadFile.type === 'application/pdf'
+                    ? <FilePdf  size={20} className="text-red-400 shrink-0" />
+                    : <FileImage size={20} className="text-blue-400 shrink-0" />
+                  }
+                  <span className="font-medium truncate max-w-64">{uploadFile.name}</span>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <CloudArrowUp size={28} className="text-gray-400 mx-auto" />
+                  <p className="text-sm text-gray-600 font-medium">Drop file here or click to browse</p>
+                  <p className="text-xs text-gray-400">JPEG · PNG · GIF · WebP · PDF &nbsp;·&nbsp; Max 10 MB</p>
+                </div>
+              )}
+            </div>
+
+            {/* Error */}
+            {upload.error && (
+              <div role="alert" className="bg-red-50 border border-red-200 rounded px-3 py-2.5 text-sm text-red-700">
+                {String((upload.error as Error).message)}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              onClick={() => upload.mutate()}
+              disabled={!uploadFile || upload.isPending}
+              className="btn btn-primary btn-lg w-full gap-2"
+            >
+              <CloudArrowUp size={16} />
+              {upload.isPending ? 'Uploading & Starting Extraction…' : 'Upload & Start AI Extraction'}
+            </button>
+
+          </div>
+        </div>
       )}
     </div>
   )

@@ -20,10 +20,13 @@ export function useCurrentUser() {
         .select('full_name, role')
         .eq('email', user.email!)
         .maybeSingle()
+      // I-20: If no staff_profiles record exists, surface the data integrity problem
+      // rather than silently defaulting to CASHIER with a raw email as display name.
+      // The 'CASHIER' fallback is kept for auth continuity but the name is sanitised.
       return {
         id:    user.id,
         email: user.email!,
-        name:  profile?.full_name ?? user.email!,
+        name:  profile?.full_name ?? 'Unknown User',
         role:  (profile?.role ?? 'CASHIER') as StaffRole,
       }
     },

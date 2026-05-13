@@ -7,19 +7,8 @@ import {
   Calculator,
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
+import { toJamaicaBounds, toJamaicaDate, todayJamaica } from '../../lib/date';
 import { PageHeader, MetricCard } from '../../components/Shell';
-
-// Jamaica does not observe DST — UTC-5 year-round
-function toJamaicaBounds(from: string, to: string) {
-  return {
-    gte: `${from}T00:00:00-05:00`,
-    lte: `${to}T23:59:59.999-05:00`,
-  }
-}
-
-function toJamaicaDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' })
-}
 
 interface RetailTransaction {
   id: string;
@@ -44,10 +33,6 @@ interface DailySalesRow {
   total: number;
 }
 
-function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-JM', {
     year: 'numeric',
@@ -65,10 +50,11 @@ function fmtJMD(value: number): string {
 }
 
 function defaultDateRange(): { from: string; to: string } {
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - 6);
-  return { from: toDateString(from), to: toDateString(to) };
+  // I-22: Use Jamaica timezone for default date range
+  const to = todayJamaica()
+  const fromDate = new Date(to)
+  fromDate.setDate(fromDate.getDate() - 6)
+  return { from: fromDate.toISOString().slice(0, 10), to }
 }
 
 function exportCsv(rows: DailySalesRow[]) {

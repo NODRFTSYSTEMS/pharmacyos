@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, X, ClipboardText } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { todayJamaica } from '../../lib/date'
 import { PageHeader } from '../../components/Shell'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ interface EntryForm {
 }
 
 const EMPTY_FORM: EntryForm = {
-  entry_date: new Date().toISOString().slice(0, 10),
+  entry_date: todayJamaica(),
   drug_name: '',
   strength: '',
   quantity_in: '',
@@ -253,7 +254,7 @@ export function ScheduleLog() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Schedule Drug Log"
-        subtitle="Controlled document — Dangerous Drugs Act (Jamaica)"
+        subtitle="Controlled Substances Register — Jamaica Dangerous Drugs Act, Chapter 92 — Pharmacist signature required for all entries"
         breadcrumb={['Prescriptions', 'Schedule Log']}
         cta={
           <button className="btn btn-primary flex items-center gap-2" onClick={() => setDrawerOpen(true)}>

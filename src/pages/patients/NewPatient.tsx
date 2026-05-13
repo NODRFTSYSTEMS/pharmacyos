@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Shield, ArrowLeft, Warning } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 
 interface PatientFormState {
   first_name: string
@@ -49,17 +50,36 @@ export function NewPatient() {
 
   const mutation = useMutation({
     mutationFn: async (values: PatientFormState) => {
-      const { error } = await supabase.from('patients').insert({
-        first_name: values.first_name.trim(),
-        last_name: values.last_name.trim(),
-        date_of_birth: values.date_of_birth || null,
-        phone: values.phone.trim() || null,
-        address: values.address.trim() || null,
-        allergies: values.allergies.trim() || null,
-        notes: values.notes.trim() || null,
-        is_active: true,
+      const consentAt = new Date().toISOString()
+
+      // Insert patient record — return id for audit trail
+      const { data: patient, error: insertError } = await supabase
+        .from('patients')
+        .insert({
+          first_name:      values.first_name.trim(),
+          last_name:       values.last_name.trim(),
+          date_of_birth:   values.date_of_birth || null,
+          phone:           values.phone.trim() || null,
+          address:         values.address.trim() || null,
+          allergies:       values.allergies.trim() || null,
+          notes:           values.notes.trim() || null,
+          is_active:       true,
+          // I-13: persist JDPA consent timestamp (consent is validated before submit)
+          jdpa_consent_at: consentAt,
+        })
+        .select('id')
+        .single()
+      if (insertError) throw insertError
+
+      // I-13: Write JDPA consent audit trail
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('audit_log').insert({
+        action:      AUDIT_ACTIONS.PATIENT_JDPA_CONSENT,
+        entity_type: 'patient',
+        entity_id:   patient.id,
+        performed_by: user?.id ?? null,
+        metadata:    { consent_at: consentAt },
       })
-      if (error) throw error
     },
     onSuccess: () => {
       void navigate('/patients')

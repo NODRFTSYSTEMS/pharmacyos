@@ -5,6 +5,7 @@ import {
   ArrowRight, Calculator,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { todayJamaica, toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
 import type { EodCloseout, ShiftType } from '../../types/database'
 
@@ -20,7 +21,8 @@ function VarianceBadge({ variance }: { variance: number }) {
 }
 
 export default function CloseOut() {
-  const today = new Date().toISOString().slice(0, 10)
+  // I-22: Use Jamaica timezone for today's date
+  const today = todayJamaica()
   const [date]  = useState(today)
   const [shift, setShift] = useState<ShiftType>('FULL_DAY')
 
@@ -51,17 +53,19 @@ export default function CloseOut() {
   const { data: systemTotals, isLoading: totalsLoading } = useQuery({
     queryKey: ['eod-system-totals', date, shift],
     queryFn: async () => {
+      // I-22: Jamaica-aware bounds (UTC-5, no DST)
+      const bounds = toJamaicaBounds(date, date)
       const [retail, rx] = await Promise.all([
         supabase
           .from('retail_transactions')
           .select('total, payment_method, voided')
-          .gte('created_at', `${date}T00:00:00`)
-          .lte('created_at', `${date}T23:59:59`),
+          .gte('created_at', bounds.gte)
+          .lte('created_at', bounds.lte),
         supabase
           .from('rx_transactions')
           .select('patient_copay, payment_method, nhf_subsidy, voided')
-          .gte('created_at', `${date}T00:00:00`)
-          .lte('created_at', `${date}T23:59:59`),
+          .gte('created_at', bounds.gte)
+          .lte('created_at', bounds.lte),
       ])
 
       const rt = (retail.data ?? []).filter(t => !t.voided)

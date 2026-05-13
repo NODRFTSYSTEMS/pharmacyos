@@ -3,7 +3,9 @@ import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../components/Shell'
+import { usePermission } from '../hooks/usePermission'
 import type {
   RetailTransaction,
   RxTransaction,
@@ -22,12 +24,6 @@ function fmtCurrency(n: number): string {
   }).format(n)
 }
 
-function fmtTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('en-JM', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -54,11 +50,13 @@ function useTodayRetail(today: string) {
   return useQuery({
     queryKey: ['dashboard-retail', today],
     queryFn: async () => {
+      // I-22: Use Jamaica-aware bounds (UTC-5) to avoid midnight off-by-one errors
+      const bounds = toJamaicaBounds(today, today)
       const { data, error } = await supabase
         .from('retail_transactions')
         .select('*')
-        .gte('created_at', `${today}T00:00:00`)
-        .lte('created_at', `${today}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .eq('voided', false)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -72,11 +70,13 @@ function useTodayRx(today: string) {
   return useQuery({
     queryKey: ['dashboard-rx', today],
     queryFn: async () => {
+      // I-22: Use Jamaica-aware bounds (UTC-5) to avoid midnight off-by-one errors
+      const bounds = toJamaicaBounds(today, today)
       const { data, error } = await supabase
         .from('rx_transactions')
         .select('*')
-        .gte('created_at', `${today}T00:00:00`)
-        .lte('created_at', `${today}T23:59:59`)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
         .eq('voided', false)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -123,7 +123,12 @@ function useLowStockProducts() {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Dashboard() {
-  const today = new Date().toISOString().slice(0, 10)
+  // I-22: todayJamaica() uses America/Jamaica timezone — not UTC
+  const today = todayJamaica()
+
+  // I-21: Role-filtered dashboard sections
+  const canViewReports = usePermission('reports_view')
+  const canViewRx      = usePermission('rx_dispense')
 
   const retailQ       = useTodayRetail(today)
   const rxQ           = useTodayRx(today)
@@ -176,38 +181,59 @@ export function Dashboard() {
       />
 
       {/* ── Metric cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MetricCard
-          label="Today's Revenue"
-          value={fmtCurrency(totalRevenue)}
-          sub={`Retail ${fmtCurrency(retailRevenue)} + Rx ${fmtCurrency(rxRevenue)}`}
-          icon={CurrencyDollar}
-          accent="green"
-        />
-        <MetricCard
-          label="Transactions Today"
-          value={String(txnCount)}
-          sub={`${(retailQ.data ?? []).length} retail · ${(rxQ.data ?? []).length} Rx`}
-          icon={Receipt}
-          accent="blue"
-        />
-        <MetricCard
-          label="Pending Prescriptions"
-          value={String(pendingRxCount)}
-          sub="Received, verifying, or ready"
-          icon={ClockCounterClockwise}
-          accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
-        />
-        <MetricCard
-          label="Low Stock Items"
-          value={String(lowStockCount)}
-          sub="At or below reorder level"
-          icon={Warning}
-          accent={lowStockCount > 0 ? 'red' : 'blue'}
-        />
-      </div>
+      {/* I-21: Revenue metrics visible to roles with reports_view; others see operational metrics */}
+      {canViewReports ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <MetricCard
+            label="Today's Revenue"
+            value={fmtCurrency(totalRevenue)}
+            sub={`Retail ${fmtCurrency(retailRevenue)} + Rx ${fmtCurrency(rxRevenue)}`}
+            icon={CurrencyDollar}
+            accent="green"
+          />
+          <MetricCard
+            label="Transactions Today"
+            value={String(txnCount)}
+            sub={`${(retailQ.data ?? []).length} retail · ${(rxQ.data ?? []).length} Rx`}
+            icon={Receipt}
+            accent="blue"
+          />
+          <MetricCard
+            label="Pending Prescriptions"
+            value={String(pendingRxCount)}
+            sub="Received, verifying, or ready"
+            icon={ClockCounterClockwise}
+            accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
+          />
+          <MetricCard
+            label="Low Stock Items"
+            value={String(lowStockCount)}
+            sub="At or below reorder level"
+            icon={Warning}
+            accent={lowStockCount > 0 ? 'red' : 'blue'}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <MetricCard
+            label="Pending Prescriptions"
+            value={String(pendingRxCount)}
+            sub="Received, verifying, or ready"
+            icon={ClockCounterClockwise}
+            accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
+          />
+          <MetricCard
+            label="Low Stock Items"
+            value={String(lowStockCount)}
+            sub="At or below reorder level"
+            icon={Warning}
+            accent={lowStockCount > 0 ? 'red' : 'blue'}
+          />
+        </div>
+      )}
 
-      {/* ── Recent Transactions ────────────────────────────────────────────── */}
+      {/* ── Recent Transactions — reports_view roles only ──────────────────── */}
+      {canViewReports && (
       <section className="mb-8" aria-labelledby="recent-txns-heading">
         <h2 id="recent-txns-heading" className="section-title mb-3">
           Recent Transactions
@@ -253,7 +279,7 @@ export function Dashboard() {
                     <td className="px-4 text-right font-mono text-xs font-medium text-gray-800">
                       {fmtCurrency(t.amount)}
                     </td>
-                    <td className="px-4 font-mono text-xs text-gray-500">{fmtTime(t.created_at)}</td>
+                    <td className="px-4 font-mono text-xs text-gray-500">{fmtJamaicaTime(t.created_at)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -261,8 +287,10 @@ export function Dashboard() {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── Prescription Queue ─────────────────────────────────────────────── */}
+      {/* ── Prescription Queue — rx_dispense roles only ────────────────────── */}
+      {canViewRx && (
       <section aria-labelledby="rx-queue-heading">
         <h2 id="rx-queue-heading" className="section-title mb-3">
           Prescription Queue
@@ -306,7 +334,7 @@ export function Dashboard() {
                         variant={RX_PILL_MAP[p.status]}
                       />
                     </td>
-                    <td className="px-4 font-mono text-xs text-gray-500">{fmtTime(p.created_at)}</td>
+                    <td className="px-4 font-mono text-xs text-gray-500">{fmtJamaicaTime(p.created_at)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -314,6 +342,7 @@ export function Dashboard() {
           </div>
         </div>
       </section>
+      )}
     </div>
   )
 }

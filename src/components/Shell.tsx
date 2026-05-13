@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
-  Gear, Files, List, X, SignOut, CaretRight,
+  Gear, Files, List, X, SignOut, CaretRight, UserCircle, LockSimple,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
+import { useCurrentUser } from '../hooks/useCurrentUser'
+import { useAnyPermission } from '../hooks/usePermission'
+import { NAV_PERMISSIONS } from '../config/route-permissions'
+import { GlobalSearch } from './GlobalSearch'
+import { NotificationBell } from './NotificationBell'
 
 interface NavItem {
   label: string
@@ -13,6 +18,7 @@ interface NavItem {
   children?: { label: string; href: string }[]
 }
 
+// Full nav definition — filtered at render time by useAnyPermission
 const NAV: NavItem[] = [
   { label: 'Dashboard',    href: '/dashboard',      icon: House },
   { label: 'Prescriptions', icon: PillIcon, children: [
@@ -46,6 +52,29 @@ const NAV: NavItem[] = [
     { label: 'Settings',      href: '/admin/settings' },
   ]},
 ]
+
+// ── Role-filtered nav hook ─────────────────────────────────────────────────────
+// Dashboard always shows (session-only). All other groups are filtered by
+// NAV_PERMISSIONS: a group is visible only if the user has ≥1 required permission.
+function useFilteredNav(): NavItem[] {
+  const showPrescriptions = useAnyPermission(NAV_PERMISSIONS['Prescriptions'])
+  const showPOS           = useAnyPermission(NAV_PERMISSIONS['Retail POS'])
+  const showPatients      = useAnyPermission(NAV_PERMISSIONS['Patients'])
+  const showReports       = useAnyPermission(NAV_PERMISSIONS['Reports'])
+  const showAiQueue       = useAnyPermission(NAV_PERMISSIONS['AI Queue'])
+  const showAdmin         = useAnyPermission(NAV_PERMISSIONS['Admin'])
+
+  return NAV.filter(item => {
+    if (item.label === 'Dashboard')     return true
+    if (item.label === 'Prescriptions') return showPrescriptions
+    if (item.label === 'Retail POS')    return showPOS
+    if (item.label === 'Patients')      return showPatients
+    if (item.label === 'Reports')       return showReports
+    if (item.label === 'AI Queue')      return showAiQueue
+    if (item.label === 'Admin')         return showAdmin
+    return false
+  })
+}
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const { pathname } = useLocation()
@@ -96,7 +125,16 @@ function NavGroup({ item }: { item: NavItem }) {
 }
 
 export function Sidebar() {
-  const nav = useNavigate()
+  const nav            = useNavigate()
+  const filteredNav    = useFilteredNav()
+  const { data: user } = useCurrentUser()
+
+  // I-20: display name fallback — never show raw email as a person's name
+  const displayName = user?.name && user.name !== user?.email
+    ? user.name
+    : user?.email
+      ? 'Staff Member'   // fallback when profile name is missing
+      : '—'
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -108,13 +146,14 @@ export function Sidebar() {
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2">
           <Files size={20} weight="duotone" className="text-blue-400" />
-          <span className="text-white font-bold text-sm tracking-tight">PharmacyOS</span>
+          <span className="text-white font-bold text-sm tracking-tight flex-1">PharmacyOS</span>
+          <NotificationBell />
         </div>
         <p className="text-gray-500 text-xs mt-0.5">Winchester Global Pharmacy</p>
       </div>
 
-      <nav className="flex-1 px-2 py-3 space-y-0.5">
-        {NAV.map(item =>
+      <nav className="flex-1 px-2 py-3 space-y-0.5" aria-label="Main navigation">
+        {filteredNav.map(item =>
           item.href ? (
             <NavLink key={item.href} href={item.href}>
               <item.icon size={16} weight="duotone" />
@@ -126,7 +165,22 @@ export function Sidebar() {
         )}
       </nav>
 
-      <div className="px-2 py-3 border-t border-white/10">
+      {/* User identity + sign out */}
+      <div className="px-3 py-3 border-t border-white/10 space-y-1">
+        {user && (
+          <div className="flex items-center gap-2 px-1 py-1.5 mb-1">
+            <UserCircle size={18} weight="duotone" className="text-gray-500 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-300 truncate">{displayName}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wide">{user.role}</p>
+            </div>
+          </div>
+        )}
+        {/* I-09: Security / MFA setup — available to all authenticated staff */}
+        <NavLink href="/profile/security">
+          <LockSimple size={16} />
+          Security
+        </NavLink>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
@@ -213,6 +267,18 @@ interface AppShellProps { children: React.ReactNode }
 
 export function AppShell({ children }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setSearchOpen(prev => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -251,6 +317,8 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </div>
+
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   )
 }
@@ -270,6 +338,46 @@ export function ClosableAlert({
     <div className={`flex items-center justify-between gap-3 border rounded px-3 py-2.5 text-sm mb-4 ${map[variant]}`}>
       <span>{message}</span>
       <button onClick={() => setOpen(false)} className="shrink-0"><X size={14} /></button>
+    </div>
+  )
+}
+
+// ── PrintHeader ───────────────────────────────────────────────────────────────
+// Rendered only in print media. Shows pharmacy identity, OIC registration,
+// report title, period, and generator on every printed report page.
+// Wrap report pages with this component above the report content.
+//
+// Usage:
+//   <PrintHeader
+//     reportTitle="Revenue Report"
+//     period="2026-05-01 to 2026-05-13"
+//     generatedBy="Marcus Thompson — PHARMACIST"
+//   />
+
+interface PrintHeaderProps {
+  reportTitle:  string
+  period?:      string
+  generatedBy?: string
+}
+
+export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderProps) {
+  const now = new Date().toLocaleString('en-JM', { timeZone: 'America/Jamaica' })
+
+  return (
+    <div className="print-only mb-6 pb-4 border-b border-gray-300">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-bold text-base text-gray-900">Winchester Global Pharmacy</p>
+          <p className="text-xs text-gray-600">Kingston, Jamaica</p>
+          <p className="text-xs text-gray-500 mt-0.5">OIC Registration: [See pharmacy_settings]</p>
+        </div>
+        <div className="text-right">
+          <p className="font-semibold text-sm text-gray-800">{reportTitle}</p>
+          {period && <p className="text-xs text-gray-500">Period: {period}</p>}
+          <p className="text-xs text-gray-400">Generated: {now}</p>
+          {generatedBy && <p className="text-xs text-gray-400">By: {generatedBy}</p>}
+        </div>
+      </div>
     </div>
   )
 }
