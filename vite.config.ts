@@ -4,6 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // base: override with VITE_BASE_PATH env var for sub-path deployments.
+  // Vercel (pharmacyos.vercel.app) → default '/'
+  // GitHub Pages (nodrftsystems.github.io/pharmacyos) → '/pharmacyos/'
+  base: process.env.VITE_BASE_PATH ?? '/',
   server: { port: 5174 },
   build: {
     // Vendor chunks prevent the entire dependency tree from landing in a single bundle.

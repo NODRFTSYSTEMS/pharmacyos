@@ -32,32 +32,59 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // ── Auth state + AAL check (I-09) ───────────────────────────────────────
+    // IMPORTANT: resolveAuthState MUST be wrapped in try/catch.
+    // `void resolveAuthState()` silently swallows thrown errors — if getSession
+    // or getAuthenticatorAssuranceLevel throw (bad env vars, network failure, etc.)
+    // the state stays at 'loading' forever and the user sees a blank spinner.
     async function resolveAuthState() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) {
+          console.error('[ProtectedRoute] getSession error:', sessionError.message)
+          setState('unauthed')
+          return
+        }
+        if (!session) {
+          setState('unauthed')
+          return
+        }
+        // If the user has enrolled MFA and the session is at AAL1, gate on MFA
+        const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+        if (aalError) {
+          // MFA check failed — fail open (authed) rather than blocking login
+          console.warn('[ProtectedRoute] MFA AAL check failed:', aalError.message)
+          setState('authed')
+          return
+        }
+        if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
+          setState('mfa-required')
+        } else {
+          setState('authed')
+        }
+      } catch (err) {
+        // Unexpected throw (e.g. env vars missing, Supabase misconfigured)
+        // Fail safe: redirect to login so the user sees something actionable.
+        console.error('[ProtectedRoute] Auth resolution failed unexpectedly:', err)
         setState('unauthed')
-        return
-      }
-      // If the user has enrolled MFA and the session is at AAL1, gate on MFA
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-      if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
-        setState('mfa-required')
-      } else {
-        setState('authed')
       }
     }
     void resolveAuthState()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
-      if (!session) {
+      try {
+        if (!session) {
+          setState('unauthed')
+          return
+        }
+        const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+        if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
+          setState('mfa-required')
+        } else {
+          setState('authed')
+        }
+      } catch (err) {
+        console.error('[ProtectedRoute] onAuthStateChange handler error:', err)
         setState('unauthed')
-        return
-      }
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-      if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
-        setState('mfa-required')
-      } else {
-        setState('authed')
       }
     })
 

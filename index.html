@@ -6,10 +6,19 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-    <title>PharmacyOS — Winchester Global Pharmacy</title>
+    <title>PharmacyOS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- GitHub Pages SPA: decode redirect from 404.html back into real path -->
+  <script>
+    (function(l){
+      if(l.search[1]==='/'){
+        var d=l.search.slice(1).split('&').map(function(s){return s.replace(/~and~/g,'&')}).join('?');
+        window.history.replaceState(null,null,l.pathname.slice(0,-1)+d+l.hash);
+      }
+    }(window.location));
+  </script>
   </head>
   <body>
     <div id="root"></div>

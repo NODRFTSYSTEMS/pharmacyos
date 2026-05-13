@@ -39,7 +39,7 @@ export default function Login() {
           <Files size={28} weight="duotone" className="text-blue-600" />
           <div>
             <p className="font-bold text-gray-900 text-lg leading-tight">PharmacyOS</p>
-            <p className="text-xs text-gray-500 leading-tight">Winchester Global Pharmacy</p>
+            <p className="text-xs text-gray-500 leading-tight">Pharmacy Operations Platform</p>
           </div>
         </div>
 
