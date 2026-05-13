@@ -215,7 +215,7 @@ export function AppShell({ children }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar />
@@ -233,10 +233,10 @@ export function AppShell({ children }: AppShellProps) {
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main content — fills remaining height, scrolls internally */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200">
+        <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 shrink-0">
           <button
             onClick={() => setMobileSidebarOpen(true)}
             className="p-1.5 rounded text-gray-500 hover:bg-gray-100"
@@ -247,7 +247,7 @@ export function AppShell({ children }: AppShellProps) {
           <span className="font-bold text-sm text-gray-800">PharmacyOS</span>
         </div>
 
-        <main className="flex-1 p-6 max-w-screen-2xl">
+        <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>
