@@ -61,7 +61,7 @@ export default function Login() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="input"
-                placeholder="you@winchesterglobal.com"
+                placeholder="you@example.com"
               />
             </div>
 
@@ -101,7 +101,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          © 2026 Winchester Global Pharmacy · Powered by PharmacyOS
+          © 2026 PharmacyOS · NoDrftSystems
         </p>
       </div>
     </div>
