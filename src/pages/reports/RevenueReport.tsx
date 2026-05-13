@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Export, CurrencyDollar, Receipt, Pill as PillIcon,
+  Export, CurrencyDollar, Receipt, Pill as PillIcon, Printer,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard } from '../../components/Shell'
@@ -52,6 +52,18 @@ const PAY_LABEL: Record<PaymentMethod, string> = {
 export function RevenueReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
+
+  // Pharmacy name for print header
+  const { data: settingsRows = [] } = useQuery<{ key: string; value: string }[]>({
+    queryKey: ['pharmacy_settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('pharmacy_settings').select('key, value')
+      if (error) throw error
+      return data ?? []
+    },
+    staleTime: 300_000,
+  })
+  const pharmacyName = settingsRows.find(r => r.key === 'pharmacy_name')?.value || 'Winchester Global Pharmacy'
 
   const retailQuery = useQuery<RetailTransaction[]>({
     queryKey: ['report-retail', from, to],
@@ -138,6 +150,16 @@ export function RevenueReport() {
     .map(([method, v]) => ({ method, count: v.count, total: v.total }))
     .sort((a, b) => b.total - a.total)
 
+  // Totals for tfoot
+  const dailyTotals = dailyRows.reduce(
+    (acc, r) => ({ retail: acc.retail + r.retail, rx: acc.rx + r.rx, nhf: acc.nhf + r.nhf, total: acc.total + r.total }),
+    { retail: 0, rx: 0, nhf: 0, total: 0 }
+  )
+  const payTotals = payRows.reduce(
+    (acc, r) => ({ count: acc.count + r.count, total: acc.total + r.total }),
+    { count: 0, total: 0 }
+  )
+
   // CSV export
   function exportCsv() {
     const rows = [
@@ -149,6 +171,7 @@ export function RevenueReport() {
         r.nhf.toFixed(2),
         r.total.toFixed(2),
       ]),
+      ['TOTAL', dailyTotals.retail.toFixed(2), dailyTotals.rx.toFixed(2), dailyTotals.nhf.toFixed(2), dailyTotals.total.toFixed(2)],
     ]
     const csv = rows.map(r => r.join(',')).join('\n')
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
@@ -159,20 +182,35 @@ export function RevenueReport() {
     URL.revokeObjectURL(url)
   }
 
+  const generatedAt = new Date().toLocaleString('en-JM', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+
   return (
     <div>
-      <PageHeader
-        title="Revenue Report"
-        subtitle="Retail and Rx revenue by date range"
-        breadcrumb={['Reports', 'Revenue']}
-      />
+      {/* ── Print-only header ─────────────────────────────────────────── */}
+      <div className="print-only mb-6 border-b-2 border-gray-800 pb-4">
+        <h1 className="text-2xl font-bold text-gray-900">{pharmacyName}</h1>
+        <h2 className="text-lg font-semibold text-gray-700 mt-1">Revenue Report</h2>
+        <div className="flex gap-8 mt-2 text-sm text-gray-600">
+          <span>Period: <strong>{from}</strong> to <strong>{to}</strong></span>
+          <span>Generated: {generatedAt}</span>
+        </div>
+      </div>
+
+      <div className="no-print">
+        <PageHeader
+          title="Revenue Report"
+          subtitle="Retail and Rx revenue by date range"
+          breadcrumb={['Reports', 'Revenue']}
+        />
+      </div>
 
       {/* Date range + export row */}
-      <div className="card p-3 mb-6 flex flex-wrap items-center gap-3">
+      <div className="card p-3 mb-6 flex flex-wrap items-center gap-3 no-print">
         <div className="flex items-center gap-2">
-          <label htmlFor="rev-from" className="text-xs text-gray-500 font-medium shrink-0">
-            From
-          </label>
+          <label htmlFor="rev-from" className="text-xs text-gray-500 font-medium shrink-0">From</label>
           <input
             id="rev-from"
             type="date"
@@ -182,9 +220,7 @@ export function RevenueReport() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor="rev-to" className="text-xs text-gray-500 font-medium shrink-0">
-            To
-          </label>
+          <label htmlFor="rev-to" className="text-xs text-gray-500 font-medium shrink-0">To</label>
           <input
             id="rev-to"
             type="date"
@@ -193,15 +229,26 @@ export function RevenueReport() {
             className="input w-36 text-xs"
           />
         </div>
-        <button
-          onClick={exportCsv}
-          className="btn btn-ghost gap-1.5 text-xs ml-auto"
-          disabled={isLoading || dailyRows.length === 0}
-          aria-label="Export revenue report as CSV"
-        >
-          <Export size={13} />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={exportCsv}
+            className="btn btn-ghost gap-1.5 text-xs"
+            disabled={isLoading || dailyRows.length === 0}
+            aria-label="Export revenue report as CSV"
+          >
+            <Export size={13} />
+            Export CSV
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="btn btn-ghost gap-1.5 text-xs"
+            disabled={isLoading}
+            aria-label="Print revenue report"
+          >
+            <Printer size={13} />
+            Print
+          </button>
+        </div>
       </div>
 
       {/* Metric cards */}
@@ -244,56 +291,45 @@ export function RevenueReport() {
             <table className="w-full table-compact text-sm" aria-label="Daily revenue breakdown">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Retail Sales
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Rx Collections
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    NHF Subsidy
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Retail Sales</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rx Collections</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">NHF Subsidy</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {isLoading && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">
-                      Loading…
-                    </td>
+                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">Loading…</td>
                   </tr>
                 )}
                 {!isLoading && dailyRows.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">
-                      No transactions in this date range.
-                    </td>
+                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">No transactions in this date range.</td>
                   </tr>
                 )}
                 {!isLoading && dailyRows.map(row => (
                   <tr key={row.date} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-mono text-xs text-gray-700">{row.date}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">
-                      {fmtCurrency(row.retail)}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">
-                      {fmtCurrency(row.rx)}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-500">
-                      {fmtCurrency(row.nhf)}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800">
-                      {fmtCurrency(row.total)}
-                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">{fmtCurrency(row.retail)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">{fmtCurrency(row.rx)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-500">{fmtCurrency(row.nhf)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800">{fmtCurrency(row.total)}</td>
                   </tr>
                 ))}
               </tbody>
+              {!isLoading && dailyRows.length > 0 && (
+                <tfoot className="bg-gray-50 border-t-2 border-gray-300">
+                  <tr>
+                    <td className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wide">Grand Total</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-800">{fmtCurrency(dailyTotals.retail)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-800">{fmtCurrency(dailyTotals.rx)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-500">{fmtCurrency(dailyTotals.nhf)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-blue-700">{fmtCurrency(dailyTotals.total)}</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
@@ -307,44 +343,39 @@ export function RevenueReport() {
             <table className="w-full table-compact text-sm" aria-label="Payment method breakdown">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Payment Method
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Count
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Total Amount
-                  </th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment Method</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Count</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {isLoading && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">
-                      Loading…
-                    </td>
+                    <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">Loading…</td>
                   </tr>
                 )}
                 {!isLoading && payRows.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">
-                      No data.
-                    </td>
+                    <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">No data.</td>
                   </tr>
                 )}
                 {!isLoading && payRows.map(row => (
                   <tr key={row.method} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium text-gray-700">{row.method}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-600">
-                      {row.count}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800">
-                      {fmtCurrency(row.total)}
-                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-600">{row.count}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800">{fmtCurrency(row.total)}</td>
                   </tr>
                 ))}
               </tbody>
+              {!isLoading && payRows.length > 0 && (
+                <tfoot className="bg-gray-50 border-t-2 border-gray-300">
+                  <tr>
+                    <td className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wide">Total</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-800">{payTotals.count}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-blue-700">{fmtCurrency(payTotals.total)}</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>

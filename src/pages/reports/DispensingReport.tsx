@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Export, Pill as PillIcon, CurrencyDollar, Warning,
+  Export, Pill as PillIcon, CurrencyDollar, Warning, Printer,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
@@ -42,6 +42,18 @@ export function DispensingReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
 
+  // Pharmacy name for print header
+  const { data: settingsRows = [] } = useQuery<{ key: string; value: string }[]>({
+    queryKey: ['pharmacy_settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('pharmacy_settings').select('key, value')
+      if (error) throw error
+      return data ?? []
+    },
+    staleTime: 300_000,
+  })
+  const pharmacyName = settingsRows.find(r => r.key === 'pharmacy_name')?.value || 'Winchester Global Pharmacy'
+
   const { data, isLoading, isError } = useQuery<RxTransaction[]>({
     queryKey: ['report-dispensing', from, to],
     queryFn: async () => {
@@ -62,6 +74,12 @@ export function DispensingReport() {
 
   const totalRevenue = nonVoided.reduce((s, r) => s + r.patient_copay, 0)
   const totalNhf = nonVoided.reduce((s, r) => s + r.nhf_subsidy, 0)
+  const totalQty = nonVoided.reduce((s, r) => s + r.quantity_dispensed, 0)
+
+  const generatedAt = new Date().toLocaleString('en-JM', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
 
   // CSV export
   function exportCsv() {
@@ -90,18 +108,33 @@ export function DispensingReport() {
 
   return (
     <div>
-      <PageHeader
-        title="Dispensing Report"
-        subtitle="Prescription dispensing activity and Rx collections"
-        breadcrumb={['Reports', 'Dispensing']}
-      />
+      {/* ── Print-only header ─────────────────────────────────────────── */}
+      <div className="print-only mb-6 border-b-2 border-gray-800 pb-4">
+        <h1 className="text-2xl font-bold text-gray-900">{pharmacyName}</h1>
+        <h2 className="text-lg font-semibold text-gray-700 mt-1">Dispensing Report</h2>
+        <div className="flex gap-8 mt-2 text-sm text-gray-600">
+          <span>Period: <strong>{from}</strong> to <strong>{to}</strong></span>
+          <span>Generated: {generatedAt}</span>
+        </div>
+        <div className="flex gap-8 mt-1 text-sm text-gray-600">
+          <span>Total dispensings: <strong>{nonVoided.length}</strong></span>
+          <span>Voids: <strong>{voided.length}</strong></span>
+          <span>Total revenue: <strong>{fmtCurrency(totalRevenue)}</strong></span>
+        </div>
+      </div>
+
+      <div className="no-print">
+        <PageHeader
+          title="Dispensing Report"
+          subtitle="Prescription dispensing activity and Rx collections"
+          breadcrumb={['Reports', 'Dispensing']}
+        />
+      </div>
 
       {/* Date range + export row */}
-      <div className="card p-3 mb-6 flex flex-wrap items-center gap-3">
+      <div className="card p-3 mb-6 flex flex-wrap items-center gap-3 no-print">
         <div className="flex items-center gap-2">
-          <label htmlFor="disp-from" className="text-xs text-gray-500 font-medium shrink-0">
-            From
-          </label>
+          <label htmlFor="disp-from" className="text-xs text-gray-500 font-medium shrink-0">From</label>
           <input
             id="disp-from"
             type="date"
@@ -111,9 +144,7 @@ export function DispensingReport() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor="disp-to" className="text-xs text-gray-500 font-medium shrink-0">
-            To
-          </label>
+          <label htmlFor="disp-to" className="text-xs text-gray-500 font-medium shrink-0">To</label>
           <input
             id="disp-to"
             type="date"
@@ -122,15 +153,26 @@ export function DispensingReport() {
             className="input w-36 text-xs"
           />
         </div>
-        <button
-          onClick={exportCsv}
-          className="btn btn-ghost gap-1.5 text-xs ml-auto"
-          disabled={isLoading || records.length === 0}
-          aria-label="Export dispensing report as CSV"
-        >
-          <Export size={13} />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={exportCsv}
+            className="btn btn-ghost gap-1.5 text-xs"
+            disabled={isLoading || records.length === 0}
+            aria-label="Export dispensing report as CSV"
+          >
+            <Export size={13} />
+            Export CSV
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="btn btn-ghost gap-1.5 text-xs"
+            disabled={isLoading}
+            aria-label="Print dispensing report"
+          >
+            <Printer size={13} />
+            Print
+          </button>
+        </div>
       </div>
 
       {/* Metric cards */}
@@ -180,58 +222,31 @@ export function DispensingReport() {
             <table className="w-full table-compact text-sm" aria-label="Dispensing records">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Ref
-                  </th>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Drug
-                  </th>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Patient
-                  </th>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Prescriber
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Qty
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Copay
-                  </th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    NHF
-                  </th>
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ref</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Drug</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Patient</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dispensed By</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Copay</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">NHF</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {isLoading && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-400">
-                      Loading…
-                    </td>
+                    <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-400">Loading…</td>
                   </tr>
                 )}
                 {!isLoading && records.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-400">
-                      No dispensing records in this date range.
-                    </td>
+                    <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-400">No dispensing records in this date range.</td>
                   </tr>
                 )}
                 {!isLoading && records.map(r => (
-                  <tr
-                    key={r.id}
-                    className={`hover:bg-gray-50 ${r.voided ? 'opacity-60' : ''}`}
-                  >
-                    <td className="px-4 py-3 font-mono text-xs text-gray-600 whitespace-nowrap">
-                      {fmtDateTime(r.created_at)}
-                    </td>
+                  <tr key={r.id} className={`hover:bg-gray-50 ${r.voided ? 'opacity-60' : ''}`}>
+                    <td className="px-4 py-3 font-mono text-xs text-gray-600 whitespace-nowrap">{fmtDateTime(r.created_at)}</td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-700">
                       {r.voided
                         ? <span className="line-through text-gray-400">{r.ref_number}</span>
@@ -244,15 +259,9 @@ export function DispensingReport() {
                         : r.drug_name
                       }
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-700 max-w-[120px] truncate">
-                      {r.patient_name}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
-                      {r.dispensed_by ?? '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">
-                      {r.quantity_dispensed}
-                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-700 max-w-[120px] truncate">{r.patient_name}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">{r.dispensed_by ?? '—'}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">{r.quantity_dispensed}</td>
                     <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">
                       {r.voided
                         ? <span className="line-through text-gray-400">{fmtCurrency(r.patient_copay)}</span>
@@ -274,6 +283,19 @@ export function DispensingReport() {
                   </tr>
                 ))}
               </tbody>
+              {!isLoading && nonVoided.length > 0 && (
+                <tfoot className="bg-gray-50 border-t-2 border-gray-300">
+                  <tr>
+                    <td colSpan={5} className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      Totals ({nonVoided.length} dispensed, {voided.length} voided)
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-800">{totalQty}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-blue-700">{fmtCurrency(totalRevenue)}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-600">{fmtCurrency(totalNhf)}</td>
+                    <td />
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
