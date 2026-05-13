@@ -1,4 +1,3 @@
-import React from 'react';
 import { Warning, LockSimple, ClipboardText } from '@phosphor-icons/react';
 import { PageHeader } from '../../components/Shell';
 

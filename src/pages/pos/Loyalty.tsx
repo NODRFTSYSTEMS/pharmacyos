@@ -353,7 +353,7 @@ export function Loyalty() {
         title="Loyalty Programme"
         subtitle="Customer rewards and points tracking"
         breadcrumb={['Retail POS', 'Loyalty']}
-        actions={
+        cta={
           <button className="btn btn-primary flex items-center gap-2" onClick={openAdd}>
             <Plus size={18} aria-hidden="true" />
             Add Customer
@@ -366,22 +366,22 @@ export function Loyalty() {
         <MetricCard
           label="Total Members"
           value={totalMembers.toLocaleString()}
-          icon={<Users size={22} aria-hidden="true" />}
+          icon={Users}
         />
         <MetricCard
           label="Active Members"
           value={activeMembers.toLocaleString()}
-          icon={<Users size={22} aria-hidden="true" />}
+          icon={Users}
         />
         <MetricCard
           label="Gold / Platinum"
           value={eliteCount.toLocaleString()}
-          icon={<Star size={22} aria-hidden="true" />}
+          icon={Star}
         />
         <MetricCard
           label="Total Points Issued"
           value={totalPoints.toLocaleString()}
-          icon={<Star size={22} aria-hidden="true" />}
+          icon={Star}
         />
       </div>
 
@@ -468,18 +468,20 @@ export function Loyalty() {
                     <td className="text-gray-600">{c.phone ?? '—'}</td>
                     <td className="text-gray-600">{c.email ?? '—'}</td>
                     <td>
-                      <StatusPill variant={TIER_PILL_VARIANT[c.tier]}>
-                        {c.tier.charAt(0) + c.tier.slice(1).toLowerCase()}
-                      </StatusPill>
+                      <StatusPill
+                        label={c.tier.charAt(0) + c.tier.slice(1).toLowerCase()}
+                        variant={TIER_PILL_VARIANT[c.tier]}
+                      />
                     </td>
                     <td className="text-right">
                       <span className="num">{c.points_balance.toLocaleString()}</span>
                     </td>
                     <td className="text-gray-600">{fmtDate(c.joined_date)}</td>
                     <td>
-                      <StatusPill variant={c.is_active ? 'green' : 'gray'}>
-                        {c.is_active ? 'Active' : 'Inactive'}
-                      </StatusPill>
+                      <StatusPill
+                        label={c.is_active ? 'Active' : 'Inactive'}
+                        variant={c.is_active ? 'green' : 'gray'}
+                      />
                     </td>
                     <td className="text-right">
                       <button

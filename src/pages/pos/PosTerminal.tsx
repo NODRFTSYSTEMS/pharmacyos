@@ -351,21 +351,29 @@ export default function PosTerminal() {
       if (e2) throw e2
 
       // Decrement stock — only for real catalog products, not custom items
+      const stockFailures: string[] = []
       for (const item of cart.filter(i => !i.is_custom)) {
         const { error: e3 } = await supabase.rpc('decrement_product_stock', {
           p_product_id: item.product_id,
           p_qty:        item.qty,
         })
-        if (e3) console.warn('Stock decrement failed for', item.product_name, e3.message)
+        if (e3) stockFailures.push(item.product_name)
       }
 
-      return txn.id
+      return { txnId: txn.id, stockFailures }
     },
-    onSuccess: () => {
+    onSuccess: ({ stockFailures }) => {
       clearCart()
       qc.invalidateQueries({ queryKey: ['retail-txns'] })
       qc.invalidateQueries({ queryKey: ['pos-products'] })
-      showToast('Sale processed successfully', true)
+      if (stockFailures.length > 0) {
+        showToast(
+          `Sale recorded. Stock update failed for: ${stockFailures.join(', ')} — manual adjustment required.`,
+          false,
+        )
+      } else {
+        showToast('Sale processed successfully', true)
+      }
       searchRef.current?.focus()
     },
     onError: (e: Error) => showToast(`Sale failed: ${e.message}`, false),

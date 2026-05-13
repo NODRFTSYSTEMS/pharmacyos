@@ -202,7 +202,7 @@ export default function EodReport() {
           </div>
           {peakHour && (
             <p className="text-xs text-gray-500 mt-2">
-              Peak hour: <strong>{peakHour[0]}:00</strong> — {fmtCurrency(parseFloat(peakHour[1] as string))}
+              Peak hour: <strong>{peakHour[0]}:00</strong> — {fmtCurrency(Number(peakHour[1]))}
             </p>
           )}
         </div>

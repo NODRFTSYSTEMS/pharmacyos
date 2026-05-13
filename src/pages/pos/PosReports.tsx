@@ -9,11 +9,22 @@ import {
 import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard } from '../../components/Shell';
 
+// Jamaica does not observe DST — UTC-5 year-round
+function toJamaicaBounds(from: string, to: string) {
+  return {
+    gte: `${from}T00:00:00-05:00`,
+    lte: `${to}T23:59:59.999-05:00`,
+  }
+}
+
+function toJamaicaDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' })
+}
+
 interface RetailTransaction {
   id: string;
   payment_method: 'CASH' | 'CARD' | 'LYNK';
-  amount: number;
-  transaction_date: string;
+  total: number;
   created_at: string;
 }
 
@@ -83,27 +94,29 @@ export function PosReports() {
   const { data: transactions = [], isLoading } = useQuery<RetailTransaction[]>({
     queryKey: ['pos_reports', dateFrom, dateTo],
     queryFn: async () => {
+      const bounds = toJamaicaBounds(dateFrom, dateTo)
       const { data, error } = await supabase
         .from('retail_transactions')
-        .select('id, payment_method, amount, transaction_date, created_at')
-        .gte('transaction_date', dateFrom)
-        .lte('transaction_date', dateTo)
-        .order('transaction_date', { ascending: true });
+        .select('id, payment_method, total, created_at')
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
+        .eq('voided', false)
+        .order('created_at', { ascending: true });
       if (error) throw error;
       return data as RetailTransaction[];
     },
   });
 
-  const totalRevenue = useMemo(() => transactions.reduce((s, t) => s + t.amount, 0), [transactions]);
-  const cashTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'CASH').reduce((s, t) => s + t.amount, 0), [transactions]);
-  const cardTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'CARD').reduce((s, t) => s + t.amount, 0), [transactions]);
-  const lynkTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'LYNK').reduce((s, t) => s + t.amount, 0), [transactions]);
+  const totalRevenue = useMemo(() => transactions.reduce((s, t) => s + t.total, 0), [transactions]);
+  const cashTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'CASH').reduce((s, t) => s + t.total, 0), [transactions]);
+  const cardTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'CARD').reduce((s, t) => s + t.total, 0), [transactions]);
+  const lynkTotal = useMemo(() => transactions.filter((t) => t.payment_method === 'LYNK').reduce((s, t) => s + t.total, 0), [transactions]);
 
   const paymentBreakdown = useMemo<PaymentMethodRow[]>(() => {
     const methods: Array<RetailTransaction['payment_method']> = ['CASH', 'CARD', 'LYNK'];
     return methods.map((m) => {
       const filtered = transactions.filter((t) => t.payment_method === m);
-      const total = filtered.reduce((s, t) => s + t.amount, 0);
+      const total = filtered.reduce((s, t) => s + t.total, 0);
       return {
         method: m,
         count: filtered.length,
@@ -116,13 +129,13 @@ export function PosReports() {
   const dailySales = useMemo<DailySalesRow[]>(() => {
     const map = new Map<string, DailySalesRow>();
     for (const t of transactions) {
-      const d = t.transaction_date.slice(0, 10);
+      const d = toJamaicaDate(t.created_at);
       const existing = map.get(d) ?? { date: d, cash: 0, card: 0, lynk: 0, txCount: 0, total: 0 };
-      if (t.payment_method === 'CASH') existing.cash += t.amount;
-      if (t.payment_method === 'CARD') existing.card += t.amount;
-      if (t.payment_method === 'LYNK') existing.lynk += t.amount;
+      if (t.payment_method === 'CASH') existing.cash += t.total;
+      if (t.payment_method === 'CARD') existing.card += t.total;
+      if (t.payment_method === 'LYNK') existing.lynk += t.total;
       existing.txCount += 1;
-      existing.total += t.amount;
+      existing.total += t.total;
       map.set(d, existing);
     }
     return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
@@ -182,22 +195,22 @@ export function PosReports() {
         <MetricCard
           label="Total POS Revenue"
           value={fmtJMD(totalRevenue)}
-          icon={<CurrencyDollar size={22} aria-hidden="true" />}
+          icon={CurrencyDollar}
         />
         <MetricCard
           label="Cash Total"
           value={fmtJMD(cashTotal)}
-          icon={<Calculator size={22} aria-hidden="true" />}
+          icon={Calculator}
         />
         <MetricCard
           label="Card Total"
           value={fmtJMD(cardTotal)}
-          icon={<Receipt size={22} aria-hidden="true" />}
+          icon={Receipt}
         />
         <MetricCard
           label="Lynk Total"
           value={fmtJMD(lynkTotal)}
-          icon={<Receipt size={22} aria-hidden="true" />}
+          icon={Receipt}
         />
       </div>
 

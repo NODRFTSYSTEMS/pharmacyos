@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  CurrencyDollar, Warning, CheckCircle, LockSimple,
+  Warning, CheckCircle, LockSimple,
   ArrowRight, Calculator,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
@@ -103,7 +103,7 @@ export default function CloseOut() {
     mutationFn: async () => {
       if (!systemTotals) throw new Error('System totals not loaded')
       const { data: { user } } = await supabase.auth.getUser()
-      const payload: Record<string, unknown> = {
+      const payload = {
         closeout_date:              date,
         shift,
         closed_by:                  user?.id ?? 'unknown',
@@ -122,9 +122,9 @@ export default function CloseOut() {
         retail_transaction_count:   systemTotals.retailCount,
         rx_transaction_count:       systemTotals.rxCount,
         void_count:                 systemTotals.voidCount,
-        status:                     cashVariance !== null && Math.abs(cashVariance) >= 500
+        status:                     (cashVariance !== null && Math.abs(cashVariance) >= 500
                                       ? 'DISCREPANCY'
-                                      : 'SUBMITTED',
+                                      : 'SUBMITTED') as EodCloseout['status'],
         notes: notes || null,
       }
       const { error } = await supabase.from('eod_closeouts').insert([payload])

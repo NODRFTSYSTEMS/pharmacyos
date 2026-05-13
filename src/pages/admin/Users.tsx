@@ -284,7 +284,7 @@ export function UsersAdmin() {
         title="Staff & Users"
         subtitle="Manage staff accounts and system access"
         breadcrumb={['Admin', 'Users']}
-        actions={
+        cta={
           <button className="btn btn-primary flex items-center gap-2" onClick={openAdd}>
             <Plus size={18} aria-hidden="true" />
             Add Staff
@@ -310,22 +310,22 @@ export function UsersAdmin() {
         <MetricCard
           label="Total Staff"
           value={totalStaff.toLocaleString()}
-          icon={<Users size={22} aria-hidden="true" />}
+          icon={Users}
         />
         <MetricCard
           label="Active"
           value={activeStaff.toLocaleString()}
-          icon={<Users size={22} aria-hidden="true" />}
+          icon={Users}
         />
         <MetricCard
           label="Pharmacists"
           value={pharmacistCount.toLocaleString()}
-          icon={<Shield size={22} aria-hidden="true" />}
+          icon={Shield}
         />
         <MetricCard
           label="Managers"
           value={managerCount.toLocaleString()}
-          icon={<Shield size={22} aria-hidden="true" />}
+          icon={Shield}
         />
       </div>
 
@@ -356,14 +356,16 @@ export function UsersAdmin() {
                     <td className="font-medium text-gray-900">{s.full_name}</td>
                     <td className="text-gray-600">{s.email}</td>
                     <td>
-                      <StatusPill variant={ROLE_PILL_VARIANT[s.role]}>
-                        {s.role.charAt(0) + s.role.slice(1).toLowerCase()}
-                      </StatusPill>
+                      <StatusPill
+                        label={s.role.charAt(0) + s.role.slice(1).toLowerCase()}
+                        variant={ROLE_PILL_VARIANT[s.role]}
+                      />
                     </td>
                     <td>
-                      <StatusPill variant={s.is_active ? 'green' : 'gray'}>
-                        {s.is_active ? 'Active' : 'Inactive'}
-                      </StatusPill>
+                      <StatusPill
+                        label={s.is_active ? 'Active' : 'Inactive'}
+                        variant={s.is_active ? 'green' : 'gray'}
+                      />
                     </td>
                     <td className="text-right">
                       <button

@@ -69,6 +69,33 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
   const accept = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      let linkedPrescriptionId: string | null = null
+
+      // For prescriptions: create the prescription record first, then link it
+      if (isRx) {
+        const issueDate = editedFields.issue_date?.trim()
+          || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' })
+
+        const { data: rx, error: rxErr } = await supabase
+          .from('prescriptions')
+          .insert({
+            patient_name:        editedFields.patient_name?.trim()    || 'Unknown',
+            prescriber_name:     editedFields.prescriber_name?.trim() || 'Unknown',
+            prescriber_reg:      editedFields.prescriber_reg?.trim()  || null,
+            drug_name:           editedFields.drug_name?.trim()       || 'Unknown',
+            dosage:              editedFields.dosage?.trim()          || null,
+            quantity:            Math.max(1, parseInt(editedFields.quantity ?? '1', 10) || 1),
+            issue_date:          issueDate,
+            status:              'RECEIVED' as const,
+            extraction_queue_id: entry.id,
+          })
+          .select('id')
+          .single()
+
+        if (rxErr) throw rxErr
+        linkedPrescriptionId = rx.id
+      }
+
       const { error } = await supabase.from('extraction_queue').update({
         ...editedFields,
         extraction_status: 'ACCEPTED',
@@ -76,11 +103,13 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
         reviewed_at: new Date().toISOString(),
         review_notes: reviewNotes || null,
         updated_at: new Date().toISOString(),
+        ...(linkedPrescriptionId ? { linked_prescription_id: linkedPrescriptionId } : {}),
       }).eq('id', entry.id)
       if (error) throw error
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['extraction-queue'] })
+      qc.invalidateQueries({ queryKey: ['prescriptions'] })
       onClose()
     },
   })

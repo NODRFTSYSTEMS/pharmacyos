@@ -11,7 +11,7 @@ export type PrescriptionStatus = 'RECEIVED' | 'VERIFYING' | 'READY' | 'DISPENSED
 export type StaffRole          = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN'
 export type LoyaltyTier        = 'STANDARD' | 'SILVER' | 'GOLD' | 'PLATINUM'
 
-// ── Existing tables ───────────────────────────────────────────────────────────
+// ── Row types ─────────────────────────────────────────────────────────────────
 
 export interface RetailTransaction {
   id: string
@@ -214,7 +214,33 @@ export interface AuditLogEntry {
   created_at: string
 }
 
+// ── Migration 002 ─────────────────────────────────────────────────────────────
+
+export interface RetailSupplier {
+  id: string
+  name: string
+  contact_person: string | null
+  phone: string | null
+  email: string | null
+  address: string | null
+  payment_terms: string | null
+  notes: string | null
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ── Pharmacy Settings ─────────────────────────────────────────────────────────
+
+export interface PharmacySetting {
+  key: string
+  value: string
+  updated_at: string
+}
+
 // ── Database type map ─────────────────────────────────────────────────────────
+// Structured to satisfy @supabase/supabase-js GenericDatabase constraint.
+// Each table requires Relationships: []; schema requires Views/Functions/Enums/CompositeTypes.
 
 export type Database = {
   public: {
@@ -223,57 +249,92 @@ export type Database = {
         Row: RetailTransaction
         Insert: Omit<RetailTransaction, 'id' | 'created_at'>
         Update: Partial<Omit<RetailTransaction, 'id' | 'created_at'>>
+        Relationships: []
       }
       retail_transaction_items: {
         Row: RetailTransactionItem
         Insert: Omit<RetailTransactionItem, 'id' | 'created_at'>
         Update: Partial<Omit<RetailTransactionItem, 'id' | 'created_at'>>
+        Relationships: []
       }
       rx_transactions: {
         Row: RxTransaction
         Insert: Omit<RxTransaction, 'id' | 'created_at'>
         Update: Partial<Omit<RxTransaction, 'id' | 'created_at'>>
+        Relationships: []
       }
       eod_closeouts: {
         Row: EodCloseout
         Insert: Omit<EodCloseout, 'id' | 'created_at'>
         Update: Partial<Omit<EodCloseout, 'id' | 'created_at'>>
+        Relationships: []
       }
       extraction_queue: {
         Row: ExtractionQueueEntry
         Insert: Omit<ExtractionQueueEntry, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<ExtractionQueueEntry, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      retail_suppliers: {
+        Row: RetailSupplier
+        Insert: Omit<RetailSupplier, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<RetailSupplier, 'id' | 'created_at'>>
+        Relationships: []
       }
       products: {
         Row: Product
         Insert: Omit<Product, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Product, 'id' | 'created_at'>>
+        Relationships: []
       }
       patients: {
         Row: Patient
         Insert: Omit<Patient, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Patient, 'id' | 'created_at'>>
+        Relationships: []
       }
       prescriptions: {
         Row: Prescription
         Insert: Omit<Prescription, 'id' | 'ref_number' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Prescription, 'id' | 'created_at'>>
+        Relationships: []
       }
       staff_profiles: {
         Row: StaffProfile
         Insert: Omit<StaffProfile, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<StaffProfile, 'id' | 'created_at'>>
+        Relationships: []
       }
       loyalty_customers: {
         Row: LoyaltyCustomer
         Insert: Omit<LoyaltyCustomer, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<LoyaltyCustomer, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      pharmacy_settings: {
+        Row: PharmacySetting
+        Insert: Omit<PharmacySetting, 'updated_at'>
+        Update: Partial<PharmacySetting>
+        Relationships: []
       }
       audit_log: {
         Row: AuditLogEntry
         Insert: Omit<AuditLogEntry, 'id' | 'created_at'>
-        Update: never
+        Update: Partial<Omit<AuditLogEntry, 'id' | 'created_at'>>
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

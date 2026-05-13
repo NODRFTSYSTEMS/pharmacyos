@@ -122,7 +122,7 @@ export function Settings() {
         title="Settings"
         subtitle="Pharmacy configuration and system settings"
         breadcrumb={['Admin', 'Settings']}
-        actions={
+        cta={
           <button
             className="btn btn-primary flex items-center gap-2"
             onClick={handleSave}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import {
-  House, Pill, ShoppingBag, Users, ChartBar, Robot,
+  House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
@@ -15,7 +15,7 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { label: 'Dashboard',    href: '/dashboard',      icon: House },
-  { label: 'Prescriptions', icon: Pill, children: [
+  { label: 'Prescriptions', icon: PillIcon, children: [
     { label: 'Queue',         href: '/prescriptions' },
     { label: 'New Rx',        href: '/prescriptions/new' },
     { label: 'Schedule Log',  href: '/prescriptions/schedule-log' },
