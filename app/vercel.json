@@ -3,6 +3,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "vite",
-  "outputDirectory": "dist",
-  "rootDirectory": "app"
+  "outputDirectory": "dist"
 }
