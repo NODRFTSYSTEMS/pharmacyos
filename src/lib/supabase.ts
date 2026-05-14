@@ -6,9 +6,10 @@ const key  = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
 // ⚠️  Do NOT throw here. A module-level throw fires before React mounts —
 // AppErrorBoundary cannot catch it and the result is a blank white screen.
-// Log the misconfiguration and fall back to placeholder values so React
-// can at least render the error boundary or redirect to /login.
-if (!url || !key) {
+// Export a flag instead so main.tsx can render a visible config error screen.
+export const supabaseConfigured = Boolean(url && key)
+
+if (!supabaseConfigured) {
   console.error(
     '[PharmacyOS] FATAL: Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.',
     '\nLocal dev → add to app/.env.local',

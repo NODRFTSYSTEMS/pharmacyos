@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
+import { supabaseConfigured } from './lib/supabase'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -77,14 +78,47 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Strip trailing slash so React Router v7 basename is always '/pharmacyos' not '/pharmacyos/'
+// When base is '/' (Vercel), this resolves to '' which React Router treats as root.
+const routerBase = import.meta.env.BASE_URL.replace(/\/$/, '')
+
+// Visible config error screen rendered before Router/App when Supabase is unconfigured.
+// Supabase module cannot throw at module level (blank screen before React mounts),
+// so we check the exported flag here and short-circuit the full render tree.
+function MissingConfigScreen() {
+  return (
+    <div style={{ minHeight: '100vh', background: '#F5F7FA', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ background: '#fff', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,.12)', maxWidth: '420px', width: '100%', padding: '40px', textAlign: 'center' }}>
+        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <svg width="28" height="28" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z" fill="#D97706"/></svg>
+        </div>
+        <h1 style={{ fontSize: '18px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>PharmacyOS — Configuration Required</h1>
+        <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '4px' }}>
+          This deployment is missing required environment variables.
+        </p>
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginBottom: '24px' }}>
+          Add <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>VITE_SUPABASE_URL</code> and <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>VITE_SUPABASE_ANON_KEY</code> to your Vercel project under <strong>Settings → Environment Variables</strong>, then redeploy.
+        </p>
+        <a href="https://vercel.com/dashboard" style={{ display: 'inline-block', padding: '10px 20px', background: '#2563EB', color: '#fff', borderRadius: '6px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>
+          Open Vercel Dashboard
+        </a>
+      </div>
+    </div>
+  )
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AppErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </AppErrorBoundary>
+    {supabaseConfigured ? (
+      <AppErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter basename={routerBase}>
+            <App />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </AppErrorBoundary>
+    ) : (
+      <MissingConfigScreen />
+    )}
   </StrictMode>
 )
