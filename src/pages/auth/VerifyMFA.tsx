@@ -85,7 +85,6 @@ export default function VerifyMFA() {
           <Files size={28} weight="duotone" className="text-blue-600" />
           <div>
             <p className="font-bold text-gray-900 text-lg leading-tight">PharmacyOS</p>
-            <p className="text-xs text-gray-500 leading-tight">Winchester Global Pharmacy</p>
           </div>
         </div>
 
@@ -155,7 +154,7 @@ export default function VerifyMFA() {
         </button>
 
         <p className="text-center text-xs text-gray-400 mt-4">
-          © 2026 Winchester Global Pharmacy · Powered by PharmacyOS
+          Powered by PharmacyOS
         </p>
       </div>
     </div>

@@ -8,6 +8,9 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/prescriptions':               'rx_dispense',
   '/prescriptions/new':           'rx_dispense',
   '/prescriptions/schedule-log':  'rx_schedule_log',
+  // Note: '/prescriptions/:id' is intentionally absent. Dynamic Rx detail routes
+  // are accessible only from the queue page which already requires rx_dispense.
+  // React Router v7 does not match literal ':id' patterns in this static map.
 
   // ── POS ────────────────────────────────────────────────────────────────────
   '/pos':                         'pos_terminal',

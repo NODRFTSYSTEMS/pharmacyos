@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, X, ClipboardText } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { todayJamaica } from '../../lib/date'
+import { formatDrugName } from '../../lib/formatting'
 import { PageHeader } from '../../components/Shell'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -314,7 +315,7 @@ export function ScheduleLog() {
                   <tr key={e.id} className="hover:bg-gray-50">
                     <td className="px-4 font-mono text-xs text-gray-600">{fmtDate(e.entry_date)}</td>
                     <td className="px-4">
-                      <p className="font-medium text-gray-900 text-xs">{e.drug_name}</p>
+                      <p className="font-medium text-gray-900 text-xs">{formatDrugName(e.drug_name)}</p>
                       {e.strength && <p className="text-gray-400 text-xs">{e.strength}</p>}
                     </td>
                     <td className="px-4 text-right font-mono text-xs text-emerald-700">{e.quantity_in > 0 ? `+${e.quantity_in}` : '—'}</td>

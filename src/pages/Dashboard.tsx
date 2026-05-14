@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../components/Shell'
 import { usePermission } from '../hooks/usePermission'
+import { usePharmacyName } from '../hooks/usePharmacyName'
 import type {
   RetailTransaction,
   RxTransaction,
@@ -126,6 +127,8 @@ export function Dashboard() {
   // I-22: todayJamaica() uses America/Jamaica timezone — not UTC
   const today = todayJamaica()
 
+  const pharmacyName = usePharmacyName()
+
   // I-21: Role-filtered dashboard sections
   const canViewReports = usePermission('reports_view')
   const canViewRx      = usePermission('rx_dispense')
@@ -176,7 +179,7 @@ export function Dashboard() {
     <div>
       <PageHeader
         title="Dashboard"
-        subtitle="Winchester Global Pharmacy — today's overview"
+        subtitle={`${pharmacyName} — today's overview`}
         breadcrumb={['Dashboard']}
       />
 

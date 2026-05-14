@@ -5,6 +5,7 @@ import {
   Plus, MagnifyingGlass, X, PencilSimple, Users, Warning, Shield,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { formatPatientName } from '../../lib/formatting'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
 import type { Patient } from '../../types/database'
 
@@ -79,7 +80,7 @@ function EditPatientDrawer({ patient, onClose }: EditDrawerProps) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <div>
             <h2 className="font-semibold text-gray-800">Edit Patient</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{patient.last_name}, {patient.first_name}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{formatPatientName(patient.first_name, patient.last_name)}</p>
           </div>
           <button onClick={onClose} className="btn btn-ghost h-8 w-8 p-0" aria-label="Close">
             <X size={16} />
@@ -399,7 +400,7 @@ export function PatientList() {
                   return (
                     <tr key={patient.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium text-gray-800 text-sm">
-                        {patient.last_name}, {patient.first_name}
+                        {formatPatientName(patient.first_name, patient.last_name)}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-600 font-mono">
                         {fmtDob(patient.date_of_birth)}

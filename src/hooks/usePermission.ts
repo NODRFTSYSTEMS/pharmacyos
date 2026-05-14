@@ -22,6 +22,8 @@ const DEFAULT_PERMS: Record<string, string[]> = {
   PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue'],
   CASHIER:    ['pos_terminal','loyalty_manage'],
   TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue'],
+  // pos_void is a page-action permission (void transaction within a session), not a
+  // standalone route guard. Cashier explicitly excluded to prevent unauthorized voids.
 }
 
 function useRolePermissions() {

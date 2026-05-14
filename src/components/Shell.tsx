@@ -7,6 +7,7 @@ import {
 import { supabase } from '../lib/supabase'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useAnyPermission } from '../hooks/usePermission'
+import { usePharmacyName } from '../hooks/usePharmacyName'
 import { NAV_PERMISSIONS } from '../config/route-permissions'
 import { GlobalSearch } from './GlobalSearch'
 import { NotificationBell } from './NotificationBell'
@@ -102,6 +103,7 @@ function NavGroup({ item }: { item: NavItem }) {
     <div>
       <button
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
         className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
       >
         <item.icon size={16} weight="duotone" />
@@ -128,6 +130,7 @@ export function Sidebar() {
   const nav            = useNavigate()
   const filteredNav    = useFilteredNav()
   const { data: user } = useCurrentUser()
+  const pharmacyName   = usePharmacyName()
 
   // I-20: display name fallback — never show raw email as a person's name
   const displayName = user?.name && user.name !== user?.email
@@ -149,7 +152,7 @@ export function Sidebar() {
           <span className="text-white font-bold text-sm tracking-tight flex-1">PharmacyOS</span>
           <NotificationBell />
         </div>
-        <p className="text-gray-500 text-xs mt-0.5">Winchester Global Pharmacy</p>
+        <p className="text-gray-400 text-xs mt-0.5">{pharmacyName}</p>
       </div>
 
       <nav className="flex-1 px-2 py-3 space-y-0.5" aria-label="Main navigation">
@@ -172,7 +175,7 @@ export function Sidebar() {
             <UserCircle size={18} weight="duotone" className="text-gray-500 shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-300 truncate">{displayName}</p>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wide">{user.role}</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide">{user.role}</p>
             </div>
           </div>
         )}
@@ -282,6 +285,14 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* WCAG 2.4.1 — skip link allows keyboard users to bypass sidebar nav */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[200] focus:bg-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-semibold focus:text-blue-700 focus:outline focus:outline-2 focus:outline-blue-700"
+      >
+        Skip to main content
+      </a>
+
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar />
@@ -313,7 +324,7 @@ export function AppShell({ children }: AppShellProps) {
           <span className="font-bold text-sm text-gray-800">PharmacyOS</span>
         </div>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main id="main-content" className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>
@@ -337,7 +348,7 @@ export function ClosableAlert({
   return (
     <div className={`flex items-center justify-between gap-3 border rounded px-3 py-2.5 text-sm mb-4 ${map[variant]}`}>
       <span>{message}</span>
-      <button onClick={() => setOpen(false)} className="shrink-0"><X size={14} /></button>
+      <button onClick={() => setOpen(false)} aria-label="Dismiss alert" className="shrink-0"><X size={14} /></button>
     </div>
   )
 }
@@ -361,13 +372,14 @@ interface PrintHeaderProps {
 }
 
 export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderProps) {
+  const pharmacyName = usePharmacyName()
   const now = new Date().toLocaleString('en-JM', { timeZone: 'America/Jamaica' })
 
   return (
     <div className="print-only mb-6 pb-4 border-b border-gray-300">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-bold text-base text-gray-900">Winchester Global Pharmacy</p>
+          <p className="font-bold text-base text-gray-900">{pharmacyName}</p>
           <p className="text-xs text-gray-600">Kingston, Jamaica</p>
           <p className="text-xs text-gray-500 mt-0.5">OIC Registration: [See pharmacy_settings]</p>
         </div>
