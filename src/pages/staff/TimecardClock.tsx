@@ -37,8 +37,9 @@ function useElapsed(clockedInAt: string | undefined): string {
 
   useEffect(() => {
     if (!clockedInAt) { setElapsed(''); return }
+    const clocked = clockedInAt
     function update() {
-      const mins = Math.floor((Date.now() - new Date(clockedInAt).getTime()) / 60_000)
+      const mins = Math.floor((Date.now() - new Date(clocked).getTime()) / 60_000)
       setElapsed(fmtDuration(mins))
     }
     update()
@@ -64,14 +65,14 @@ export default function TimecardClock() {
     queryKey: ['timecard-active', user?.id, today],
     queryFn: async () => {
       if (!user) return null
-      const { from, to } = toJamaicaBounds(today, today)
+      const { gte, lte } = toJamaicaBounds(today, today)
       const { data } = await supabase
         .from('timecards')
         .select('*')
         .eq('staff_id', user.id)
         .eq('status', 'CLOCKED_IN')
-        .gte('clocked_in_at', from)
-        .lte('clocked_in_at', to)
+        .gte('clocked_in_at', gte)
+        .lte('clocked_in_at', lte)
         .maybeSingle()
       return (data ?? null) as Timecard | null
     },

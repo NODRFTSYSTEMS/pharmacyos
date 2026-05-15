@@ -50,12 +50,12 @@ export default function TimecardManager() {
   const { data = [], isLoading, isError } = useQuery<Timecard[]>({
     queryKey: ['timecards-manager', range],
     queryFn: async () => {
-      const { from, to } = toJamaicaBounds(range.from, range.to)
+      const { gte, lte } = toJamaicaBounds(range.from, range.to)
       const { data, error } = await supabase
         .from('timecards')
         .select('*')
-        .gte('clocked_in_at', from)
-        .lte('clocked_in_at', to)
+        .gte('clocked_in_at', gte)
+        .lte('clocked_in_at', lte)
         .order('clocked_in_at', { ascending: false })
         .limit(500)
       if (error) throw error

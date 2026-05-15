@@ -63,7 +63,7 @@ export default function StockMovements() {
   const { data, isLoading, isError } = useQuery<MovementRow[]>({
     queryKey: ['stock-movements', range],
     queryFn: async () => {
-      const { from: fromDt, to: toDt } = toJamaicaBounds(range.from, range.to)
+      const { gte: fromDt, lte: toDt } = toJamaicaBounds(range.from, range.to)
       const { data, error } = await supabase
         .from('stock_movements')
         .select('*, product:products(name, barcode)')

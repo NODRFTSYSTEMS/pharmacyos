@@ -256,7 +256,7 @@ export default function PatientProfile() {
     )
   }
 
-  const patientDisplayName = formatPatientName(patient)
+  const patientDisplayName = formatPatientName(patient.first_name, patient.last_name)
 
   return (
     <div>

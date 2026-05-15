@@ -40,12 +40,12 @@ export function TimecardReport() {
   const { data = [], isLoading, isError } = useQuery<Timecard[]>({
     queryKey: ['timecard-report', range],
     queryFn: async () => {
-      const { from, to } = toJamaicaBounds(range.from, range.to)
+      const { gte, lte } = toJamaicaBounds(range.from, range.to)
       const { data, error } = await supabase
         .from('timecards')
         .select('*')
-        .gte('clocked_in_at', from)
-        .lte('clocked_in_at', to)
+        .gte('clocked_in_at', gte)
+        .lte('clocked_in_at', lte)
         .neq('status', 'CLOCKED_IN')
         .order('clocked_in_at', { ascending: false })
       if (error) throw error
