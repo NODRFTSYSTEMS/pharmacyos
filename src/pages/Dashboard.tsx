@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from 'react-router'
 import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
 } from '@phosphor-icons/react'
@@ -144,7 +145,8 @@ function useExpiringSoonCount() {
 
 export function Dashboard() {
   // I-22: todayJamaica() uses America/Jamaica timezone — not UTC
-  const today = todayJamaica()
+  const today    = todayJamaica()
+  const navigate = useNavigate()
 
   const pharmacyName = usePharmacyName()
 
@@ -207,7 +209,13 @@ export function Dashboard() {
       {(expiringQ.data ?? 0) > 0 && (
         <ClosableAlert
           variant="yellow"
-          message={`${expiringQ.data} product${expiringQ.data !== 1 ? 's' : ''} expiring within 30 days. Review the Inventory Report → Expiring Soon tab.`}
+          message={
+            <>{expiringQ.data} product{expiringQ.data !== 1 ? 's' : ''} expiring within 30 days.{' '}
+              <Link to="/reports/inventory" className="underline font-medium hover:opacity-75">
+                Review the Inventory Report → Expiring Soon tab.
+              </Link>
+            </>
+          }
         />
       )}
 
@@ -229,37 +237,45 @@ export function Dashboard() {
             icon={Receipt}
             accent="blue"
           />
-          <MetricCard
-            label="Pending Prescriptions"
-            value={String(pendingRxCount)}
-            sub="Received, verifying, or ready"
-            icon={ClockCounterClockwise}
-            accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
-          />
-          <MetricCard
-            label="Low Stock Items"
-            value={String(lowStockCount)}
-            sub="At or below reorder level"
-            icon={Warning}
-            accent={lowStockCount > 0 ? 'red' : 'blue'}
-          />
+          <Link to="/prescriptions" className="block">
+            <MetricCard
+              label="Pending Prescriptions"
+              value={String(pendingRxCount)}
+              sub="Received, verifying, or ready"
+              icon={ClockCounterClockwise}
+              accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
+            />
+          </Link>
+          <Link to="/reports/inventory" className="block">
+            <MetricCard
+              label="Low Stock Items"
+              value={String(lowStockCount)}
+              sub="At or below reorder level"
+              icon={Warning}
+              accent={lowStockCount > 0 ? 'red' : 'blue'}
+            />
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <MetricCard
-            label="Pending Prescriptions"
-            value={String(pendingRxCount)}
-            sub="Received, verifying, or ready"
-            icon={ClockCounterClockwise}
-            accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
-          />
-          <MetricCard
-            label="Low Stock Items"
-            value={String(lowStockCount)}
-            sub="At or below reorder level"
-            icon={Warning}
-            accent={lowStockCount > 0 ? 'red' : 'blue'}
-          />
+          <Link to="/prescriptions" className="block">
+            <MetricCard
+              label="Pending Prescriptions"
+              value={String(pendingRxCount)}
+              sub="Received, verifying, or ready"
+              icon={ClockCounterClockwise}
+              accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
+            />
+          </Link>
+          <Link to="/reports/inventory" className="block">
+            <MetricCard
+              label="Low Stock Items"
+              value={String(lowStockCount)}
+              sub="At or below reorder level"
+              icon={Warning}
+              accent={lowStockCount > 0 ? 'red' : 'blue'}
+            />
+          </Link>
         </div>
       )}
 
@@ -355,7 +371,12 @@ export function Dashboard() {
                   </tr>
                 )}
                 {rxQueue.map(p => (
-                  <tr key={p.id} className="hover:bg-gray-50">
+                  <tr
+                    key={p.id}
+                    className="hover:bg-blue-50 cursor-pointer"
+                    onClick={() => navigate(`/prescriptions/${p.id}`)}
+                    title="Open prescription"
+                  >
                     <td className="px-4 font-mono text-xs text-gray-700">{p.ref_number}</td>
                     <td className="px-4 text-xs text-gray-700">{p.drug_name}</td>
                     <td className="px-4 text-xs text-gray-700">{p.patient_name}</td>

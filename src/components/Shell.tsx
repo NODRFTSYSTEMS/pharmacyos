@@ -351,7 +351,7 @@ export function AppShell({ children }: AppShellProps) {
 
 export function ClosableAlert({
   message, variant = 'yellow',
-}: { message: string; variant?: 'yellow' | 'red' | 'green' | 'blue' }) {
+}: { message: React.ReactNode; variant?: 'yellow' | 'red' | 'green' | 'blue' }) {
   const [open, setOpen] = useState(true)
   if (!open) return null
   const map = {

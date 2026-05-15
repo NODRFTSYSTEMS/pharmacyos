@@ -267,7 +267,7 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
                 ? 'Accepting…'
                 : isRx
                   ? 'Accept & Create Prescription Record'
-                  : 'Accept & Post to Inventory'}
+                  : 'Accept Invoice'}
             </button>
             <button
               onClick={() => reject.mutate()}
