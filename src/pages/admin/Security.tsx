@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
-  ShieldCheck,
   ShieldWarning,
   UserCircleGear,
   LockSimple,
@@ -231,7 +230,7 @@ function StaffSecurityTable() {
                     <div className="text-xs text-gray-400">{s.email}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <StatusPill variant={rolePill(s.role)}>{s.role}</StatusPill>
+                    <StatusPill variant={rolePill(s.role)} label={s.role} />
                   </td>
                   <td className="px-4 py-3">
                     {s.is_active ? (
@@ -400,7 +399,6 @@ export function SecurityAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <PageHeader
-          icon={ShieldCheck}
           title="Security"
           subtitle="Staff account status, access controls, and security events"
         />

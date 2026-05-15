@@ -40,7 +40,7 @@ export function RoleGuard({ permission, children }: RoleGuardProps) {
       if (!user) return
       supabase.from('audit_log').insert({
         actor_id:   user.id,
-        actor_name: currentUser.full_name || currentUser.email,
+        actor_name: currentUser.name || currentUser.email,
         action:     AUDIT_ACTIONS.ACCESS_DENIED,
         table_name: 'route',
         record_id:  null,
