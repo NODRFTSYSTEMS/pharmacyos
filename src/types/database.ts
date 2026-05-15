@@ -35,6 +35,14 @@ export interface RetailTransaction {
   voided: boolean
   voided_by: string | null
   voided_at: string | null
+  void_reason: string | null
+  void_requested_by: string | null
+  void_requested_by_name: string | null
+  void_requested_at: string | null
+  void_denied_by: string | null
+  void_denied_by_name: string | null
+  void_denied_at: string | null
+  void_denied_note: string | null
   created_at: string
 }
 

@@ -63,6 +63,11 @@ export const AUDIT_ACTIONS = {
   SESSION_TIMEOUT:          'session_timeout',
   ACCESS_DENIED:            'access_denied',
 
+  // ── Void Requests ────────────────────────────────────────────────────────────
+  VOID_REQUEST:             'void_request',
+  VOID_APPROVED:            'void_approved',
+  VOID_DENIED:              'void_denied',
+
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',
   PERMISSIONS_UPDATE:       'permissions_update',
