@@ -240,6 +240,7 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
               <option value="TECHNICIAN">Technician</option>
               <option value="MANAGER">Manager</option>
               <option value="ADMIN">Admin</option>
+              <option value="AUDITOR">Auditor</option>
             </select>
           </div>
 
