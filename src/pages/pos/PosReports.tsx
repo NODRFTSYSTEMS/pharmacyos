@@ -9,6 +9,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { toJamaicaBounds, toJamaicaDate, todayJamaica } from '../../lib/date';
 import { PageHeader, MetricCard } from '../../components/Shell';
+import { ReportAssistant } from '../../components/ReportAssistant';
 
 interface RetailTransaction {
   id: string;
@@ -126,6 +127,23 @@ export function PosReports() {
     }
     return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
   }, [transactions]);
+
+  const dataSummary = useMemo(() => {
+    const lines = [
+      `Period: ${dateFrom} to ${dateTo}`,
+      `Total POS revenue: JMD ${totalRevenue.toFixed(2)}`,
+      `Transactions: ${transactions.length}`,
+      `Cash: JMD ${cashTotal.toFixed(2)} (${totalRevenue > 0 ? ((cashTotal / totalRevenue) * 100).toFixed(1) : 0}%)`,
+      `Card: JMD ${cardTotal.toFixed(2)} (${totalRevenue > 0 ? ((cardTotal / totalRevenue) * 100).toFixed(1) : 0}%)`,
+      `Lynk: JMD ${lynkTotal.toFixed(2)} (${totalRevenue > 0 ? ((lynkTotal / totalRevenue) * 100).toFixed(1) : 0}%)`,
+      '',
+      'Daily breakdown:',
+      ...dailySales.map(r =>
+        `${r.date}: ${r.txCount} txns, JMD ${r.total.toFixed(2)} (Cash ${r.cash.toFixed(2)}, Card ${r.card.toFixed(2)}, Lynk ${r.lynk.toFixed(2)})`
+      ),
+    ]
+    return lines.join('\n')
+  }, [dateFrom, dateTo, totalRevenue, cashTotal, cardTotal, lynkTotal, transactions.length, dailySales])
 
   return (
     <div className="flex flex-col gap-6">
@@ -292,6 +310,8 @@ export function PosReports() {
           </section>
         </>
       )}
+
+      <ReportAssistant dataSummary={dataSummary} reportType="POS Revenue" />
     </div>
   );
 }

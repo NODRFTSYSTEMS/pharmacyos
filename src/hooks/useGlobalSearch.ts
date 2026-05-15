@@ -51,7 +51,7 @@ async function fetchSearchResults(query: string): Promise<SearchResult[]> {
       type: 'patient',
       title: formatPatientName(row.first_name, row.last_name),
       subtitle: `Patient · ${row.phone ?? '—'}`,
-      href: '/patients',
+      href: `/patients/${row.id}`,
     })),
 
     ...prescriptions.map((row): SearchResult => ({
@@ -59,7 +59,7 @@ async function fetchSearchResults(query: string): Promise<SearchResult[]> {
       type: 'prescription',
       title: toTitleCase(row.drug_name),
       subtitle: `Rx ${row.ref_number} · ${row.patient_name}`,
-      href: '/prescriptions',
+      href: `/prescriptions/${row.id}`,
     })),
 
     ...products.map((row): SearchResult => ({

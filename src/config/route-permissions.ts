@@ -49,6 +49,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   // ── Admin ──────────────────────────────────────────────────────────────────
   '/admin/users':                 'staff_manage',
   '/admin/audit':                 'audit_view',
+  '/admin/security':              'staff_manage',
   '/admin/settings':              'settings_manage',
 }
 

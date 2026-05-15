@@ -22,6 +22,9 @@ const DEFAULT_PERMS: Record<string, string[]> = {
   PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue'],
   CASHIER:    ['pos_terminal','loyalty_manage'],
   TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue'],
+  // AUDITOR: read-only compliance observer — audit log and reports only.
+  // No POS, Rx, patient, or staff management access.
+  AUDITOR:    ['audit_view','reports_view'],
   // pos_void is a page-action permission (void transaction within a session), not a
   // standalone route guard. Cashier explicitly excluded to prevent unauthorized voids.
 }

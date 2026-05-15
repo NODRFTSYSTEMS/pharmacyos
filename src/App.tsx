@@ -8,6 +8,7 @@ import { RoleGuard } from './components/RoleGuard'
 import Login                from './pages/auth/Login'
 import VerifyMFA            from './pages/auth/VerifyMFA'
 import SetupMFA             from './pages/auth/SetupMFA'
+import ForgotPassword       from './pages/auth/ForgotPassword'
 
 // Error pages
 import { Forbidden }        from './pages/errors/Forbidden'
@@ -55,6 +56,7 @@ import TimecardReport       from './pages/reports/TimecardReport'
 import { UsersAdmin }       from './pages/admin/Users'
 import { AuditLog }         from './pages/admin/AuditLog'
 import { Settings }         from './pages/admin/Settings'
+import SecurityAdmin        from './pages/admin/Security'
 
 // AI Queue
 import AiQueue              from './pages/ai/Queue'
@@ -66,6 +68,7 @@ export default function App() {
     <Routes>
       {/* Public / semi-public auth routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       {/* I-09: /verify-mfa is accessible with an AAL1 session (before MFA upgrade) */}
       <Route path="/verify-mfa" element={<VerifyMFA />} />
 
@@ -175,6 +178,9 @@ export default function App() {
                 } />
                 <Route path="/admin/settings" element={
                   <RoleGuard permission="settings_manage"><Settings /></RoleGuard>
+                } />
+                <Route path="/admin/security" element={
+                  <RoleGuard permission="staff_manage"><SecurityAdmin /></RoleGuard>
                 } />
 
                 {/* AI Queue */}

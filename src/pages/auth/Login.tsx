@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, Link } from 'react-router'
 import { Files } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
@@ -98,6 +98,15 @@ export default function Login() {
               }
             </button>
           </form>
+
+          <div className="mt-5 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              Forgot your password?
+            </Link>
+          </div>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">

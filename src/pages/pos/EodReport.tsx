@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Printer, Export, CheckCircle, Warning,
-  CurrencyDollar, Receipt, Pill, CalendarBlank, Seal,
+  CurrencyDollar, Receipt, Pill, CalendarBlank, Seal, Sparkle,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
@@ -32,10 +32,61 @@ function eodStatus(status: EodCloseout['status']) {
   return map[status] ?? { label: status, variant: 'gray' }
 }
 
+type VarianceExplanation =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; text: string }
+  | { status: 'error'; message: string }
+
 export default function EodReport() {
   // I-22: Use Jamaica timezone for default date — not UTC
   const today = todayJamaica()
   const [date, setDate] = useState(today)
+  const [varianceExplanations, setVarianceExplanations] = useState<Record<string, VarianceExplanation>>({})
+
+  async function explainVariance(c: EodCloseout) {
+    setVarianceExplanations(prev => ({ ...prev, [c.id]: { status: 'loading' } }))
+    try {
+      const dataSummary = [
+        `Date: ${c.closeout_date}`,
+        `Shift: ${c.shift}`,
+        `Opening float: JMD ${c.opening_float.toFixed(2)}`,
+        `Expected cash in drawer: JMD ${(c.opening_float + c.system_retail_cash + c.system_rx_cash).toFixed(2)}`,
+        `Cashier counted: JMD ${c.actual_cash_counted?.toFixed(2) ?? 'unknown'}`,
+        `Cash variance: JMD ${c.cash_variance?.toFixed(2) ?? 'unknown'} (negative = short, positive = overage)`,
+        `System retail cash: JMD ${c.system_retail_cash.toFixed(2)}`,
+        `System Rx cash: JMD ${c.system_rx_cash.toFixed(2)}`,
+        `System retail card: JMD ${c.system_retail_card.toFixed(2)}`,
+        `System Rx card: JMD ${c.system_rx_card.toFixed(2)}`,
+        `Retail transactions: ${c.retail_transaction_count}`,
+        `Rx transactions: ${c.rx_transaction_count}`,
+        `Voids: ${c.void_count}`,
+        c.notes ? `Cashier notes: ${c.notes}` : 'No cashier notes.',
+      ].join('\n')
+
+      const { data, error } = await supabase.functions.invoke('report-assistant', {
+        body: {
+          question: 'What are the most likely explanations for this cash variance? List 3 specific, actionable possibilities the manager should investigate.',
+          data_summary: dataSummary,
+          report_type: 'EOD Cash Variance',
+        },
+      })
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
+      setVarianceExplanations(prev => ({ ...prev, [c.id]: { status: 'success', text: data.answer } }))
+    } catch (err) {
+      const msg = String((err as Error).message ?? err)
+      setVarianceExplanations(prev => ({
+        ...prev,
+        [c.id]: {
+          status: 'error',
+          message: msg.includes('ANTHROPIC_API_KEY')
+            ? 'AI explanation unavailable — set ANTHROPIC_API_KEY in Supabase project secrets.'
+            : msg,
+        },
+      }))
+    }
+  }
 
   const qc = useQueryClient()
   const canApprove = usePermission('eod_approve')
@@ -275,6 +326,7 @@ export default function EodReport() {
         {(closeouts ?? []).map(c => {
           const status = eodStatus(c.status)
           const cashVar = c.cash_variance
+          const varExplain = varianceExplanations[c.id] ?? { status: 'idle' }
           return (
             <div key={c.id} className="card p-5 mb-4">
               <div className="flex items-start justify-between gap-4 mb-4">
@@ -359,6 +411,44 @@ export default function EodReport() {
                       </p>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* AI variance explanation — only shown when there is a non-zero variance */}
+              {c.actual_cash_counted !== null && cashVar !== null && cashVar !== 0 && (
+                <div className="mt-3">
+                  {varExplain.status === 'idle' && (
+                    <button
+                      onClick={() => explainVariance(c)}
+                      className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                    >
+                      <Sparkle size={13} weight="fill" aria-hidden="true" />
+                      Explain Variance
+                    </button>
+                  )}
+                  {varExplain.status === 'loading' && (
+                    <p className="text-xs text-indigo-500 animate-pulse flex items-center gap-1.5">
+                      <Sparkle size={13} className="animate-spin" aria-hidden="true" />
+                      Analysing variance…
+                    </p>
+                  )}
+                  {varExplain.status === 'success' && (
+                    <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <Sparkle size={13} weight="fill" className="text-indigo-600" aria-hidden="true" />
+                        <span className="text-xs font-semibold text-indigo-800">AI Variance Analysis</span>
+                      </div>
+                      <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">{varExplain.text}</p>
+                      <p className="mt-2 text-xs text-gray-400">
+                        Generated by Claude. Verify all findings against transaction records before taking action.
+                      </p>
+                    </div>
+                  )}
+                  {varExplain.status === 'error' && (
+                    <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                      {varExplain.message}
+                    </div>
+                  )}
                 </div>
               )}
 

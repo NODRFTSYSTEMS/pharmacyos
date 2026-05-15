@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Robot, Eye, CheckCircle, XCircle, ArrowClockwise,
@@ -6,6 +6,7 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { ExtractionQueueEntry, ExtractionStatus } from '../../types/database'
 
 function fmtDateTime(iso: string) {
@@ -123,6 +124,24 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
         ...(linkedPrescriptionId ? { linked_prescription_id: linkedPrescriptionId } : {}),
       }).eq('id', entry.id)
       if (error) throw error
+
+      // Audit trail — fire-and-forget
+      if (user) {
+        await supabase.from('audit_log').insert({
+          actor_id:   user.id,
+          actor_name: user.email ?? 'unknown',
+          action:     AUDIT_ACTIONS.AI_EXTRACTION_ACCEPT,
+          table_name: 'extraction_queue',
+          record_id:  entry.id,
+          details: {
+            ref_number:      entry.ref_number,
+            document_type:   entry.document_type,
+            confidence_score: entry.confidence_score,
+            reviewer_edited: hasEdited,
+            ...(linkedPrescriptionId ? { linked_prescription_id: linkedPrescriptionId } : {}),
+          },
+        })
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['extraction-queue'] })
@@ -142,6 +161,23 @@ function ReviewDrawer({ entry, onClose }: ReviewDrawerProps) {
         updated_at: new Date().toISOString(),
       }).eq('id', entry.id)
       if (error) throw error
+
+      // Audit trail — fire-and-forget
+      if (user) {
+        await supabase.from('audit_log').insert({
+          actor_id:   user.id,
+          actor_name: user.email ?? 'unknown',
+          action:     AUDIT_ACTIONS.AI_EXTRACTION_REJECT,
+          table_name: 'extraction_queue',
+          record_id:  entry.id,
+          details: {
+            ref_number:      entry.ref_number,
+            document_type:   entry.document_type,
+            confidence_score: entry.confidence_score,
+            review_notes:    reviewNotes || null,
+          },
+        })
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['extraction-queue'] })
@@ -372,6 +408,18 @@ export default function AiQueue() {
     },
     refetchInterval: 20_000,
   })
+
+  // Realtime subscription — push-refresh when extraction_queue rows change
+  // (Edge Function updates status from PENDING → PROCESSING → REVIEW_REQUIRED/ACCEPTED)
+  useEffect(() => {
+    const channel = supabase
+      .channel('extraction-queue-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'extraction_queue' }, () => {
+        qc.invalidateQueries({ queryKey: ['extraction-queue'] })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [qc])
 
   const triggerExtraction = useMutation({
     mutationFn: async (id: string) => {

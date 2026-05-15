@@ -7,6 +7,7 @@ import {
   Receipt,
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
+import { AUDIT_ACTIONS } from '../../constants/audit-actions';
 import { PageHeader } from '../../components/Shell';
 
 interface PharmacySetting {
@@ -109,6 +110,19 @@ export function Settings() {
         .from('pharmacy_settings')
         .upsert(upserts, { onConflict: 'key' });
       if (error) throw error;
+
+      // Audit trail — record which keys were updated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('audit_log').insert({
+          actor_id:   user.id,
+          actor_name: user.email ?? 'unknown',
+          action:     AUDIT_ACTIONS.SETTINGS_UPDATE,
+          table_name: 'pharmacy_settings',
+          record_id:  null,
+          details:    { updated_keys: SETTING_KEYS },
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pharmacy_settings'] });

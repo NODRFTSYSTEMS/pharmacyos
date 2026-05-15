@@ -2,11 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router'
 import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
+  ShoppingBag, Robot, Clock, ArrowRight, Warehouse,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, ClosableAlert } from '../components/Shell'
 import { usePermission } from '../hooks/usePermission'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 import { usePharmacyName } from '../hooks/usePharmacyName'
 import type {
   RetailTransaction,
@@ -141,6 +143,68 @@ function useExpiringSoonCount() {
   })
 }
 
+function useAIQueuePendingCount() {
+  return useQuery({
+    queryKey: ['dashboard-ai-queue-pending'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('extraction_queue')
+        .select('id', { count: 'exact', head: true })
+        .in('extraction_status', ['PENDING', 'REVIEW_REQUIRED'])
+      if (error) throw error
+      return (data as unknown as null | { count: number })?.count ?? 0
+    },
+    refetchInterval: 30_000,
+  })
+}
+
+interface ReorderRecommendation {
+  product_id: string
+  product_name: string
+  category: string
+  stock_qty: number
+  reorder_level: number
+  avg_daily_sales: number
+  days_to_stockout: number | null
+  urgency: 'OUT_OF_STOCK' | 'CRITICAL' | 'LOW'
+}
+
+function useReorderRecommendations(enabled: boolean) {
+  return useQuery<ReorderRecommendation[]>({
+    queryKey: ['dashboard-reorder'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_reorder_recommendations')
+      if (error) throw error
+      return (data ?? []) as ReorderRecommendation[]
+    },
+    enabled,
+    refetchInterval: 120_000, // 2 min — reorder state changes slowly
+  })
+}
+
+function useTodayClockIn(userId: string | undefined) {
+  const today = todayJamaica()
+  return useQuery({
+    queryKey: ['dashboard-clockin', userId, today],
+    queryFn: async () => {
+      if (!userId) return null
+      const bounds = toJamaicaBounds(today, today)
+      const { data } = await supabase
+        .from('timecards')
+        .select('clocked_in_at, clocked_out_at')
+        .eq('staff_id', userId)
+        .gte('created_at', bounds.gte)
+        .lte('created_at', bounds.lte)
+        .order('clocked_in_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      return data
+    },
+    enabled: !!userId,
+    refetchInterval: 60_000,
+  })
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Dashboard() {
@@ -148,17 +212,28 @@ export function Dashboard() {
   const today    = todayJamaica()
   const navigate = useNavigate()
 
-  const pharmacyName = usePharmacyName()
+  const pharmacyName   = usePharmacyName()
+  const { data: user } = useCurrentUser()
 
   // I-21: Role-filtered dashboard sections
-  const canViewReports = usePermission('reports_view')
-  const canViewRx      = usePermission('rx_dispense')
+  const canViewReports      = usePermission('reports_view')
+  const canViewRx           = usePermission('rx_dispense')
+  const canUsePOS           = usePermission('pos_terminal')
+  const canViewAIQueue      = usePermission('ai_queue')
+  const canManageInventory  = usePermission('inventory_manage')
 
   const retailQ        = useTodayRetail(today)
   const rxQ            = useTodayRx(today)
   const prescriptionsQ = usePendingPrescriptions()
   const lowStockQ      = useLowStockProducts()
   const expiringQ      = useExpiringSoonCount()
+  const aiQueueQ       = useAIQueuePendingCount()
+  const clockInQ       = useTodayClockIn(user?.id)
+  const reorderQ       = useReorderRecommendations(canManageInventory)
+
+  const isCashier      = user?.role === 'CASHIER'
+  const isPharmacist   = user?.role === 'PHARMACIST'
+  const isClockedIn    = clockInQ.data !== null && !clockInQ.data?.clocked_out_at
 
   // Derived metrics
   const retailRevenue  = (retailQ.data ?? []).reduce((s, t) => s + t.total, 0)
@@ -219,6 +294,43 @@ export function Dashboard() {
         />
       )}
 
+      {/* ── Role-specific quick action panel ──────────────────────────────── */}
+      {isCashier && (
+        <div className="card p-4 mb-6 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-700 font-medium">
+            <Clock size={16} className={isClockedIn ? 'text-emerald-500' : 'text-gray-400'} />
+            {isClockedIn
+              ? <span className="text-emerald-700">Clocked in</span>
+              : <span className="text-amber-600">Not clocked in today</span>
+            }
+          </div>
+          <Link to="/staff/timecard" className="btn btn-ghost text-xs h-8 px-3">
+            {isClockedIn ? 'View My Timecard' : 'Clock In'}
+            <ArrowRight size={12} />
+          </Link>
+          {canUsePOS && (
+            <Link to="/pos" className="btn btn-primary text-xs h-8 px-3 gap-1.5 ml-auto">
+              <ShoppingBag size={14} />
+              Open POS Terminal
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* AI Queue alert for pharmacists/technicians with pending documents */}
+      {canViewAIQueue && (aiQueueQ.data ?? 0) > 0 && !isCashier && (
+        <ClosableAlert
+          variant="blue"
+          message={
+            <>{aiQueueQ.data} document{(aiQueueQ.data ?? 0) !== 1 ? 's' : ''} in the extraction queue need{(aiQueueQ.data ?? 0) === 1 ? 's' : ''} review.{' '}
+              <Link to="/ai/queue" className="underline font-medium hover:opacity-75">
+                Go to Document Review →
+              </Link>
+            </>
+          }
+        />
+      )}
+
       {/* ── Metric cards ───────────────────────────────────────────────────── */}
       {/* I-21: Revenue metrics visible to roles with reports_view; others see operational metrics */}
       {canViewReports ? (
@@ -257,25 +369,51 @@ export function Dashboard() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Link to="/prescriptions" className="block">
-            <MetricCard
-              label="Pending Prescriptions"
-              value={String(pendingRxCount)}
-              sub="Received, verifying, or ready"
-              icon={ClockCounterClockwise}
-              accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
-            />
-          </Link>
-          <Link to="/reports/inventory" className="block">
-            <MetricCard
-              label="Low Stock Items"
-              value={String(lowStockCount)}
-              sub="At or below reorder level"
-              icon={Warning}
-              accent={lowStockCount > 0 ? 'red' : 'blue'}
-            />
-          </Link>
+        <div className={`grid gap-4 mb-8 ${canViewAIQueue ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-2'}`}>
+          {canViewRx && (
+            <Link to="/prescriptions" className="block">
+              <MetricCard
+                label="Prescriptions Awaiting Action"
+                value={String(pendingRxCount)}
+                sub="Received, verifying, or ready"
+                icon={ClockCounterClockwise}
+                accent={pendingRxCount > 0 ? 'yellow' : 'blue'}
+              />
+            </Link>
+          )}
+          {canViewAIQueue && (
+            <Link to="/ai/queue" className="block">
+              <MetricCard
+                label="Documents for Review"
+                value={String(aiQueueQ.data ?? 0)}
+                sub="Pending extraction or review"
+                icon={Robot}
+                accent={(aiQueueQ.data ?? 0) > 0 ? 'yellow' : 'blue'}
+              />
+            </Link>
+          )}
+          {isPharmacist || !canViewRx ? (
+            <Link to="/reports/inventory" className="block">
+              <MetricCard
+                label="Items Below Reorder Level"
+                value={String(lowStockCount)}
+                sub="At or below reorder level"
+                icon={Warning}
+                accent={lowStockCount > 0 ? 'red' : 'blue'}
+              />
+            </Link>
+          ) : null}
+          {isCashier && canUsePOS && (
+            <Link to="/pos" className="block">
+              <MetricCard
+                label="Today's Transactions"
+                value={String((retailQ.data ?? []).length)}
+                sub="Retail sales today"
+                icon={Receipt}
+                accent="blue"
+              />
+            </Link>
+          )}
         </div>
       )}
 
@@ -338,7 +476,7 @@ export function Dashboard() {
 
       {/* ── Prescription Queue — rx_dispense roles only ────────────────────── */}
       {canViewRx && (
-      <section aria-labelledby="rx-queue-heading">
+      <section aria-labelledby="rx-queue-heading" className="mb-8">
         <h2 id="rx-queue-heading" className="section-title mb-3">
           Prescription Queue
         </h2>
@@ -392,6 +530,93 @@ export function Dashboard() {
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+      )}
+
+      {/* ── Reorder Recommendations — inventory_manage roles only ──────────── */}
+      {canManageInventory && (reorderQ.data?.length ?? 0) > 0 && (
+      <section aria-labelledby="reorder-heading">
+        <div className="flex items-center justify-between mb-3">
+          <h2 id="reorder-heading" className="section-title">
+            Reorder Recommendations
+          </h2>
+          <Link
+            to="/inventory/receive-stock"
+            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+          >
+            Receive Stock →
+          </Link>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full table-compact text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                  <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Urgency</th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">On Hand</th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reorder At</th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Days Left</th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Daily Velocity</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {reorderQ.isLoading && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
+                      Computing recommendations…
+                    </td>
+                  </tr>
+                )}
+                {(reorderQ.data ?? []).slice(0, 10).map(r => (
+                  <tr key={r.product_id} className="hover:bg-gray-50">
+                    <td className="px-4">
+                      <div className="text-xs font-medium text-gray-800">{r.product_name}</div>
+                      <div className="text-xs text-gray-400">{r.category}</div>
+                    </td>
+                    <td className="px-4">
+                      {r.urgency === 'OUT_OF_STOCK' && (
+                        <StatusPill variant="red" label="Out of Stock" />
+                      )}
+                      {r.urgency === 'CRITICAL' && (
+                        <StatusPill variant="yellow" label="Critical" />
+                      )}
+                      {r.urgency === 'LOW' && (
+                        <StatusPill variant="blue" label="Low" />
+                      )}
+                    </td>
+                    <td className="px-4 text-right font-mono text-xs text-gray-700">{r.stock_qty}</td>
+                    <td className="px-4 text-right font-mono text-xs text-gray-500">{r.reorder_level}</td>
+                    <td className="px-4 text-right font-mono text-xs">
+                      {r.days_to_stockout !== null
+                        ? <span className={r.days_to_stockout <= 3 ? 'text-red-600 font-semibold' : 'text-gray-700'}>
+                            {r.days_to_stockout}d
+                          </span>
+                        : <span className="text-gray-400">—</span>
+                      }
+                    </td>
+                    <td className="px-4 text-right font-mono text-xs text-gray-500">
+                      {r.avg_daily_sales > 0
+                        ? `${Number(r.avg_daily_sales).toFixed(1)}/day`
+                        : '—'
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {(reorderQ.data?.length ?? 0) > 10 && (
+            <div className="px-4 py-3 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-500">
+              <Warehouse size={14} className="text-gray-400" />
+              Showing top 10 of {reorderQ.data?.length} items needing reorder.{' '}
+              <Link to="/reports/inventory" className="text-indigo-600 hover:text-indigo-800 font-medium">
+                View full inventory report →
+              </Link>
+            </div>
+          )}
         </div>
       </section>
       )}

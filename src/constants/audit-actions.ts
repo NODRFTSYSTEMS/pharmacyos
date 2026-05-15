@@ -61,6 +61,7 @@ export const AUDIT_ACTIONS = {
   STAFF_LOGOUT:             'staff_logout',
   STAFF_LOGIN_FAILED:       'staff_login_failed',
   SESSION_TIMEOUT:          'session_timeout',
+  ACCESS_DENIED:            'access_denied',
 
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',

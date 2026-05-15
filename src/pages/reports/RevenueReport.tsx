@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   Export, CurrencyDollar, Receipt, Pill as PillIcon, Printer,
@@ -6,6 +6,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, PrintHeader } from '../../components/Shell'
+import { ReportAssistant } from '../../components/ReportAssistant'
 import type { RetailTransaction, RxTransaction, PaymentMethod } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -152,6 +153,25 @@ export function RevenueReport() {
     (acc, r) => ({ count: acc.count + r.count, total: acc.total + r.total }),
     { count: 0, total: 0 }
   )
+
+  const dataSummary = useMemo(() => {
+    const lines = [
+      `Period: ${from} to ${to}`,
+      `Grand total revenue: JMD ${grandTotal.toFixed(2)}`,
+      `Retail revenue: JMD ${totalRetail.toFixed(2)} (${retail.length} transactions)`,
+      `Rx collections: JMD ${totalRx.toFixed(2)} (${rx.length} dispensings)`,
+      `NHF subsidy (not in total): JMD ${totalNhf.toFixed(2)}`,
+      '',
+      'Daily breakdown:',
+      ...dailyRows.map(r =>
+        `${r.date}: Retail ${r.retail.toFixed(2)}, Rx ${r.rx.toFixed(2)}, Total ${r.total.toFixed(2)}`
+      ),
+      '',
+      'Payment method breakdown:',
+      ...payRows.map(r => `${r.method}: ${r.count} transactions, JMD ${r.total.toFixed(2)}`),
+    ]
+    return lines.join('\n')
+  }, [from, to, grandTotal, totalRetail, totalRx, totalNhf, retail.length, rx.length, dailyRows, payRows])
 
   // CSV export
   function exportCsv() {
@@ -359,6 +379,8 @@ export function RevenueReport() {
           </div>
         </div>
       </div>
+
+      <ReportAssistant dataSummary={dataSummary} reportType="Revenue" />
     </div>
   )
 }

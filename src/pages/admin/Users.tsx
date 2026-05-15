@@ -24,7 +24,7 @@ interface StaffProfile {
   updated_at: string;
 }
 
-type StaffRole = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN';
+type StaffRole = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN' | 'AUDITOR';
 
 interface DrawerFormState {
   full_name: string;
@@ -40,12 +40,13 @@ interface DrawerErrors {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const ROLE_PILL_VARIANT: Record<StaffRole, 'green' | 'blue' | 'purple' | 'yellow' | 'red'> = {
+const ROLE_PILL_VARIANT: Record<StaffRole, 'green' | 'blue' | 'purple' | 'yellow' | 'red' | 'gray'> = {
   PHARMACIST: 'green',
   CASHIER:    'blue',
   TECHNICIAN: 'purple',
   MANAGER:    'yellow',
   ADMIN:      'red',
+  AUDITOR:    'gray',
 };
 
 const EMPTY_FORM: DrawerFormState = {
@@ -70,19 +71,22 @@ const PERMISSIONS = [
   { key: 'audit_view',      label: 'View Audit Log'         },
   { key: 'settings_manage', label: 'Manage Settings'        },
   { key: 'loyalty_manage',  label: 'Manage Loyalty'         },
-  { key: 'ai_queue',        label: 'AI Queue'               },
+  { key: 'ai_queue',        label: 'Document Review'        },
+  { key: 'timecard_manage', label: 'Manage Timecards'       },
 ] as const;
 
-const ROLES_LIST: StaffRole[] = ['ADMIN', 'MANAGER', 'PHARMACIST', 'CASHIER', 'TECHNICIAN'];
+const ROLES_LIST: StaffRole[] = ['ADMIN', 'MANAGER', 'PHARMACIST', 'CASHIER', 'TECHNICIAN', 'AUDITOR'];
 
 type RolePermsRecord = Record<string, string[]>;
 
 const DEFAULT_PERMS: RolePermsRecord = {
   ADMIN:      PERMISSIONS.map(p => p.key) as string[],
-  MANAGER:    ['pos_terminal','pos_void','pos_closeout','eod_approve','inventory_manage','reports_view','loyalty_manage','audit_view'],
-  PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view'],
+  MANAGER:    ['pos_terminal','pos_void','pos_closeout','eod_approve','inventory_manage',
+               'reports_view','loyalty_manage','audit_view','settings_manage','timecard_manage'],
+  PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue'],
   CASHIER:    ['pos_terminal','loyalty_manage'],
-  TECHNICIAN: ['pos_terminal','rx_dispense'],
+  TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue'],
+  AUDITOR:    ['audit_view','reports_view'],
 };
 
 function makeMatrix(record: RolePermsRecord): Record<string, Set<string>> {
@@ -345,6 +349,7 @@ function PermissionsMatrix() {
     PHARMACIST: 'Pharmacist',
     CASHIER:    'Cashier',
     TECHNICIAN: 'Technician',
+    AUDITOR:    'Auditor',
   };
 
   return (
