@@ -25,11 +25,23 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   // ── Patients ───────────────────────────────────────────────────────────────
   '/patients':                    'rx_dispense',
   '/patients/new':                'rx_dispense',
+  // Note: '/patients/:id' not listed — dynamic segments don't match this static map;
+  // route access is enforced by the RoleGuard on the Route element in App.tsx.
+
+  // ── Inventory ──────────────────────────────────────────────────────────────
+  '/inventory/receive-stock':     'inventory_manage',
+  '/inventory/stock-movements':   'inventory_manage',
+
+  // ── Staff / Timecards ──────────────────────────────────────────────────────
+  // Note: '/staff/timecard' (clock-in/out) is session-only — all authenticated
+  // staff may clock in/out regardless of role. Not listed here by design.
+  '/staff/timecards':             'timecard_manage',
 
   // ── Reports ────────────────────────────────────────────────────────────────
   '/reports/revenue':             'reports_view',
   '/reports/dispensing':          'reports_view',
   '/reports/inventory':           'reports_view',
+  '/reports/timecards':           'reports_view',
 
   // ── AI Queue ───────────────────────────────────────────────────────────────
   '/ai/queue':                    'ai_queue',
@@ -48,6 +60,9 @@ export const NAV_PERMISSIONS: Record<string, string[]> = {
   'Retail POS':  ['pos_terminal', 'pos_closeout', 'eod_approve', 'inventory_manage',
                   'reports_view', 'loyalty_manage'],
   Patients:      ['rx_dispense'],
+  Inventory:     ['inventory_manage'],
+  // Staff nav group: My Timecard is session-only (all staff). Timecards manager
+  // requires timecard_manage. Group is always visible — filter done in useFilteredNav.
   Reports:       ['reports_view'],
   'AI Queue':    ['ai_queue'],
   Admin:         ['staff_manage', 'audit_view', 'settings_manage'],

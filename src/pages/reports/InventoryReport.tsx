@@ -18,6 +18,7 @@ function fmtCurrency(n: number): string {
 }
 
 type StockStatus = 'OUT_OF_STOCK' | 'LOW_STOCK' | 'IN_STOCK'
+type ExpiryStatus = 'EXPIRED' | 'EXPIRING_SOON' | 'OK' | null
 
 function getStockStatus(product: Product): StockStatus {
   if (product.stock_qty === 0) return 'OUT_OF_STOCK'
@@ -25,13 +26,31 @@ function getStockStatus(product: Product): StockStatus {
   return 'IN_STOCK'
 }
 
-type FilterTab = 'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'IN_STOCK'
+function getExpiryStatus(expiry_date: string | null): ExpiryStatus {
+  if (!expiry_date) return null
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const in30  = new Date(today); in30.setDate(today.getDate() + 30)
+  const d = new Date(expiry_date)
+  if (d < today) return 'EXPIRED'
+  if (d <= in30) return 'EXPIRING_SOON'
+  return 'OK'
+}
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('en-JM', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  })
+}
+
+type FilterTab = 'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'IN_STOCK' | 'EXPIRING_SOON'
 
 const TAB_LABELS: Record<FilterTab, string> = {
-  ALL: 'All',
-  LOW_STOCK: 'Low Stock',
-  OUT_OF_STOCK: 'Out of Stock',
-  IN_STOCK: 'In Stock',
+  ALL:           'All',
+  LOW_STOCK:     'Low Stock',
+  OUT_OF_STOCK:  'Out of Stock',
+  IN_STOCK:      'In Stock',
+  EXPIRING_SOON: 'Expiring Soon',
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -55,25 +74,35 @@ export function InventoryReport() {
 
   const products = data ?? []
 
-  // Pre-annotate with stock status
+  // Pre-annotate with stock + expiry status
   const annotated = useMemo(
-    () => products.map(p => ({ ...p, _status: getStockStatus(p) })),
+    () => products.map(p => ({
+      ...p,
+      _status:       getStockStatus(p),
+      _expiryStatus: getExpiryStatus(p.expiry_date),
+    })),
     [products],
   )
 
   // Metrics
-  const inStockCount    = annotated.filter(p => p._status === 'IN_STOCK').length
-  const lowStockCount   = annotated.filter(p => p._status === 'LOW_STOCK').length
-  const outOfStockCount = annotated.filter(p => p._status === 'OUT_OF_STOCK').length
+  const inStockCount      = annotated.filter(p => p._status === 'IN_STOCK').length
+  const lowStockCount     = annotated.filter(p => p._status === 'LOW_STOCK').length
+  const outOfStockCount   = annotated.filter(p => p._status === 'OUT_OF_STOCK').length
+  const expiringSoonCount = annotated.filter(
+    p => p._expiryStatus === 'EXPIRING_SOON' || p._expiryStatus === 'EXPIRED'
+  ).length
 
   // Filter + search
   const filtered = useMemo(() => {
     return annotated.filter(p => {
       const matchesTab =
         tab === 'ALL' ||
-        (tab === 'LOW_STOCK'    && p._status === 'LOW_STOCK') ||
-        (tab === 'OUT_OF_STOCK' && p._status === 'OUT_OF_STOCK') ||
-        (tab === 'IN_STOCK'     && p._status === 'IN_STOCK')
+        (tab === 'LOW_STOCK'     && p._status === 'LOW_STOCK') ||
+        (tab === 'OUT_OF_STOCK'  && p._status === 'OUT_OF_STOCK') ||
+        (tab === 'IN_STOCK'      && p._status === 'IN_STOCK') ||
+        (tab === 'EXPIRING_SOON' && (
+          p._expiryStatus === 'EXPIRING_SOON' || p._expiryStatus === 'EXPIRED'
+        ))
 
       if (!matchesTab) return false
 
@@ -95,7 +124,7 @@ export function InventoryReport() {
   // CSV export (all products, not just filtered, for completeness)
   function exportCsv() {
     const rows = [
-      ['Product', 'Barcode', 'Category', 'Unit Price', 'Stock Qty', 'Stock Value', 'Reorder Level', 'Status'],
+      ['Product', 'Barcode', 'Category', 'Unit Price', 'Stock Qty', 'Stock Value', 'Reorder Level', 'Expiry Date', 'Batch No', 'Status'],
       ...annotated.map(p => [
         p.name,
         p.barcode ?? '',
@@ -104,6 +133,8 @@ export function InventoryReport() {
         String(p.stock_qty),
         (p.unit_price * p.stock_qty).toFixed(2),
         String(p.reorder_level),
+        p.expiry_date ?? '',
+        p.batch_number ?? '',
         p._status === 'OUT_OF_STOCK' ? 'Out of Stock'
           : p._status === 'LOW_STOCK' ? 'Low Stock'
           : 'In Stock',
@@ -152,7 +183,7 @@ export function InventoryReport() {
       />
 
       {/* Metric cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <MetricCard
           label="Total Products"
           value={isLoading ? '—' : String(products.length)}
@@ -179,6 +210,13 @@ export function InventoryReport() {
           sub="stock qty = 0"
           icon={Warning}
           accent={outOfStockCount > 0 ? 'red' : 'blue'}
+        />
+        <MetricCard
+          label="Expiring Soon"
+          value={isLoading ? '—' : String(expiringSoonCount)}
+          sub="within 30 days or expired"
+          icon={Warning}
+          accent={expiringSoonCount > 0 ? 'red' : 'green'}
         />
       </div>
 
@@ -248,18 +286,20 @@ export function InventoryReport() {
                   <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock Qty</th>
                   <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock Value</th>
                   <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reorder At</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Expiry</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Batch</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {isLoading && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-sm text-gray-400">Loading inventory…</td>
+                    <td colSpan={10} className="px-4 py-8 text-center text-sm text-gray-400">Loading inventory…</td>
                   </tr>
                 )}
                 {!isLoading && filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-sm text-gray-400">No products match your filter.</td>
+                    <td colSpan={10} className="px-4 py-8 text-center text-sm text-gray-400">No products match your filter.</td>
                   </tr>
                 )}
                 {!isLoading && filtered.map(p => {
@@ -268,7 +308,11 @@ export function InventoryReport() {
                       ? 'bg-red-50 hover:bg-red-100'
                       : p._status === 'LOW_STOCK'
                         ? 'bg-amber-50 hover:bg-amber-100'
-                        : 'hover:bg-gray-50'
+                        : p._expiryStatus === 'EXPIRED'
+                          ? 'bg-red-50 hover:bg-red-100'
+                          : p._expiryStatus === 'EXPIRING_SOON'
+                            ? 'bg-amber-50 hover:bg-amber-100'
+                            : 'hover:bg-gray-50'
 
                   const pillVariant =
                     p._status === 'OUT_OF_STOCK' ? 'red'
@@ -280,6 +324,11 @@ export function InventoryReport() {
                     : p._status === 'LOW_STOCK'   ? 'Low Stock'
                     : 'In Stock'
 
+                  const expiryClass =
+                    p._expiryStatus === 'EXPIRED'       ? 'text-red-600 font-semibold'
+                    : p._expiryStatus === 'EXPIRING_SOON' ? 'text-amber-700'
+                    : 'text-gray-600'
+
                   return (
                     <tr key={p.id} className={rowBg}>
                       <td className="px-4 py-3 font-medium text-sm text-gray-800 max-w-[200px] truncate">{p.name}</td>
@@ -289,6 +338,10 @@ export function InventoryReport() {
                       <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800">{p.stock_qty}</td>
                       <td className="px-4 py-3 text-right font-mono text-xs text-gray-700">{fmtCurrency(p.unit_price * p.stock_qty)}</td>
                       <td className="px-4 py-3 text-right font-mono text-xs text-gray-500">{p.reorder_level}</td>
+                      <td className={`px-4 py-3 text-xs tabular-nums ${expiryClass}`}>
+                        {fmtDate(p.expiry_date)}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-gray-500">{p.batch_number ?? '—'}</td>
                       <td className="px-4 py-3">
                         <StatusPill label={pillLabel} variant={pillVariant} />
                       </td>
@@ -305,7 +358,7 @@ export function InventoryReport() {
                     <td className="px-4 py-3" />
                     <td className="px-4 py-3 text-right font-mono text-xs font-bold text-gray-800">{totalStockQty.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right font-mono text-xs font-bold text-blue-700">{fmtCurrency(totalStockValue)}</td>
-                    <td colSpan={2} />
+                    <td colSpan={4} />
                   </tr>
                 </tfoot>
               )}

@@ -10,6 +10,9 @@ export type ShiftType          = 'MORNING' | 'AFTERNOON' | 'FULL_DAY'
 export type PrescriptionStatus = 'RECEIVED' | 'VERIFYING' | 'READY' | 'DISPENSED' | 'CANCELLED'
 export type StaffRole          = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN'
 export type LoyaltyTier        = 'STANDARD' | 'SILVER' | 'GOLD' | 'PLATINUM'
+export type StockMovementType  = 'SALE' | 'RECEIVE' | 'ADJUST' | 'RETURN' | 'WRITE_OFF'
+export type PoStatus           = 'DRAFT' | 'SUBMITTED' | 'RECEIVED' | 'CANCELLED'
+export type TimecardStatus     = 'CLOCKED_IN' | 'CLOCKED_OUT' | 'FLAGGED' | 'APPROVED'
 
 // ── Row types ─────────────────────────────────────────────────────────────────
 
@@ -141,6 +144,8 @@ export interface Product {
   supplier_id: string | null
   is_active: boolean
   notes: string | null
+  expiry_date: string | null
+  batch_number: string | null
   created_at: string
   updated_at: string
 }
@@ -240,6 +245,74 @@ export interface PharmacySetting {
   updated_at: string
 }
 
+// ── Migration 016–019 interfaces ─────────────────────────────────────────────
+
+export interface StockMovement {
+  id: string
+  product_id: string
+  movement_type: StockMovementType
+  quantity_delta: number
+  quantity_after: number
+  actor_id: string | null
+  actor_name: string | null
+  reference_id: string | null
+  reference_type: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface PurchaseOrder {
+  id: string
+  ref_number: string
+  supplier_id: string | null
+  supplier_name: string
+  status: PoStatus
+  total_cost: number
+  notes: string | null
+  created_by: string | null
+  created_by_name: string | null
+  received_by: string | null
+  received_by_name: string | null
+  received_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PurchaseOrderItem {
+  id: string
+  purchase_order_id: string
+  product_id: string | null
+  product_name: string
+  quantity_ordered: number
+  quantity_received: number
+  unit_cost: number
+  line_total: number
+  expiry_date: string | null
+  batch_number: string | null
+  created_at: string
+}
+
+export interface Timecard {
+  id: string
+  staff_id: string | null
+  staff_name: string
+  staff_role: StaffRole
+  clocked_in_at: string
+  clocked_out_at: string | null
+  total_minutes: number | null
+  status: TimecardStatus
+  ai_flag_overtime: boolean
+  ai_flag_short_shift: boolean
+  ai_flag_anomaly: boolean
+  ai_flag_reason: string | null
+  approved_by: string | null
+  approved_by_name: string | null
+  approved_at: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 // ── Database type map ─────────────────────────────────────────────────────────
 // Structured to satisfy @supabase/supabase-js GenericDatabase constraint.
 // Each table requires Relationships: []; schema requires Views/Functions/Enums/CompositeTypes.
@@ -323,6 +396,30 @@ export type Database = {
         Row: AuditLogEntry
         Insert: Omit<AuditLogEntry, 'id' | 'created_at'>
         Update: Partial<Omit<AuditLogEntry, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      stock_movements: {
+        Row: StockMovement
+        Insert: Omit<StockMovement, 'id' | 'created_at'>
+        Update: Partial<Omit<StockMovement, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      purchase_orders: {
+        Row: PurchaseOrder
+        Insert: Omit<PurchaseOrder, 'id' | 'ref_number' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<PurchaseOrder, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      purchase_order_items: {
+        Row: PurchaseOrderItem
+        Insert: Omit<PurchaseOrderItem, 'id' | 'created_at'>
+        Update: Partial<Omit<PurchaseOrderItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      timecards: {
+        Row: Timecard
+        Insert: Omit<Timecard, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<Timecard, 'id' | 'created_at'>>
         Relationships: []
       }
     }

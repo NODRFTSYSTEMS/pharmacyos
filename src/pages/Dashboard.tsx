@@ -4,7 +4,7 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
-import { PageHeader, MetricCard, Pill as StatusPill } from '../components/Shell'
+import { PageHeader, MetricCard, Pill as StatusPill, ClosableAlert } from '../components/Shell'
 import { usePermission } from '../hooks/usePermission'
 import { usePharmacyName } from '../hooks/usePharmacyName'
 import type {
@@ -121,6 +121,25 @@ function useLowStockProducts() {
   })
 }
 
+function useExpiringSoonCount() {
+  return useQuery({
+    queryKey: ['dashboard-expiring-soon'],
+    queryFn: async () => {
+      const cutoff = new Date()
+      cutoff.setDate(cutoff.getDate() + 30)
+      const { data, error } = await supabase
+        .from('products')
+        .select('id')
+        .eq('is_active', true)
+        .not('expiry_date', 'is', null)
+        .lte('expiry_date', cutoff.toISOString().slice(0, 10))
+      if (error) throw error
+      return (data ?? []).length
+    },
+    refetchInterval: 300_000, // 5 min — expiry dates don't change often
+  })
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Dashboard() {
@@ -133,10 +152,11 @@ export function Dashboard() {
   const canViewReports = usePermission('reports_view')
   const canViewRx      = usePermission('rx_dispense')
 
-  const retailQ       = useTodayRetail(today)
-  const rxQ           = useTodayRx(today)
+  const retailQ        = useTodayRetail(today)
+  const rxQ            = useTodayRx(today)
   const prescriptionsQ = usePendingPrescriptions()
-  const lowStockQ     = useLowStockProducts()
+  const lowStockQ      = useLowStockProducts()
+  const expiringQ      = useExpiringSoonCount()
 
   // Derived metrics
   const retailRevenue  = (retailQ.data ?? []).reduce((s, t) => s + t.total, 0)
@@ -182,6 +202,14 @@ export function Dashboard() {
         subtitle={`${pharmacyName} — today's overview`}
         breadcrumb={['Dashboard']}
       />
+
+      {/* Expiry alert — dismissable, shown only when products are expiring within 30 days */}
+      {(expiringQ.data ?? 0) > 0 && (
+        <ClosableAlert
+          variant="yellow"
+          message={`${expiringQ.data} product${expiringQ.data !== 1 ? 's' : ''} expiring within 30 days. Review the Inventory Report → Expiring Soon tab.`}
+        />
+      )}
 
       {/* ── Metric cards ───────────────────────────────────────────────────── */}
       {/* I-21: Revenue metrics visible to roles with reports_view; others see operational metrics */}

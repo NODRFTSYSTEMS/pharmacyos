@@ -400,7 +400,12 @@ export function PatientList() {
                   return (
                     <tr key={patient.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium text-gray-800 text-sm">
-                        {formatPatientName(patient.first_name, patient.last_name)}
+                        <Link
+                          to={`/patients/${patient.id}`}
+                          className="hover:text-blue-600 hover:underline"
+                        >
+                          {formatPatientName(patient.first_name, patient.last_name)}
+                        </Link>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-600 font-mono">
                         {fmtDob(patient.date_of_birth)}

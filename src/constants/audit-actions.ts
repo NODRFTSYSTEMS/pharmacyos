@@ -47,6 +47,12 @@ export const AUDIT_ACTIONS = {
   AI_EXTRACTION_ACCEPT:     'ai_extraction_accept',
   AI_EXTRACTION_REJECT:     'ai_extraction_reject',
 
+  // ── Timecards ────────────────────────────────────────────────────────────────
+  TIMECARD_CLOCK_IN:        'timecard_clock_in',
+  TIMECARD_CLOCK_OUT:       'timecard_clock_out',
+  TIMECARD_APPROVE:         'timecard_approve',
+  TIMECARD_FLAG:            'timecard_flag',
+
   // ── Staff / Auth ─────────────────────────────────────────────────────────────
   STAFF_CREATE:             'staff_create',
   STAFF_UPDATE:             'staff_update',

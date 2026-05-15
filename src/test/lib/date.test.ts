@@ -156,7 +156,7 @@ describe('fmtJamaicaTime', () => {
   it('applies Jamaica UTC-5 offset — 04:00 UTC renders as previous day 23:xx Jamaica', () => {
     // 2026-05-13T04:00:00Z = 2026-05-12T23:00:00 Jamaica
     const s = fmtJamaicaTime('2026-05-13T04:00:00.000Z')
-    expect(s).toMatch(/11:00 PM|23:00/)
+    expect(s).toMatch(/11:00 [Pp][Mm]|23:00/)
   })
 })
 

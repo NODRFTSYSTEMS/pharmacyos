@@ -45,6 +45,8 @@ type ProductDraft = {
   cost_price: number | ''
   stock_qty: number | ''
   reorder_level: number | ''
+  expiry_date: string
+  batch_number: string
   notes: string
   is_active: boolean
 }
@@ -58,6 +60,8 @@ const BLANK: ProductDraft = {
   cost_price: '',
   stock_qty: '',
   reorder_level: 5,
+  expiry_date: '',
+  batch_number: '',
   notes: '',
   is_active: true,
 }
@@ -118,6 +122,8 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
         cost_price:    form.cost_price !== '' ? Number(form.cost_price) : null,
         stock_qty:     Number(form.stock_qty),
         reorder_level: form.reorder_level !== '' ? Number(form.reorder_level) : 5,
+        expiry_date:   form.expiry_date || null,
+        batch_number:  form.batch_number.trim() || null,
         notes:         form.notes.trim() || null,
         is_active:     form.is_active,
         updated_at:    new Date().toISOString(),
@@ -320,6 +326,35 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
             </div>
           </div>
 
+          {/* Expiry Date + Batch/Lot Number */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="p-expiry" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Expiry Date
+              </label>
+              <input
+                id="p-expiry"
+                type="date"
+                value={form.expiry_date}
+                onChange={e => set('expiry_date', e.target.value)}
+                className="input"
+              />
+            </div>
+            <div>
+              <label htmlFor="p-batch" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Batch / Lot No.
+              </label>
+              <input
+                id="p-batch"
+                type="text"
+                value={form.batch_number}
+                onChange={e => set('batch_number', e.target.value)}
+                placeholder="e.g. BT-2026-001"
+                className="input font-mono"
+              />
+            </div>
+          </div>
+
           {/* Notes */}
           <div>
             <label htmlFor="p-notes" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
@@ -390,6 +425,20 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
       </div>
     </div>
   )
+}
+
+// ─── Expiry badge ─────────────────────────────────────────────────────────────
+
+function ExpiryBadge({ date }: { date: string | null }) {
+  if (!date) return <span className="text-gray-300 text-xs">—</span>
+  const expiry = new Date(date)
+  const today  = new Date()
+  today.setHours(0, 0, 0, 0)
+  const in30 = new Date(today); in30.setDate(today.getDate() + 30)
+  const label = expiry.toLocaleDateString('en-JM', { day: '2-digit', month: 'short', year: 'numeric' })
+  if (expiry < today)  return <span className="pill pill-red text-xs">{label}</span>
+  if (expiry <= in30)  return <span className="pill pill-yellow text-xs">{label}</span>
+  return <span className="text-xs text-gray-600 tabular-nums">{label}</span>
 }
 
 // ─── Stock status helpers ──────────────────────────────────────────────────────
@@ -586,6 +635,9 @@ export default function ProductCatalog() {
                       Stock Status
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Expiry
+                    </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-4 py-3" aria-label="Actions" />
@@ -614,6 +666,9 @@ export default function ProductCatalog() {
                       </td>
                       <td className="px-4 py-3">
                         <StockBadge qty={p.stock_qty} reorder={p.reorder_level} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <ExpiryBadge date={p.expiry_date} />
                       </td>
                       <td className="px-4 py-3">
                         <StatusPill
@@ -652,6 +707,8 @@ export default function ProductCatalog() {
             cost_price:    editing.cost_price ?? '',
             stock_qty:     editing.stock_qty,
             reorder_level: editing.reorder_level,
+            expiry_date:   editing.expiry_date ?? '',
+            batch_number:  editing.batch_number ?? '',
             notes:         editing.notes ?? '',
             is_active:     editing.is_active,
           } : null}

@@ -16,9 +16,9 @@ import { useCurrentUser } from './useCurrentUser'
 const DEFAULT_PERMS: Record<string, string[]> = {
   ADMIN:      ['pos_terminal','pos_void','pos_closeout','eod_approve','rx_dispense',
                'rx_schedule_log','inventory_manage','reports_view','staff_manage',
-               'audit_view','settings_manage','loyalty_manage','ai_queue'],
+               'audit_view','settings_manage','loyalty_manage','ai_queue','timecard_manage'],
   MANAGER:    ['pos_terminal','pos_void','pos_closeout','eod_approve','inventory_manage',
-               'reports_view','loyalty_manage','audit_view','settings_manage'],
+               'reports_view','loyalty_manage','audit_view','settings_manage','timecard_manage'],
   PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue'],
   CASHIER:    ['pos_terminal','loyalty_manage'],
   TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue'],

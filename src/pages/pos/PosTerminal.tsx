@@ -354,8 +354,12 @@ export default function PosTerminal() {
       const stockFailures: string[] = []
       for (const item of cart.filter(i => !i.is_custom)) {
         const { error: e3 } = await supabase.rpc('decrement_product_stock', {
-          p_product_id: item.product_id,
-          p_qty:        item.qty,
+          p_product_id:     item.product_id,
+          p_qty:            item.qty,
+          p_actor_id:       cashier?.id ?? null,
+          p_actor_name:     cashier?.name ?? null,
+          p_reference_id:   txn.id,
+          p_reference_type: 'SALE',
         })
         if (e3) stockFailures.push(item.product_name)
       }

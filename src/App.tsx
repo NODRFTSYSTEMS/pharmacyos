@@ -35,11 +35,21 @@ import { RxDetail }         from './pages/prescriptions/RxDetail'
 // Patients
 import PatientList          from './pages/patients/PatientList'
 import NewPatient           from './pages/patients/NewPatient'
+import PatientProfile       from './pages/patients/PatientProfile'
+
+// Inventory
+import ReceiveStock         from './pages/inventory/ReceiveStock'
+import StockMovements       from './pages/inventory/StockMovements'
+
+// Staff / Timecards
+import TimecardClock        from './pages/staff/TimecardClock'
+import TimecardManager      from './pages/staff/TimecardManager'
 
 // Reports
 import RevenueReport        from './pages/reports/RevenueReport'
 import DispensingReport     from './pages/reports/DispensingReport'
 import InventoryReport      from './pages/reports/InventoryReport'
+import TimecardReport       from './pages/reports/TimecardReport'
 
 // Admin
 import { UsersAdmin }       from './pages/admin/Users'
@@ -122,6 +132,25 @@ export default function App() {
                 <Route path="/patients/new" element={
                   <RoleGuard permission="rx_dispense"><NewPatient /></RoleGuard>
                 } />
+                {/* /patients/:id — same permission as patient list; no separate route guard needed */}
+                <Route path="/patients/:id" element={
+                  <RoleGuard permission="rx_dispense"><PatientProfile /></RoleGuard>
+                } />
+
+                {/* Inventory */}
+                <Route path="/inventory/receive-stock" element={
+                  <RoleGuard permission="inventory_manage"><ReceiveStock /></RoleGuard>
+                } />
+                <Route path="/inventory/stock-movements" element={
+                  <RoleGuard permission="inventory_manage"><StockMovements /></RoleGuard>
+                } />
+
+                {/* Staff / Timecards */}
+                {/* /staff/timecard — session-only, all authenticated staff */}
+                <Route path="/staff/timecard" element={<TimecardClock />} />
+                <Route path="/staff/timecards" element={
+                  <RoleGuard permission="timecard_manage"><TimecardManager /></RoleGuard>
+                } />
 
                 {/* Reports */}
                 <Route path="/reports/revenue" element={
@@ -132,6 +161,9 @@ export default function App() {
                 } />
                 <Route path="/reports/inventory" element={
                   <RoleGuard permission="reports_view"><InventoryReport /></RoleGuard>
+                } />
+                <Route path="/reports/timecards" element={
+                  <RoleGuard permission="reports_view"><TimecardReport /></RoleGuard>
                 } />
 
                 {/* Admin */}

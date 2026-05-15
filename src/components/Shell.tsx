@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight, UserCircle, LockSimple,
+  Warehouse, Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -41,10 +42,19 @@ const NAV: NavItem[] = [
     { label: 'Patient List',  href: '/patients' },
     { label: 'New Patient',   href: '/patients/new' },
   ]},
+  { label: 'Inventory',   icon: Warehouse, children: [
+    { label: 'Receive Stock',   href: '/inventory/receive-stock' },
+    { label: 'Stock Movements', href: '/inventory/stock-movements' },
+  ]},
+  { label: 'Staff',       icon: Clock, children: [
+    { label: 'My Timecard',   href: '/staff/timecard' },
+    { label: 'Timecards',     href: '/staff/timecards' },
+  ]},
   { label: 'Reports',     icon: ChartBar, children: [
     { label: 'Revenue',       href: '/reports/revenue' },
     { label: 'Dispensing',    href: '/reports/dispensing' },
     { label: 'Inventory',     href: '/reports/inventory' },
+    { label: 'Timecards',     href: '/reports/timecards' },
   ]},
   { label: 'AI Queue',    href: '/ai/queue',  icon: Robot },
   { label: 'Admin',       icon: Gear, children: [
@@ -61,6 +71,8 @@ function useFilteredNav(): NavItem[] {
   const showPrescriptions = useAnyPermission(NAV_PERMISSIONS['Prescriptions'])
   const showPOS           = useAnyPermission(NAV_PERMISSIONS['Retail POS'])
   const showPatients      = useAnyPermission(NAV_PERMISSIONS['Patients'])
+  const showInventory     = useAnyPermission(NAV_PERMISSIONS['Inventory'])
+  const showStaff         = true  // My Timecard is session-only; all staff see Staff group
   const showReports       = useAnyPermission(NAV_PERMISSIONS['Reports'])
   const showAiQueue       = useAnyPermission(NAV_PERMISSIONS['AI Queue'])
   const showAdmin         = useAnyPermission(NAV_PERMISSIONS['Admin'])
@@ -70,6 +82,8 @@ function useFilteredNav(): NavItem[] {
     if (item.label === 'Prescriptions') return showPrescriptions
     if (item.label === 'Retail POS')    return showPOS
     if (item.label === 'Patients')      return showPatients
+    if (item.label === 'Inventory')     return showInventory
+    if (item.label === 'Staff')         return showStaff
     if (item.label === 'Reports')       return showReports
     if (item.label === 'AI Queue')      return showAiQueue
     if (item.label === 'Admin')         return showAdmin
