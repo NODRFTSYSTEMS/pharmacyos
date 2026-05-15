@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
@@ -48,7 +49,7 @@ const NAV: NavItem[] = [
   ]},
   { label: 'Staff',       icon: Clock, children: [
     { label: 'My Timecard',   href: '/staff/timecard' },
-    { label: 'Timecards',     href: '/staff/timecards' },
+    { label: 'Manage Timecards', href: '/staff/timecards' },
   ]},
   { label: 'Reports',     icon: ChartBar, children: [
     { label: 'Revenue',       href: '/reports/revenue' },
@@ -387,6 +388,24 @@ interface PrintHeaderProps {
 
 export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderProps) {
   const pharmacyName = usePharmacyName()
+  const { data: pharmacyAddress } = useQuery({
+    queryKey: ['pharmacy-address'],
+    queryFn: async () => {
+      const { data } = await supabase.from('pharmacy_settings').select('value').eq('key', 'pharmacy_address').maybeSingle()
+      return data?.value ?? null
+    },
+    staleTime: 300_000,
+    retry: false,
+  })
+  const { data: oicRegNo } = useQuery({
+    queryKey: ['pharmacy-oic-reg-no'],
+    queryFn: async () => {
+      const { data } = await supabase.from('pharmacy_settings').select('value').eq('key', 'oic_reg_no').maybeSingle()
+      return data?.value ?? null
+    },
+    staleTime: 300_000,
+    retry: false,
+  })
   const now = new Date().toLocaleString('en-JM', { timeZone: 'America/Jamaica' })
 
   return (
@@ -394,8 +413,8 @@ export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderPro
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-bold text-base text-gray-900">{pharmacyName}</p>
-          <p className="text-xs text-gray-600">Kingston, Jamaica</p>
-          <p className="text-xs text-gray-500 mt-0.5">OIC Registration: [See pharmacy_settings]</p>
+          {pharmacyAddress && <p className="text-xs text-gray-600">{pharmacyAddress}</p>}
+          {oicRegNo && <p className="text-xs text-gray-500 mt-0.5">OIC Registration: {oicRegNo}</p>}
         </div>
         <div className="text-right">
           <p className="font-semibold text-sm text-gray-800">{reportTitle}</p>

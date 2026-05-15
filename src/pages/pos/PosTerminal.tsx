@@ -167,7 +167,7 @@ export default function PosTerminal() {
         .maybeSingle()
       return {
         id:   user.id,
-        name: profile?.full_name ?? user.email ?? user.id,
+        name: profile?.full_name ?? user.email ?? 'Staff Member',
         role: profile?.role ?? 'CASHIER',
       }
     },
@@ -372,7 +372,7 @@ export default function PosTerminal() {
       qc.invalidateQueries({ queryKey: ['pos-products'] })
       if (stockFailures.length > 0) {
         showToast(
-          `Sale recorded. Stock update failed for: ${stockFailures.join(', ')} — manual adjustment required.`,
+          `Sale recorded. Stock count could not be updated for: ${stockFailures.join(', ')}. Please adjust stock in the Inventory module.`,
           false,
         )
       } else {
@@ -417,7 +417,7 @@ export default function PosTerminal() {
           </span>
           <span className="flex items-center gap-1.5 text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            Session active
+            POS session open
           </span>
         </div>
       </div>
@@ -525,9 +525,6 @@ export default function PosTerminal() {
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 Payment Method
-                <span className="ml-2 text-gray-400 font-normal normal-case tracking-normal">
-                  (saved preference)
-                </span>
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {([
@@ -584,7 +581,7 @@ export default function PosTerminal() {
                       onClick={() => setCashInput(String(v))}
                       className="btn btn-ghost text-xs h-7 px-2"
                     >
-                      ${v.toLocaleString()}
+                      J${v.toLocaleString()}
                     </button>
                   ))}
                   {total > 0 && (

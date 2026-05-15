@@ -95,7 +95,7 @@ export default function TimecardManager() {
 
   function exportCsv() {
     const rows = [
-      ['Staff', 'Role', 'Clocked In', 'Clocked Out', 'Duration (min)', 'Status', 'Flags', 'Flag Reason'],
+      ['Staff', 'Role', 'Clocked In', 'Clocked Out', 'Duration (min)', 'Status', 'Anomaly Notes', 'Anomaly Detail'],
       ...timecards.map(tc => [
         tc.staff_name,
         tc.staff_role,
@@ -129,7 +129,7 @@ export default function TimecardManager() {
       <PageHeader
         title="Timecard Management"
         subtitle="Review, approve, and flag staff timecards"
-        breadcrumb={['Staff', 'Timecards']}
+        breadcrumb={['Staff', 'Manage Timecards']}
         cta={
           <button
             onClick={exportCsv}
@@ -210,7 +210,7 @@ export default function TimecardManager() {
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Clocked Out</th>
                 <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">AI Flags</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Anomaly Notes</th>
                 <th scope="col" className="px-4 py-3" aria-label="Actions" />
               </tr>
             </thead>

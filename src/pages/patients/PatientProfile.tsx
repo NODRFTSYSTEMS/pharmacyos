@@ -194,8 +194,7 @@ function JdpaTab({ patient }: { patient: Patient }) {
         <div className="px-5 py-4 bg-amber-50">
           <p className="text-xs text-amber-800">
             <strong>JDPA 2020 Notice:</strong> Patient data must only be processed with a lawful basis.
-            Consent capture UI is pending legal review (G5). Do not export or share patient records
-            until consent is confirmed.
+            Consent capture will be available after regulatory review is complete. Do not export or share patient records until consent is confirmed.
           </p>
         </div>
       )}

@@ -383,7 +383,7 @@ export function Settings() {
               rows={3}
               className="input w-full max-w-lg resize-none"
               style={{ height: 'auto', paddingTop: '8px', paddingBottom: '8px' }}
-              placeholder="e.g. Thank you for choosing Winchester Global Pharmacy. Your health is our priority."
+              placeholder="e.g. Thank you for your visit."
               value={form.receipt_footer}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleField('receipt_footer', e.target.value)}
             />
