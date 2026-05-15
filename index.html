@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <title>PharmacyOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- GitHub Pages SPA: decode redirect from 404.html back into real path -->
+  <script>
+    (function(l){
+      if(l.search[1]==='/'){
+        var d=l.search.slice(1).split('&').map(function(s){return s.replace(/~and~/g,'&')}).join('?');
+        window.history.replaceState(null,null,l.pathname.slice(0,-1)+d+l.hash);
+      }
+    }(window.location));
+  </script>
+    <script type="module" crossorigin src="/pharmacyos/assets/index-Bzp4IkmT.js"></script>
+    <link rel="modulepreload" crossorigin href="/pharmacyos/assets/vendor-react-B95FdPZS.js">
+    <link rel="modulepreload" crossorigin href="/pharmacyos/assets/vendor-query-praJo7Bp.js">
+    <link rel="modulepreload" crossorigin href="/pharmacyos/assets/vendor-icons-CduotchW.js">
+    <link rel="modulepreload" crossorigin href="/pharmacyos/assets/vendor-supabase-CArkGI0V.js">
+    <link rel="stylesheet" crossorigin href="/pharmacyos/assets/index-C63XziMT.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Catch JS crashes that fire before React mounts (module load errors, etc.)
+         and surface them visibly instead of leaving the page blank. -->
+    <script>
+      window.addEventListener('error', function(e) {
+        var root = document.getElementById('root');
+        if (root && !root.hasChildNodes()) {
+          root.innerHTML =
+            '<div style="min-height:100vh;background:#F5F7FA;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">' +
+            '<div style="background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12);max-width:480px;width:100%;padding:32px;text-align:center">' +
+            '<p style="font-size:16px;font-weight:700;color:#111827;margin-bottom:8px">PharmacyOS failed to start</p>' +
+            '<p style="font-size:13px;color:#6B7280;margin-bottom:16px">A script error prevented the application from loading.</p>' +
+            '<pre style="font-size:11px;color:#EF4444;background:#FEF2F2;border-radius:4px;padding:12px;text-align:left;overflow:auto;max-height:120px;white-space:pre-wrap">' +
+            (e.message || 'Unknown error') + '\n' + (e.filename ? e.filename + ':' + e.lineno : '') +
+            '</pre>' +
+            '<button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#2563EB;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Reload</button>' +
+            '</div></div>';
+        }
+      });
+    </script>
+  </body>
+</html>
