@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:github": "tsc -b && cross-env VITE_BASE_PATH=/pharmacyos/ vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
@@ -28,6 +29,7 @@
     "last 2 Firefox versions",
     "last 2 Safari versions",
     "last 2 Edge versions",
+    "last 2 Opera versions",
     "iOS >= 14",
     "not dead",
     "not IE 11"
@@ -43,6 +45,7 @@
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.0.0",
     "@vitest/coverage-v8": "^2.1.9",
+    "cross-env": "^10.1.0",
     "jsdom": "^25.0.1",
     "tailwindcss": "^4.2.4",
     "terser": "^5.47.1",
