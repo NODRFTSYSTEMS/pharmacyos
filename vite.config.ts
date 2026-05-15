@@ -1,9 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import legacy from '@vitejs/plugin-legacy'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    // Generates a dual-bundle: modern ES modules for current browsers, a
+    // SystemJS/Babel legacy bundle for anything older. The correct script tag
+    // is injected automatically based on browser capability at runtime.
+    // Targets come from the "browserslist" field in package.json.
+    legacy({ targets: ['last 2 versions', 'not dead', 'not IE 11'] }),
+  ],
   // base: override with VITE_BASE_PATH env var for sub-path deployments.
   // Vercel (pharmacyos.vercel.app) → default '/'
   // GitHub Pages (nodrftsystems.github.io/pharmacyos) → '/pharmacyos/'
