@@ -34,9 +34,10 @@ export default function ReceiveStock() {
   const qc  = useQueryClient()
   const { data: user } = useCurrentUser()
 
-  const [supplierId, setSupplierId]   = useState('')
-  const [supplierName, setSupplierName] = useState('')
-  const [notes, setNotes]             = useState('')
+  const [supplierId, setSupplierId]       = useState('')
+  const [supplierName, setSupplierName]   = useState('')
+  const [saveAsSupplier, setSaveAsSupplier] = useState(false)
+  const [notes, setNotes]                 = useState('')
   const [lines, setLines]             = useState<LineItem[]>([{ ...BLANK_LINE }])
   const [success, setSuccess]         = useState(false)
   const [formError, setFormError]     = useState<string | null>(null)
@@ -102,11 +103,25 @@ export default function ReceiveStock() {
       const resolvedSupplierName =
         supplierId ? (suppliers.find(s => s.id === supplierId)?.name ?? 'Unknown Supplier') : supplierName.trim() || 'Direct Purchase'
 
+      // 1a. If "Save as new supplier" is checked, insert into retail_suppliers first
+      let resolvedSupplierId = supplierId || null
+      if (supplierId === '__other__' && saveAsSupplier && supplierName.trim()) {
+        const { data: newSupplier, error: supErr } = await supabase
+          .from('retail_suppliers')
+          .insert({ name: supplierName.trim(), active: true, updated_at: new Date().toISOString() })
+          .select('id')
+          .single()
+        if (supErr) throw new Error(`Could not save supplier: ${supErr.message}`)
+        resolvedSupplierId = newSupplier.id
+        qc.invalidateQueries({ queryKey: ['retail-suppliers'] })
+        qc.invalidateQueries({ queryKey: ['suppliers-slim'] })
+      }
+
       // 1. Create purchase order
       const { data: po, error: poErr } = await supabase
         .from('purchase_orders')
         .insert({
-          supplier_id:     supplierId || null,
+          supplier_id:     resolvedSupplierId,
           supplier_name:   resolvedSupplierName,
           status:          'DRAFT',
           total_cost:      validLines.reduce((s, l) => s + (Number(l.unit_cost) || 0) * Number(l.quantity_ordered), 0),
@@ -163,7 +178,7 @@ export default function ReceiveStock() {
           <button onClick={() => nav('/inventory/stock-movements')} className="btn btn-ghost">
             View Movements
           </button>
-          <button onClick={() => { setSuccess(false); setLines([{ ...BLANK_LINE }]); setSupplierId(''); setNotes('') }} className="btn btn-primary">
+          <button onClick={() => { setSuccess(false); setLines([{ ...BLANK_LINE }]); setSupplierId(''); setSupplierName(''); setSaveAsSupplier(false); setNotes('') }} className="btn btn-primary">
             Receive Another
           </button>
         </div>
@@ -211,18 +226,33 @@ export default function ReceiveStock() {
           </div>
 
           {supplierId === '__other__' && (
-            <div>
-              <label htmlFor="rs-supplier-name" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                Supplier Name
-              </label>
-              <input
-                id="rs-supplier-name"
-                type="text"
-                value={supplierName}
-                onChange={e => setSupplierName(e.target.value)}
-                placeholder="Enter supplier name"
-                className="input"
-              />
+            <div className="space-y-2">
+              <div>
+                <label htmlFor="rs-supplier-name" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Supplier Name
+                </label>
+                <input
+                  id="rs-supplier-name"
+                  type="text"
+                  value={supplierName}
+                  onChange={e => setSupplierName(e.target.value)}
+                  placeholder="Enter supplier name"
+                  className="input"
+                />
+              </div>
+              <div className="flex items-center gap-3 pt-0.5">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={saveAsSupplier}
+                  aria-label="Save as new supplier record"
+                  onClick={() => setSaveAsSupplier(s => !s)}
+                  className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${saveAsSupplier ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${saveAsSupplier ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                </button>
+                <span className="text-xs text-gray-600">Save as new supplier record</span>
+              </div>
             </div>
           )}
 
