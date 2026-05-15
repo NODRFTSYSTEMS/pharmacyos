@@ -359,7 +359,7 @@ export function Settings() {
                   value={form.loyalty_rate}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('loyalty_rate', e.target.value)}
                 />
-                <span className="text-sm text-gray-500 shrink-0">pts / $1</span>
+                <span className="text-sm text-gray-500 shrink-0">pts / J$1</span>
               </div>
               <p className="mt-1 text-xs text-gray-400">Points earned per dollar spent</p>
             </div>

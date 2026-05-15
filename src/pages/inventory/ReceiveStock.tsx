@@ -303,7 +303,7 @@ export default function ReceiveStock() {
                   </div>
                   <div>
                     <label htmlFor={`rs-cost-${idx}`} className="block text-xs font-medium text-gray-500 mb-1">
-                      Unit Cost JMD
+                      Unit Cost (JMD)
                     </label>
                     <input
                       id={`rs-cost-${idx}`}

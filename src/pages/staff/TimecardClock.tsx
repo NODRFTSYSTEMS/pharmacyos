@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ClockIn, ClockOut, CheckCircle, Warning } from '@phosphor-icons/react'
+import { Clock, ClockCounterClockwise, CheckCircle, Warning } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
@@ -161,7 +161,7 @@ export default function TimecardClock() {
       <PageHeader
         title="My Timecard"
         subtitle="Record your shift start and end"
-        breadcrumb={['Staff', 'Timecard']}
+        breadcrumb={['Staff', 'My Timecard']}
       />
 
       {/* Clock card */}
@@ -172,7 +172,7 @@ export default function TimecardClock() {
           // Active shift
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-3">
-              <ClockIn size={28} weight="duotone" className="text-blue-500" aria-hidden="true" />
+              <Clock size={28} weight="duotone" className="text-blue-500" aria-hidden="true" />
             </div>
             <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Currently Clocked In</p>
             <p className="text-2xl font-bold text-gray-800 tabular-nums">{elapsed}</p>
@@ -182,7 +182,7 @@ export default function TimecardClock() {
           // Not clocked in
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
-              <ClockOut size={28} weight="duotone" className="text-gray-400" aria-hidden="true" />
+              <ClockCounterClockwise size={28} weight="duotone" className="text-gray-400" aria-hidden="true" />
             </div>
             <p className="text-sm text-gray-500 mb-1">You are not clocked in</p>
             <p className="text-xs text-gray-400">{new Date().toLocaleDateString('en-JM', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
@@ -225,7 +225,7 @@ export default function TimecardClock() {
               {clockOut.isPending && (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />
               )}
-              <ClockOut size={16} weight="bold" aria-hidden="true" />
+              <ClockCounterClockwise size={16} weight="bold" aria-hidden="true" />
               Clock Out
             </button>
           ) : (
@@ -237,7 +237,7 @@ export default function TimecardClock() {
               {clockIn.isPending && (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />
               )}
-              <ClockIn size={16} weight="bold" aria-hidden="true" />
+              <Clock size={16} weight="bold" aria-hidden="true" />
               Clock In
             </button>
           )}

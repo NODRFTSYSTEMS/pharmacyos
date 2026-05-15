@@ -94,7 +94,7 @@ export default function StockMovements() {
 
   function exportCsv() {
     const rows = [
-      ['Date', 'Product', 'Barcode', 'Type', 'Delta', 'Qty After', 'Actor', 'Reference'],
+      ['Date', 'Product', 'Barcode', 'Type', 'Qty Change', 'Qty After', 'Staff', 'Source'],
       ...filtered.map(m => [
         fmtDateTime(m.created_at),
         m.product?.name ?? '',
@@ -194,10 +194,10 @@ export default function StockMovements() {
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
                 <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Delta</th>
+                <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty Change</th>
                 <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty After</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actor</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reference</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -219,7 +219,7 @@ export default function StockMovements() {
               {!isLoading && !isError && filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">
-                    No movements for this period.
+                    No stock changes recorded in this period.
                   </td>
                 </tr>
               )}

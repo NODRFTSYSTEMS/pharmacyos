@@ -187,7 +187,7 @@ export function InventoryReport() {
         <MetricCard
           label="Total Products"
           value={isLoading ? '—' : String(products.length)}
-          sub="active only"
+          sub="active products"
           icon={Package}
           accent="blue"
         />
@@ -207,7 +207,7 @@ export function InventoryReport() {
         <MetricCard
           label="Out of Stock"
           value={isLoading ? '—' : String(outOfStockCount)}
-          sub="stock qty = 0"
+          sub="no units in stock"
           icon={Warning}
           accent={outOfStockCount > 0 ? 'red' : 'blue'}
         />
