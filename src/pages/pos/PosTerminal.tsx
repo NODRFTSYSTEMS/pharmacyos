@@ -6,6 +6,7 @@ import {
   Tag, Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -363,6 +364,22 @@ export default function PosTerminal() {
         })
         if (e3) stockFailures.push(item.product_name)
       }
+
+      try {
+        await supabase.from('audit_log').insert({
+          actor_id:   cashier?.id ?? null,
+          actor_name: cashier?.name ?? null,
+          action:     AUDIT_ACTIONS.TRANSACTION_CREATE,
+          table_name: 'retail_transactions',
+          record_id:  txn.id,
+          details: {
+            ref_number:     refNumber,
+            total,
+            payment_method: payMethod,
+            item_count:     cart.length,
+          },
+        })
+      } catch { /* best-effort — sale already committed */ }
 
       return { txnId: txn.id, stockFailures }
     },

@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Timecard } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -107,13 +108,23 @@ export default function TimecardClock() {
   const clockIn = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('No authenticated user')
-      const { error } = await supabase.from('timecards').insert({
+      const { data: tc, error } = await supabase.from('timecards').insert({
         staff_id:     user.id,
         staff_name:   user.name,
         staff_role:   user.role,
         notes:        notes.trim() || null,
-      })
+      }).select('id').single()
       if (error) throw error
+      try {
+        await supabase.from('audit_log').insert({
+          actor_id:   user.id,
+          actor_name: user.name,
+          action:     AUDIT_ACTIONS.TIMECARD_CLOCK_IN,
+          table_name: 'timecards',
+          record_id:  tc?.id,
+          details:    { date: todayJamaica() },
+        })
+      } catch { /* best-effort */ }
     },
     onSuccess: () => {
       setNotes('')
@@ -144,6 +155,17 @@ export default function TimecardClock() {
         p_timecard_id: activeShift.id,
       })
       if (analyzeErr) throw analyzeErr
+
+      try {
+        await supabase.from('audit_log').insert({
+          actor_id:   user?.id ?? null,
+          actor_name: user?.name ?? null,
+          action:     AUDIT_ACTIONS.TIMECARD_CLOCK_OUT,
+          table_name: 'timecards',
+          record_id:  activeShift.id,
+          details:    { total_minutes: totalMinutes },
+        })
+      } catch { /* best-effort */ }
     },
     onSuccess: () => {
       setActionError(null)

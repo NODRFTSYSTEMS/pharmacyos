@@ -7,6 +7,8 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Product } from '../../types/database'
 import type { Supplier } from './RetailSuppliers'
 
@@ -76,6 +78,7 @@ interface DrawerProps {
 
 function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
   const qc = useQueryClient()
+  const { data: user } = useCurrentUser()
   const [form, setForm] = useState<ProductDraft>(initial ?? { ...BLANK })
   const [errors, setErrors] = useState<Partial<Record<keyof ProductDraft, string>>>({})
 
@@ -134,11 +137,33 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
           .update(payload)
           .eq('id', editingId)
         if (error) throw error
+        try {
+          await supabase.from('audit_log').insert({
+            actor_id:   user?.id ?? null,
+            actor_name: user?.name ?? null,
+            action:     AUDIT_ACTIONS.PRODUCT_UPDATE,
+            table_name: 'products',
+            record_id:  editingId,
+            details:    { name: payload.name },
+          })
+        } catch { /* best-effort */ }
       } else {
-        const { error } = await supabase
+        const { data: newProduct, error } = await supabase
           .from('products')
           .insert([payload])
+          .select('id')
+          .single()
         if (error) throw error
+        try {
+          await supabase.from('audit_log').insert({
+            actor_id:   user?.id ?? null,
+            actor_name: user?.name ?? null,
+            action:     AUDIT_ACTIONS.PRODUCT_CREATE,
+            table_name: 'products',
+            record_id:  newProduct?.id,
+            details:    { name: payload.name },
+          })
+        } catch { /* best-effort */ }
       }
     },
     onSuccess: () => {
@@ -320,7 +345,7 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
                 step={1}
                 value={form.reorder_level}
                 onChange={e => set('reorder_level', e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder="5"
+                placeholder="5 (default)"
                 className="input"
               />
             </div>

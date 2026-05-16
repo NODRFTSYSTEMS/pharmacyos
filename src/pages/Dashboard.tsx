@@ -513,6 +513,8 @@ export function Dashboard() {
                     key={p.id}
                     className="hover:bg-blue-50 cursor-pointer"
                     onClick={() => navigate(`/prescriptions/${p.id}`)}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate(`/prescriptions/${p.id}`) }}
+                    tabIndex={0}
                     title="Open prescription"
                   >
                     <td className="px-4 font-mono text-xs text-gray-700">{p.ref_number}</td>
