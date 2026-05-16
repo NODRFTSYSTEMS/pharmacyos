@@ -13,6 +13,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds, todayJamaica } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, EmptyRow } from '../../components/Shell'
+import { StaffAvatar } from '../../components/StaffAvatar'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -23,6 +24,9 @@ interface StaffProfile {
   full_name: string
   role: string
   is_active: boolean
+  avatar_url: string | null
+  avatar_alt: string | null
+  avatar_source_status: string | null
   created_at: string
   updated_at: string
 }
@@ -96,7 +100,7 @@ function useStaffProfiles() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('staff_profiles')
-        .select('id, email, full_name, role, is_active, created_at, updated_at')
+        .select('id, email, full_name, role, is_active, avatar_url, avatar_alt, avatar_source_status, created_at, updated_at')
         .order('full_name')
       if (error) throw error
       return (data ?? []) as StaffProfile[]
@@ -226,8 +230,20 @@ function StaffSecurityTable() {
               return (
                 <tr key={s.id} className="hover:bg-white/3 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-100">{s.full_name}</div>
-                    <div className="text-xs text-gray-400">{s.email}</div>
+                    <div className="flex items-center gap-3">
+                      <StaffAvatar
+                        name={s.full_name}
+                        email={s.email}
+                        role={s.role}
+                        avatarUrl={s.avatar_url}
+                        avatarAlt={s.avatar_alt}
+                        size="sm"
+                      />
+                      <div className="min-w-0">
+                        <div className="font-medium text-gray-100 truncate">{s.full_name}</div>
+                        <div className="text-xs text-gray-400 truncate">{s.email}</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <StatusPill variant={rolePill(s.role)} label={s.role} />

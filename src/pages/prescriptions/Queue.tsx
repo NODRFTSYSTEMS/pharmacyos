@@ -6,8 +6,10 @@ import {
   Pill as PillIcon, CheckCircle, XCircle, Warning, ArrowClockwise, LockSimple,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { MedicationReferenceThumb } from '../../components/MedicationVisualReference'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import type { Prescription, PrescriptionStatus } from '../../types/database'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -165,6 +167,8 @@ export default function Queue() {
     })()
     return matchesStatus && matchesSearch
   })
+
+  const medicationReferences = useMedicationVisualReferences(filtered.map(r => r.drug_name))
 
   // Status advance mutation
   const advance = useMutation({
@@ -328,6 +332,7 @@ export default function Queue() {
                   <tr>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ref</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Patient</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Visual</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Drug</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dosage</th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
@@ -347,6 +352,12 @@ export default function Queue() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-800">
                         {rx.patient_name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <MedicationReferenceThumb
+                          drugName={rx.drug_name}
+                          reference={medicationReferences.data?.[normalizeMedicationKey(rx.drug_name)]}
+                        />
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-800">
                         {rx.drug_name}

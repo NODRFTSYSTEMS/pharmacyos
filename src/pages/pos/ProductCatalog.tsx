@@ -6,8 +6,10 @@ import {
   Package, Warning, ArrowRight,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Product } from '../../types/database'
 import type { Supplier } from './RetailSuppliers'
@@ -50,6 +52,8 @@ type ProductDraft = {
   expiry_date: string
   batch_number: string
   notes: string
+  image_url: string
+  image_alt: string
   is_active: boolean
 }
 
@@ -65,6 +69,8 @@ const BLANK: ProductDraft = {
   expiry_date: '',
   batch_number: '',
   notes: '',
+  image_url: '',
+  image_alt: '',
   is_active: true,
 }
 
@@ -128,6 +134,8 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
         expiry_date:   form.expiry_date || null,
         batch_number:  form.batch_number.trim() || null,
         notes:         form.notes.trim() || null,
+        image_url:     form.image_url.trim() || null,
+        image_alt:     form.image_alt.trim() || null,
         is_active:     form.is_active,
         updated_at:    new Date().toISOString(),
       }
@@ -236,6 +244,36 @@ function ProductDrawer({ initial, editingId, onClose }: DrawerProps) {
               placeholder="Scan or enter barcode"
               className="input font-mono"
             />
+          </div>
+
+          {/* Product image */}
+          <div className="grid grid-cols-1 gap-3">
+            <div>
+              <label htmlFor="p-image-url" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Demo / Product Image URL
+              </label>
+              <input
+                id="p-image-url"
+                type="text"
+                value={form.image_url}
+                onChange={e => set('image_url', e.target.value)}
+                placeholder="/demo-products/paracetamol.jpg or https://example.com/product-image.jpg"
+                className="input"
+              />
+            </div>
+            <div>
+              <label htmlFor="p-image-alt" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Image Alt Text
+              </label>
+              <input
+                id="p-image-alt"
+                type="text"
+                value={form.image_alt}
+                onChange={e => set('image_alt', e.target.value)}
+                placeholder="e.g. Front view of Paracetamol 500mg pack"
+                className="input"
+              />
+            </div>
           </div>
 
           {/* Category */}
@@ -514,6 +552,7 @@ export default function ProductCatalog() {
       categoryFilter === 'All' || p.category === categoryFilter
     return matchesSearch && matchesCategory
   })
+  const medicationReferences = useMedicationVisualReferences(filtered.map(p => p.name))
 
   function openAdd() {
     setEditing(null)
@@ -645,6 +684,9 @@ export default function ProductCatalog() {
                       Product
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Visual
+                    </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Barcode
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -676,6 +718,14 @@ export default function ProductCatalog() {
                         {p.notes && (
                           <p className="text-xs text-gray-400 truncate max-w-52">{p.notes}</p>
                         )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <ProductImageThumb
+                          productName={p.name}
+                          imageUrl={p.image_url}
+                          imageAlt={p.image_alt}
+                          fallbackReference={medicationReferences.data?.[normalizeMedicationKey(p.name)]}
+                        />
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-gray-600">
                         {p.barcode ?? <span className="text-gray-300">—</span>}
@@ -735,6 +785,8 @@ export default function ProductCatalog() {
             expiry_date:   editing.expiry_date ?? '',
             batch_number:  editing.batch_number ?? '',
             notes:         editing.notes ?? '',
+            image_url:     editing.image_url ?? '',
+            image_alt:     editing.image_alt ?? '',
             is_active:     editing.is_active,
           } : null}
           editingId={editing?.id ?? null}

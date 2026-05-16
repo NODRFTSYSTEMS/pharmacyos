@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Export, ArrowUp, ArrowDown, MagnifyingGlass, ClockCounterClockwise } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
+import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { PageHeader } from '../../components/Shell'
 import type { StockMovementType } from '../../types/database'
 
@@ -18,7 +19,7 @@ interface MovementRow {
   reference_type: string | null
   notes: string | null
   created_at: string
-  product: { name: string; barcode: string | null } | null
+  product: { name: string; barcode: string | null; image_url: string | null; image_alt: string | null } | null
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -66,7 +67,7 @@ export default function StockMovements() {
       const { gte: fromDt, lte: toDt } = toJamaicaBounds(range.from, range.to)
       const { data, error } = await supabase
         .from('stock_movements')
-        .select('*, product:products(name, barcode)')
+        .select('*, product:products(name, barcode, image_url, image_alt)')
         .gte('created_at', fromDt)
         .lte('created_at', toDt)
         .order('created_at', { ascending: false })
@@ -231,10 +232,19 @@ export default function StockMovements() {
                       {fmtDateTime(m.created_at)}
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-gray-800">{m.product?.name ?? '—'}</p>
-                      {m.product?.barcode && (
-                        <p className="text-xs text-gray-400 font-mono">{m.product.barcode}</p>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <ProductImageThumb
+                          productName={m.product?.name ?? 'Unknown product'}
+                          imageUrl={m.product?.image_url}
+                          imageAlt={m.product?.image_alt}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-800">{m.product?.name ?? '—'}</p>
+                          {m.product?.barcode && (
+                            <p className="text-xs text-gray-400 font-mono">{m.product.barcode}</p>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className={TYPE_PILL[m.movement_type] ?? 'pill pill-gray'}>

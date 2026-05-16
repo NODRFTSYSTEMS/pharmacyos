@@ -11,26 +11,20 @@ import {
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell';
+import { StaffAvatar } from '../../components/StaffAvatar';
+import { getDemoStaffPortrait } from '../../data/demoStaffPortraits';
+import type { StaffAvatarSourceStatus, StaffProfile, StaffRole } from '../../types/database';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
-interface StaffProfile {
-  id: string;
-  email: string;
-  full_name: string;
-  role: StaffRole;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-type StaffRole = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN' | 'AUDITOR';
 
 interface DrawerFormState {
   full_name: string;
   email: string;
   role: StaffRole;
   is_active: boolean;
+  avatar_url: string;
+  avatar_alt: string;
+  avatar_source_status: StaffAvatarSourceStatus;
 }
 
 interface DrawerErrors {
@@ -49,11 +43,26 @@ const ROLE_PILL_VARIANT: Record<StaffRole, 'green' | 'blue' | 'purple' | 'yellow
   AUDITOR:    'gray',
 };
 
+const AVATAR_STATUS_PILL: Record<StaffAvatarSourceStatus, 'green' | 'yellow' | 'gray'> = {
+  VERIFIED: 'green',
+  DEMO_ONLY: 'yellow',
+  NEEDS_REPLACEMENT: 'gray',
+};
+
+const AVATAR_STATUS_LABEL: Record<StaffAvatarSourceStatus, string> = {
+  VERIFIED: 'Verified',
+  DEMO_ONLY: 'Demo only',
+  NEEDS_REPLACEMENT: 'Needs replacement',
+};
+
 const EMPTY_FORM: DrawerFormState = {
   full_name: '',
   email: '',
   role: 'CASHIER',
   is_active: true,
+  avatar_url: '',
+  avatar_alt: '',
+  avatar_source_status: 'NEEDS_REPLACEMENT',
 };
 
 // ── Permissions definitions ───────────────────────────────────────────────────
@@ -89,6 +98,14 @@ const DEFAULT_PERMS: RolePermsRecord = {
   AUDITOR:    ['audit_view','reports_view'],
 };
 
+function getAvatarStatus(member: StaffProfile): StaffAvatarSourceStatus {
+  const demoPortrait = getDemoStaffPortrait(member.email);
+  if (member.avatar_url || demoPortrait) {
+    return member.avatar_source_status ?? demoPortrait?.sourceStatus ?? 'NEEDS_REPLACEMENT';
+  }
+  return 'NEEDS_REPLACEMENT';
+}
+
 function makeMatrix(record: RolePermsRecord): Record<string, Set<string>> {
   return Object.fromEntries(
     ROLES_LIST.map(r => [r, new Set<string>(record[r] ?? DEFAULT_PERMS[r] ?? [])])
@@ -111,11 +128,15 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
   useEffect(() => {
     if (open) {
       if (editTarget) {
+        const demoPortrait = getDemoStaffPortrait(editTarget.email);
         setForm({
           full_name: editTarget.full_name,
           email:     editTarget.email,
           role:      editTarget.role,
           is_active: editTarget.is_active,
+          avatar_url: editTarget.avatar_url ?? demoPortrait?.url ?? '',
+          avatar_alt: editTarget.avatar_alt ?? demoPortrait?.alt ?? '',
+          avatar_source_status: editTarget.avatar_source_status ?? demoPortrait?.sourceStatus ?? 'NEEDS_REPLACEMENT',
         });
       } else {
         setForm(EMPTY_FORM);
@@ -126,11 +147,27 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: DrawerFormState) => {
+      const email = data.email.trim().toLowerCase();
+      const fullName = data.full_name.trim();
+      const demoPortrait = getDemoStaffPortrait(email);
+      const explicitAvatarUrl = data.avatar_url.trim();
+      const resolvedAvatarUrl = explicitAvatarUrl || demoPortrait?.url || null;
+      const resolvedAvatarAlt = data.avatar_alt.trim()
+        || (resolvedAvatarUrl ? demoPortrait?.alt ?? `${fullName} profile portrait` : null);
+      const resolvedAvatarStatus: StaffAvatarSourceStatus = !resolvedAvatarUrl
+        ? 'NEEDS_REPLACEMENT'
+        : resolvedAvatarUrl === demoPortrait?.url
+          ? 'DEMO_ONLY'
+          : data.avatar_source_status;
+
       const payload = {
-        full_name: data.full_name.trim(),
-        email:     data.email.trim().toLowerCase(),
+        full_name: fullName,
+        email,
         role:      data.role,
         is_active: data.is_active,
+        avatar_url: resolvedAvatarUrl,
+        avatar_alt: resolvedAvatarAlt,
+        avatar_source_status: resolvedAvatarStatus,
       };
       if (editTarget) {
         const { error } = await supabase
@@ -242,6 +279,73 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
               <option value="ADMIN">Admin</option>
               <option value="AUDITOR">Auditor</option>
             </select>
+          </div>
+
+          <div className="rounded border border-gray-200 bg-gray-50 p-3">
+            <div className="mb-3 flex items-center gap-3">
+              <StaffAvatar
+                name={form.full_name}
+                email={form.email}
+                role={form.role}
+                avatarUrl={form.avatar_url}
+                avatarAlt={form.avatar_alt}
+                size="lg"
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {form.full_name.trim() || 'Staff Member'}
+                </p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">
+                  {AVATAR_STATUS_LABEL[form.avatar_source_status]}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="u-avatar-url" className="block text-sm font-medium text-gray-700 mb-1">
+                  Profile photo URL
+                </label>
+                <input
+                  id="u-avatar-url"
+                  type="text"
+                  className="input w-full"
+                  value={form.avatar_url}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('avatar_url', e.target.value)}
+                  placeholder="/demo/staff/grace-bennett.jpg"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="u-avatar-alt" className="block text-sm font-medium text-gray-700 mb-1">
+                  Photo alt text
+                </label>
+                <input
+                  id="u-avatar-alt"
+                  type="text"
+                  className="input w-full"
+                  value={form.avatar_alt}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('avatar_alt', e.target.value)}
+                  placeholder="Demo portrait for staff member"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="u-avatar-status" className="block text-sm font-medium text-gray-700 mb-1">
+                  Photo source status
+                </label>
+                <select
+                  id="u-avatar-status"
+                  className="input w-full"
+                  value={form.avatar_source_status}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleField('avatar_source_status', e.target.value as StaffAvatarSourceStatus)}
+                >
+                  <option value="DEMO_ONLY">Demo only</option>
+                  <option value="VERIFIED">Verified</option>
+                  <option value="NEEDS_REPLACEMENT">Needs replacement</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           {/* Active toggle */}
@@ -527,37 +631,59 @@ export function UsersAdmin() {
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Photo</th>
                   <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Edit</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {staff.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-4 font-medium text-gray-900 text-sm">{s.full_name}</td>
-                    <td className="px-4 text-gray-600 text-sm">{s.email}</td>
-                    <td className="px-4">
-                      <StatusPill
-                        label={s.role.charAt(0) + s.role.slice(1).toLowerCase()}
-                        variant={ROLE_PILL_VARIANT[s.role]}
-                      />
-                    </td>
-                    <td className="px-4">
-                      <StatusPill
-                        label={s.is_active ? 'Active' : 'Inactive'}
-                        variant={s.is_active ? 'green' : 'gray'}
-                      />
-                    </td>
-                    <td className="px-4 text-right">
-                      <button
-                        className="btn btn-ghost p-1.5"
-                        onClick={() => openEdit(s)}
-                        aria-label={`Edit ${s.full_name}`}
-                      >
-                        <PencilSimple size={16} aria-hidden="true" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {staff.map((s) => {
+                  const avatarStatus = getAvatarStatus(s);
+                  return (
+                    <tr key={s.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 font-medium text-gray-900 text-sm">
+                        <div className="flex items-center gap-3">
+                          <StaffAvatar
+                            name={s.full_name}
+                            email={s.email}
+                            role={s.role}
+                            avatarUrl={s.avatar_url}
+                            avatarAlt={s.avatar_alt}
+                            size="md"
+                          />
+                          <span>{s.full_name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 text-gray-600 text-sm">{s.email}</td>
+                      <td className="px-4">
+                        <StatusPill
+                          label={s.role.charAt(0) + s.role.slice(1).toLowerCase()}
+                          variant={ROLE_PILL_VARIANT[s.role]}
+                        />
+                      </td>
+                      <td className="px-4">
+                        <StatusPill
+                          label={s.is_active ? 'Active' : 'Inactive'}
+                          variant={s.is_active ? 'green' : 'gray'}
+                        />
+                      </td>
+                      <td className="px-4">
+                        <StatusPill
+                          label={AVATAR_STATUS_LABEL[avatarStatus]}
+                          variant={AVATAR_STATUS_PILL[avatarStatus]}
+                        />
+                      </td>
+                      <td className="px-4 text-right">
+                        <button
+                          className="btn btn-ghost p-1.5"
+                          onClick={() => openEdit(s)}
+                          aria-label={`Edit ${s.full_name}`}
+                        >
+                          <PencilSimple size={16} aria-hidden="true" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

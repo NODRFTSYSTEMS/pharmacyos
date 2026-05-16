@@ -8,11 +8,13 @@ export type ExtractionStatus   = 'PENDING' | 'PROCESSING' | 'REVIEW_REQUIRED' | 
 export type DocumentType       = 'PRESCRIPTION' | 'INVOICE' | 'OTHER'
 export type ShiftType          = 'MORNING' | 'AFTERNOON' | 'FULL_DAY'
 export type PrescriptionStatus = 'RECEIVED' | 'VERIFYING' | 'READY' | 'DISPENSED' | 'CANCELLED'
-export type StaffRole          = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN'
+export type StaffRole          = 'PHARMACIST' | 'CASHIER' | 'TECHNICIAN' | 'MANAGER' | 'ADMIN' | 'AUDITOR'
 export type LoyaltyTier        = 'STANDARD' | 'SILVER' | 'GOLD' | 'PLATINUM'
 export type StockMovementType  = 'SALE' | 'RECEIVE' | 'ADJUST' | 'RETURN' | 'WRITE_OFF'
 export type PoStatus           = 'DRAFT' | 'SUBMITTED' | 'RECEIVED' | 'CANCELLED'
 export type TimecardStatus     = 'CLOCKED_IN' | 'CLOCKED_OUT' | 'FLAGGED' | 'APPROVED'
+export type VisualReferenceStatus = 'VERIFIED' | 'DEMO_ONLY' | 'NEEDS_VERIFICATION' | 'RETIRED'
+export type StaffAvatarSourceStatus = 'DEMO_ONLY' | 'VERIFIED' | 'NEEDS_REPLACEMENT'
 
 // ── Row types ─────────────────────────────────────────────────────────────────
 
@@ -154,6 +156,8 @@ export interface Product {
   notes: string | null
   expiry_date: string | null
   batch_number: string | null
+  image_url: string | null
+  image_alt: string | null
   created_at: string
   updated_at: string
 }
@@ -195,12 +199,39 @@ export interface Prescription {
   updated_at: string
 }
 
+export interface MedicationVisualReference {
+  id: string
+  drug_key: string
+  display_name: string
+  generic_name: string | null
+  strength: string | null
+  dosage_form: string | null
+  manufacturer: string | null
+  image_url: string | null
+  image_alt: string | null
+  source_name: string | null
+  source_url: string | null
+  imprint: string | null
+  color: string | null
+  shape: string | null
+  verification_status: VisualReferenceStatus
+  verification_notes: string | null
+  verified_by: string | null
+  verified_by_name: string | null
+  verified_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface StaffProfile {
   id: string
   email: string
   full_name: string
   role: StaffRole
   is_active: boolean
+  avatar_url: string | null
+  avatar_alt: string | null
+  avatar_source_status: StaffAvatarSourceStatus
   created_at: string
   updated_at: string
 }
@@ -380,6 +411,12 @@ export type Database = {
         Row: Prescription
         Insert: Omit<Prescription, 'id' | 'ref_number' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Prescription, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      medication_visual_references: {
+        Row: MedicationVisualReference
+        Insert: Omit<MedicationVisualReference, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<MedicationVisualReference, 'id' | 'created_at'>>
         Relationships: []
       }
       staff_profiles: {

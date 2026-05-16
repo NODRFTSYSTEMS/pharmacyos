@@ -8,7 +8,9 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, Pill } from '../../components/Shell'
+import { MedicationReferenceCard } from '../../components/MedicationVisualReference'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import { fmtJamaicaDate, fmtJamaicaTime } from '../../lib/date'
 import type { Prescription, PrescriptionStatus } from '../../types/database'
@@ -325,6 +327,11 @@ export function RxDetail() {
 
   const anyMutationPending =
     advanceMutation.isPending || dispenseMutation.isPending || cancelMutation.isPending
+
+  const medicationReferences = useMedicationVisualReferences(rx ? [rx.drug_name] : [])
+  const medicationReference = rx
+    ? medicationReferences.data?.[normalizeMedicationKey(rx.drug_name)]
+    : undefined
 
   // ─── Render states ─────────────────────────────────────────────────────────
 
@@ -655,6 +662,11 @@ export function RxDetail() {
                 </div>
               )}
             </div>
+
+            <MedicationReferenceCard
+              drugName={rx.drug_name}
+              reference={medicationReference}
+            />
 
           </div>
         </div>

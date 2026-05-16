@@ -7,7 +7,9 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { formatPatientName } from '../../lib/formatting'
+import { MedicationReferenceThumb } from '../../components/MedicationVisualReference'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
+import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import type { Patient, Prescription, PrescriptionStatus } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -94,6 +96,8 @@ function MedicationTab({ patientId }: { patientId: string }) {
     },
   })
 
+  const medicationReferences = useMedicationVisualReferences(prescriptions.map(rx => rx.drug_name))
+
   if (isLoading) return <div className="py-8 text-center text-sm text-gray-400">Loading prescriptions…</div>
   if (isError)   return <div className="py-6 text-center text-sm text-red-600">Failed to load medication history.</div>
   if (prescriptions.length === 0) {
@@ -112,6 +116,7 @@ function MedicationTab({ patientId }: { patientId: string }) {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ref</th>
+              <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Visual</th>
               <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Drug</th>
               <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Prescriber</th>
               <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
@@ -123,6 +128,12 @@ function MedicationTab({ patientId }: { patientId: string }) {
             {prescriptions.map(rx => (
               <tr key={rx.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-mono text-xs text-gray-500">{rx.ref_number}</td>
+                <td className="px-4 py-3">
+                  <MedicationReferenceThumb
+                    drugName={rx.drug_name}
+                    reference={medicationReferences.data?.[normalizeMedicationKey(rx.drug_name)]}
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <p className="text-sm font-medium text-gray-800">{rx.drug_name}</p>
                   {rx.dosage && <p className="text-xs text-gray-400">{rx.dosage}</p>}

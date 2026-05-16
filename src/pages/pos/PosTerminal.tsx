@@ -6,7 +6,9 @@ import {
   Tag, Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
+import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -17,6 +19,8 @@ interface ProductRow {
   unit_price: number
   stock_qty: number
   reorder_level: number
+  image_url: string | null
+  image_alt: string | null
 }
 
 interface CartItem {
@@ -202,7 +206,7 @@ export default function PosTerminal() {
     queryFn: async () => {
       let q = supabase
         .from('products')
-        .select('id, name, barcode, unit_price, stock_qty, reorder_level')
+        .select('id, name, barcode, unit_price, stock_qty, reorder_level, image_url, image_alt')
         .eq('is_active', true)
         .order('name')
         .limit(80)
@@ -216,6 +220,7 @@ export default function PosTerminal() {
     staleTime: 15_000,
     retry: 1,
   })
+  const medicationReferences = useMedicationVisualReferences(products.map(p => p.name))
 
   // ── Cart state operations ────────────────────────────────────────────────
 
@@ -760,6 +765,12 @@ export default function PosTerminal() {
                         }`}>
                           {inCart ? inCart.qty : '+'}
                         </div>
+                        <ProductImageThumb
+                          productName={p.name}
+                          imageUrl={p.image_url}
+                          imageAlt={p.image_alt}
+                          fallbackReference={medicationReferences.data?.[normalizeMedicationKey(p.name)]}
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 truncate">{p.name}</p>
                           <p className="text-xs text-gray-500 font-mono">{fmtCurrency(p.unit_price)}</p>

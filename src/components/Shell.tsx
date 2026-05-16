@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
-  Gear, Files, List, X, SignOut, CaretRight, UserCircle, LockSimple,
+  Gear, Files, List, X, SignOut, CaretRight, LockSimple,
   Warehouse, Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
@@ -13,6 +13,7 @@ import { usePharmacyName } from '../hooks/usePharmacyName'
 import { NAV_PERMISSIONS } from '../config/route-permissions'
 import { GlobalSearch } from './GlobalSearch'
 import { NotificationBell } from './NotificationBell'
+import { StaffAvatar } from './StaffAvatar'
 
 interface NavItem {
   label: string
@@ -218,7 +219,14 @@ export function Sidebar() {
       <div className="px-3 py-3 border-t border-white/10 space-y-1">
         {user && (
           <div className="flex items-center gap-2 px-1 py-1.5 mb-1">
-            <UserCircle size={18} weight="duotone" className="text-gray-500 shrink-0" />
+            <StaffAvatar
+              name={displayName}
+              email={user.email}
+              role={user.role}
+              avatarUrl={user.avatarUrl}
+              avatarAlt={user.avatarAlt}
+              size="sm"
+            />
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-300 truncate">{displayName}</p>
               <p className="text-[10px] text-gray-400 uppercase tracking-wide">{user.role}</p>
