@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle, Warning, Export, Users } from '@phosphor-icons/react'
+import { CheckCircle, Warning, Export, Users, Flag, X } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Timecard, TimecardStatus } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -37,15 +38,84 @@ const STATUS_VARIANT: Record<TimecardStatus, 'green' | 'yellow' | 'blue' | 'gray
   APPROVED:    'green',
 }
 
+// ── Flag Modal ────────────────────────────────────────────────────────────────
+
+interface FlagModalProps {
+  tc: Timecard
+  note: string
+  onNoteChange: (v: string) => void
+  onConfirm: () => void
+  onClose: () => void
+  isPending: boolean
+}
+
+function FlagModal({ tc, note, onNoteChange, onConfirm, onClose, isPending }: FlagModalProps) {
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="flag-title">
+      <div className="card w-full max-w-sm p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 id="flag-title" className="text-sm font-semibold text-gray-800">Flag Timecard</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+            <X size={15} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="bg-gray-50 rounded-lg p-3 text-xs space-y-1 border border-gray-200">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Staff</span>
+            <span className="font-medium">{tc.staff_name}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Role</span>
+            <span>{tc.staff_role}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Duration</span>
+            <span className="font-mono">{fmtDuration(tc.total_minutes)}</span>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="flag-note" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            Reason *
+          </label>
+          <textarea
+            id="flag-note"
+            value={note}
+            onChange={e => onNoteChange(e.target.value)}
+            rows={3}
+            placeholder="Describe why this shift needs review…"
+            className="input h-auto py-2 resize-none"
+          />
+        </div>
+
+        <div className="flex gap-3 justify-end">
+          <button onClick={onClose} className="btn btn-ghost">Cancel</button>
+          <button
+            onClick={onConfirm}
+            disabled={!note.trim() || isPending}
+            className="btn bg-amber-600 text-white hover:bg-amber-700 border-amber-600 gap-1.5"
+          >
+            <Flag size={13} weight="fill" aria-hidden="true" />
+            {isPending ? 'Flagging…' : 'Flag for Review'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function TimecardManager() {
   const qc = useQueryClient()
   const { data: currentUser } = useCurrentUser()
 
-  const [range, setRange]       = useState(defaultRange)
+  const [range, setRange]               = useState(defaultRange)
   const [statusFilter, setStatusFilter] = useState<TimecardStatus | 'ALL'>('ALL')
   const [staffSearch, setStaffSearch]   = useState('')
+  const [flagTarget, setFlagTarget]     = useState<Timecard | null>(null)
+  const [flagNote, setFlagNote]         = useState('')
 
   const { data = [], isLoading, isError } = useQuery<Timecard[]>({
     queryKey: ['timecards-manager', range],
@@ -75,20 +145,58 @@ export default function TimecardManager() {
   // ── Approve mutation ─────────────────────────────────────────────────────────
 
   const approve = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (tc: Timecard) => {
       if (!currentUser) throw new Error('No authenticated user')
       const { error } = await supabase
         .from('timecards')
         .update({
-          status:          'APPROVED',
-          approved_by:     currentUser.id,
+          status:           'APPROVED',
+          approved_by:      currentUser.id,
           approved_by_name: currentUser.name,
-          approved_at:     new Date().toISOString(),
+          approved_at:      new Date().toISOString(),
         })
-        .eq('id', id)
+        .eq('id', tc.id)
       if (error) throw error
+      await supabase.from('audit_log').insert({
+        actor_id:   currentUser.id,
+        actor_name: currentUser.name,
+        action:     AUDIT_ACTIONS.TIMECARD_APPROVE,
+        table_name: 'timecards',
+        record_id:  tc.id,
+        details:    { staff_name: tc.staff_name, total_minutes: tc.total_minutes },
+      })
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['timecards-manager'] }),
+  })
+
+  // ── Flag mutation ────────────────────────────────────────────────────────────
+
+  const flagMutation = useMutation({
+    mutationFn: async ({ tc, note }: { tc: Timecard; note: string }) => {
+      if (!currentUser) throw new Error('No authenticated user')
+      const { error } = await supabase
+        .from('timecards')
+        .update({
+          status:          'FLAGGED',
+          ai_flag_anomaly:  true,
+          ai_flag_reason:  `Manager flagged: ${note.trim()}`,
+        })
+        .eq('id', tc.id)
+      if (error) throw error
+      await supabase.from('audit_log').insert({
+        actor_id:   currentUser.id,
+        actor_name: currentUser.name,
+        action:     AUDIT_ACTIONS.TIMECARD_FLAG,
+        table_name: 'timecards',
+        record_id:  tc.id,
+        details:    { staff_name: tc.staff_name, note: note.trim() },
+      })
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['timecards-manager'] })
+      setFlagTarget(null)
+      setFlagNote('')
+    },
   })
 
   // ── CSV export ───────────────────────────────────────────────────────────────
@@ -123,6 +231,7 @@ export default function TimecardManager() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   const flaggedCount = data.filter(tc => tc.status === 'FLAGGED').length
+  const anyPending   = approve.isPending || flagMutation.isPending
 
   return (
     <div>
@@ -225,7 +334,8 @@ export default function TimecardManager() {
                 <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">No timecards for this period.</td></tr>
               )}
               {!isLoading && timecards.map(tc => {
-                const isFlagged = tc.status === 'FLAGGED'
+                const isFlagged    = tc.status === 'FLAGGED'
+                const isClockdOut  = tc.status === 'CLOCKED_OUT'
                 return (
                   <tr key={tc.id} className={isFlagged ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-gray-50'}>
                     <td className="px-4 py-3">
@@ -257,17 +367,30 @@ export default function TimecardManager() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      {isFlagged && (
-                        <button
-                          onClick={() => approve.mutate(tc.id)}
-                          disabled={approve.isPending}
-                          className="btn btn-ghost gap-1 text-xs h-7 text-emerald-700 hover:bg-emerald-50"
-                          aria-label={`Approve timecard for ${tc.staff_name}`}
-                        >
-                          <CheckCircle size={13} aria-hidden="true" />
-                          Approve
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-1.5">
+                        {isFlagged && (
+                          <button
+                            onClick={() => approve.mutate(tc)}
+                            disabled={anyPending}
+                            className="btn btn-ghost gap-1 text-xs h-7 text-emerald-700 hover:bg-emerald-50"
+                            aria-label={`Approve timecard for ${tc.staff_name}`}
+                          >
+                            <CheckCircle size={13} aria-hidden="true" />
+                            Approve
+                          </button>
+                        )}
+                        {isClockdOut && (
+                          <button
+                            onClick={() => { setFlagNote(''); setFlagTarget(tc) }}
+                            disabled={anyPending}
+                            className="btn btn-ghost gap-1 text-xs h-7 text-amber-700 hover:bg-amber-50"
+                            aria-label={`Flag timecard for ${tc.staff_name}`}
+                          >
+                            <Flag size={13} aria-hidden="true" />
+                            Flag
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )
@@ -282,6 +405,18 @@ export default function TimecardManager() {
           </div>
         )}
       </div>
+
+      {/* Flag modal */}
+      {flagTarget && (
+        <FlagModal
+          tc={flagTarget}
+          note={flagNote}
+          onNoteChange={setFlagNote}
+          onConfirm={() => flagMutation.mutate({ tc: flagTarget, note: flagNote })}
+          onClose={() => { setFlagTarget(null); setFlagNote('') }}
+          isPending={flagMutation.isPending}
+        />
+      )}
     </div>
   )
 }
