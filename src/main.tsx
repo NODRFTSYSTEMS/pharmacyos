@@ -1,17 +1,31 @@
 import './polyfills'
-import { StrictMode, Component, type ReactNode } from 'react'
+import { StrictMode, Component, type ErrorInfo, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import { supabaseConfigured } from './lib/supabase'
+import { registerGlobalErrorReporting, reportAppError } from './lib/errorReporting'
 import './index.css'
 
+registerGlobalErrorReporting()
+
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: error => {
+      void reportAppError('react-query.query', error, { layer: 'query-cache' }, 'WARNING')
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: error => {
+      void reportAppError('react-query.mutation', error, { layer: 'mutation-cache' }, 'ERROR')
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 30_000,
       retry: 2,
+      refetchOnReconnect: true,
     },
   },
 })
@@ -31,6 +45,12 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, message: error.message }
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    void reportAppError('react.error-boundary', error, {
+      componentStack: info.componentStack,
+    }, 'CRITICAL')
   }
 
   render() {

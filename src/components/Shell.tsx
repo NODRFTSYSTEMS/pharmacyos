@@ -14,6 +14,7 @@ import { NAV_PERMISSIONS } from '../config/route-permissions'
 import { GlobalSearch } from './GlobalSearch'
 import { NotificationBell } from './NotificationBell'
 import { StaffAvatar } from './StaffAvatar'
+import { ConnectionStatus, OfflineBanner } from './ConnectionStatus'
 
 interface NavItem {
   label: string
@@ -197,6 +198,7 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <Files size={20} weight="duotone" className="text-blue-400" />
           <span className="text-white font-bold text-sm tracking-tight flex-1">PharmacyOS</span>
+          <ConnectionStatus compact />
           <NotificationBell />
         </div>
         <p className="text-gray-400 text-xs mt-0.5">{pharmacyName}</p>
@@ -400,6 +402,7 @@ export function AppShell({ children }: AppShellProps) {
         </div>
 
         <main id="main-content" className="flex-1 overflow-y-auto p-6">
+          <OfflineBanner />
           {children}
         </main>
       </div>
@@ -448,6 +451,7 @@ interface PrintHeaderProps {
 
 export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderProps) {
   const pharmacyName = usePharmacyName()
+  const { data: currentUser } = useCurrentUser()
   const { data: pharmacyAddress } = useQuery({
     queryKey: ['pharmacy-address'],
     queryFn: async () => {
@@ -467,6 +471,8 @@ export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderPro
     retry: false,
   })
   const now = new Date().toLocaleString('en-JM', { timeZone: 'America/Jamaica' })
+  const generatedByText = generatedBy
+    ?? (currentUser ? `${currentUser.name} - ${currentUser.role}` : undefined)
 
   return (
     <div className="print-only mb-6 pb-4 border-b border-gray-300">
@@ -480,7 +486,8 @@ export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderPro
           <p className="font-semibold text-sm text-gray-800">{reportTitle}</p>
           {period && <p className="text-xs text-gray-500">Period: {period}</p>}
           <p className="text-xs text-gray-400">Generated: {now}</p>
-          {generatedBy && <p className="text-xs text-gray-400">By: {generatedBy}</p>}
+          {generatedByText && <p className="text-xs text-gray-400">By: {generatedByText}</p>}
+          <p className="text-xs text-gray-400">Format: PharmacyOS standard report</p>
         </div>
       </div>
     </div>

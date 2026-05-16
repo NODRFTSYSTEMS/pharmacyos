@@ -260,6 +260,69 @@ export interface AuditLogEntry {
   created_at: string
 }
 
+export interface DashboardUpdate {
+  id: string
+  title: string
+  body: string
+  category: 'NEWS' | 'MESSAGE' | 'UPDATE' | 'ALERT'
+  audience_role: StaffRole | null
+  priority: number
+  is_active: boolean
+  starts_at: string
+  ends_at: string | null
+  created_by: string | null
+  created_by_name: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AiRoleSetting {
+  id: string
+  role_key: string
+  display_name: string
+  description: string | null
+  enabled: boolean
+  provider: string
+  model: string
+  temperature: number
+  max_tokens: number
+  system_prompt: string
+  escalation_role: StaffRole | null
+  safety_notes: string | null
+  last_reviewed_at: string | null
+  last_reviewed_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface SystemErrorEvent {
+  id: string
+  severity: 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL'
+  source: string
+  message: string
+  stack: string | null
+  route: string | null
+  user_agent: string | null
+  actor_id: string | null
+  actor_email: string | null
+  metadata: Json
+  resolved_at: string | null
+  created_at: string
+}
+
+export interface DailyInconsistencyReport {
+  id: string
+  report_date: string
+  scheduled_for: string
+  generated_at: string
+  status: 'GENERATED' | 'DELIVERED' | 'FAILED'
+  total_findings: number
+  findings: Json
+  delivery_roles: StaffRole[]
+  delivery_status: string
+  created_at: string
+}
+
 // ── Migration 002 ─────────────────────────────────────────────────────────────
 
 export interface RetailSupplier {
@@ -443,6 +506,30 @@ export type Database = {
         Update: Partial<Omit<AuditLogEntry, 'id' | 'created_at'>>
         Relationships: []
       }
+      dashboard_updates: {
+        Row: DashboardUpdate
+        Insert: Omit<DashboardUpdate, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<DashboardUpdate, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      ai_role_settings: {
+        Row: AiRoleSetting
+        Insert: Omit<AiRoleSetting, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<AiRoleSetting, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      system_error_events: {
+        Row: SystemErrorEvent
+        Insert: Omit<SystemErrorEvent, 'id' | 'created_at'>
+        Update: Partial<Omit<SystemErrorEvent, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      daily_inconsistency_reports: {
+        Row: DailyInconsistencyReport
+        Insert: Omit<DailyInconsistencyReport, 'id' | 'created_at'>
+        Update: Partial<Omit<DailyInconsistencyReport, 'id' | 'created_at'>>
+        Relationships: []
+      }
       stock_movements: {
         Row: StockMovement
         Insert: Omit<StockMovement, 'id' | 'created_at'>
@@ -472,7 +559,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_daily_inconsistency_report: {
+        Args: { p_report_date?: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

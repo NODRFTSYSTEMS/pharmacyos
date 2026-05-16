@@ -3,14 +3,20 @@ import { Link, useNavigate } from 'react-router'
 import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
   ShoppingBag, Robot, Clock, ArrowRight, Warehouse,
+  Megaphone, Sun, Moon, ShieldCheck,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, ClosableAlert } from '../components/Shell'
+import { ConnectionStatus } from '../components/ConnectionStatus'
+import { StaffAvatar } from '../components/StaffAvatar'
 import { usePermission } from '../hooks/usePermission'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { usePharmacyName } from '../hooks/usePharmacyName'
+import { useThemeMode } from '../hooks/useThemeMode'
 import type {
+  DailyInconsistencyReport,
+  DashboardUpdate,
   RetailTransaction,
   RxTransaction,
   Prescription,
@@ -46,6 +52,13 @@ const RX_PILL_MAP: Record<PrescriptionStatus, 'blue' | 'yellow' | 'green' | 'gra
   READY:      'green',
   DISPENSED:  'gray',
   CANCELLED:  'red',
+}
+
+const UPDATE_PILL_MAP: Record<DashboardUpdate['category'], 'blue' | 'yellow' | 'green' | 'red'> = {
+  NEWS: 'blue',
+  MESSAGE: 'green',
+  UPDATE: 'yellow',
+  ALERT: 'red',
 }
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
@@ -205,6 +218,52 @@ function useTodayClockIn(userId: string | undefined) {
   })
 }
 
+function useDashboardUpdates() {
+  return useQuery<DashboardUpdate[]>({
+    queryKey: ['dashboard-updates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('dashboard_updates')
+        .select('*')
+        .eq('is_active', true)
+        .lte('starts_at', new Date().toISOString())
+        .or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`)
+        .order('priority', { ascending: true })
+        .order('starts_at', { ascending: false })
+        .limit(8)
+      if (error) throw error
+      return (data ?? []) as DashboardUpdate[]
+    },
+    refetchInterval: 120_000,
+  })
+}
+
+function useLatestInconsistencyReport(enabled: boolean) {
+  return useQuery<DailyInconsistencyReport | null>({
+    queryKey: ['latest-daily-inconsistency-report'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('daily_inconsistency_reports')
+        .select('*')
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (error) throw error
+      return (data ?? null) as DailyInconsistencyReport | null
+    },
+    enabled,
+    refetchInterval: 300_000,
+  })
+}
+
+function getFinding(report: DailyInconsistencyReport | null | undefined, key: string): number {
+  if (!report || !report.findings || typeof report.findings !== 'object' || Array.isArray(report.findings)) {
+    return 0
+  }
+  const value = (report.findings as Record<string, unknown>)[key]
+  return typeof value === 'number' ? value : Number(value ?? 0)
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Dashboard() {
@@ -214,6 +273,7 @@ export function Dashboard() {
 
   const pharmacyName   = usePharmacyName()
   const { data: user } = useCurrentUser()
+  const { theme, toggleTheme } = useThemeMode()
 
   // I-21: Role-filtered dashboard sections
   const canViewReports      = usePermission('reports_view')
@@ -230,6 +290,8 @@ export function Dashboard() {
   const aiQueueQ       = useAIQueuePendingCount()
   const clockInQ       = useTodayClockIn(user?.id)
   const reorderQ       = useReorderRecommendations(canManageInventory)
+  const updatesQ       = useDashboardUpdates()
+  const dailyReportQ   = useLatestInconsistencyReport(canViewReports)
 
   const isCashier      = user?.role === 'CASHIER'
   const isPharmacist   = user?.role === 'PHARMACIST'
@@ -242,6 +304,7 @@ export function Dashboard() {
   const txnCount       = (retailQ.data ?? []).length + (rxQ.data ?? []).length
   const pendingRxCount = (prescriptionsQ.data ?? []).length
   const lowStockCount  = (lowStockQ.data ?? []).length
+  const latestReport   = dailyReportQ.data ?? null
 
   // Recent transactions — last 5 combined, sorted newest first
   const recentTxns: RecentTxn[] = [
@@ -279,6 +342,117 @@ export function Dashboard() {
         subtitle={`${pharmacyName} — today's overview`}
         breadcrumb={['Dashboard']}
       />
+
+      <div className="mb-6 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4">
+        <section className="card p-4 flex flex-wrap items-center gap-4" aria-label="Current user and system status">
+          <StaffAvatar
+            name={user?.name}
+            email={user?.email}
+            role={user?.role}
+            avatarUrl={user?.avatarUrl}
+            avatarAlt={user?.avatarAlt}
+            size="lg"
+          />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Signed in user</p>
+            <h2 className="text-lg font-semibold text-gray-900 truncate">
+              {user?.name ?? 'Staff Member'}
+            </h2>
+            <p className="text-sm text-gray-500 truncate">
+              {user?.role ?? 'SESSION'} {user?.email ? `- ${user.email}` : ''}
+            </p>
+          </div>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <ConnectionStatus />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700">
+              <ShieldCheck size={13} weight="duotone" aria-hidden="true" />
+              RBAC active
+            </span>
+          </div>
+        </section>
+
+        <section className="card p-4 flex items-center justify-between gap-4" aria-label="Dashboard display mode">
+          <div>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Dashboard theme</p>
+            <p className="text-sm text-gray-700">
+              {theme === 'dark' ? 'Dark mode' : 'Light mode'}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost gap-2"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
+        </section>
+      </div>
+
+      {(updatesQ.data?.length ?? 0) > 0 && (
+        <section className="mb-6" aria-labelledby="company-updates-heading">
+          <div className="flex items-center justify-between mb-3">
+            <h2 id="company-updates-heading" className="section-title flex items-center gap-2">
+              <Megaphone size={16} weight="duotone" aria-hidden="true" />
+              Company Updates
+            </h2>
+            <span className="text-xs text-gray-400">
+              Admin configured
+            </span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {(updatesQ.data ?? []).map(update => (
+              <article key={update.id} className="card p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <StatusPill label={update.category} variant={UPDATE_PILL_MAP[update.category]} />
+                  {update.audience_role && (
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                      {update.audience_role}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900">{update.title}</h3>
+                <p className="mt-1 text-sm text-gray-600">{update.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {canViewReports && latestReport && (
+        <section className="card p-4 mb-6" aria-labelledby="daily-inconsistency-heading">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="daily-inconsistency-heading" className="section-title mb-1">
+                Daily Inconsistency Report
+              </h2>
+              <p className="text-sm text-gray-500">
+                {latestReport.report_date} - {latestReport.total_findings} finding{latestReport.total_findings === 1 ? '' : 's'} recorded
+              </p>
+            </div>
+            <StatusPill
+              label={latestReport.status}
+              variant={latestReport.total_findings > 0 ? 'yellow' : 'green'}
+            />
+          </div>
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 text-sm">
+            {[
+              ['EOD unresolved', 'open_or_unresolved_eod_closeouts'],
+              ['Cash variance', 'cash_variance_closeouts'],
+              ['Timecard flags', 'flagged_timecards'],
+              ['Low stock', 'low_stock_products'],
+              ['AI review', 'pending_ai_review_items'],
+              ['Access denials', 'access_denials'],
+            ].map(([label, key]) => (
+              <div key={key} className="rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-xs text-gray-500">{label}</p>
+                <p className="num-lg text-gray-900">{getFinding(latestReport, key)}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Expiry alert — dismissable, shown only when products are expiring within 30 days */}
       {(expiringQ.data ?? 0) > 0 && (

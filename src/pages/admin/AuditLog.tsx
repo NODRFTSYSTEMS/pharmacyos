@@ -55,7 +55,7 @@ function fmtDateTime(iso: string): string {
 // Keyed against AUDIT_ACTIONS registry — unknown actions fall through to gray.
 interface ActionBadge { label: string; cls: string }
 
-type BadgeVariant = 'pill-yellow' | 'pill-purple' | 'pill-blue' | 'pill-green' | 'pill-gray'
+type BadgeVariant = 'pill-yellow' | 'pill-purple' | 'pill-blue' | 'pill-green' | 'pill-gray' | 'pill-red'
 
 const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
   // EOD close-out
@@ -103,6 +103,7 @@ const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
   // Settings / Permissions
   [AUDIT_ACTIONS.SETTINGS_UPDATE]:         'pill-gray',
   [AUDIT_ACTIONS.PERMISSIONS_UPDATE]:      'pill-gray',
+  [AUDIT_ACTIONS.SYSTEM_ERROR]:            'pill-red',
 }
 
 function getActionBadge(action: string): ActionBadge {

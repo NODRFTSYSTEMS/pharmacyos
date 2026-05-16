@@ -71,6 +71,9 @@ export const AUDIT_ACTIONS = {
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',
   PERMISSIONS_UPDATE:       'permissions_update',
+
+  // â”€â”€ System Reliability â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  SYSTEM_ERROR:             'system_error',
 } as const
 
 export type AuditAction = typeof AUDIT_ACTIONS[keyof typeof AUDIT_ACTIONS]
