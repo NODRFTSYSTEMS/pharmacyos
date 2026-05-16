@@ -9,6 +9,7 @@ import Login                from './pages/auth/Login'
 import VerifyMFA            from './pages/auth/VerifyMFA'
 import SetupMFA             from './pages/auth/SetupMFA'
 import ForgotPassword       from './pages/auth/ForgotPassword'
+import ResetPassword        from './pages/auth/ResetPassword'
 
 // Error pages
 import { Forbidden }        from './pages/errors/Forbidden'
@@ -69,6 +70,8 @@ export default function App() {
       {/* Public / semi-public auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      {/* A-1: /reset-password receives the Supabase magic-link redirect — must be public */}
+      <Route path="/reset-password" element={<ResetPassword />} />
       {/* I-09: /verify-mfa is accessible with an AAL1 session (before MFA upgrade) */}
       <Route path="/verify-mfa" element={<VerifyMFA />} />
 

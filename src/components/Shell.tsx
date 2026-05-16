@@ -146,12 +146,15 @@ function NavGroup({ item }: { item: NavItem }) {
   const { pathname } = useLocation()
   const isOpen = item.children?.some(c => pathname.startsWith(c.href)) ?? false
   const [open, setOpen] = useState(isOpen)
+  // F-4: stable id for aria-controls/aria-expanded WCAG accordion pattern
+  const groupId = `nav-group-${item.label.toLowerCase().replace(/\s+/g, '-')}`
 
   return (
     <div>
       <button
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
+        aria-controls={groupId}
         className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
       >
         <item.icon size={16} weight="duotone" />
@@ -161,15 +164,13 @@ function NavGroup({ item }: { item: NavItem }) {
           className={`transition-transform ${open ? 'rotate-90' : ''}`}
         />
       </button>
-      {open && (
-        <div className="ml-6 mt-0.5 space-y-0.5">
-          {item.children!.map(c => (
-            <NavLink key={c.href} href={c.href}>
-              {c.label}
-            </NavLink>
-          ))}
-        </div>
-      )}
+      <div id={groupId} hidden={!open} className="ml-6 mt-0.5 space-y-0.5">
+        {item.children!.map(c => (
+          <NavLink key={c.href} href={c.href}>
+            {c.label}
+          </NavLink>
+        ))}
+      </div>
     </div>
   )
 }

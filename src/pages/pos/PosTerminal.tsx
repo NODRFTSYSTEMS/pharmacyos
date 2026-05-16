@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -33,12 +34,6 @@ interface CartItem {
 }
 
 type PayMethod = 'CASH' | 'CARD' | 'LYNK'
-
-interface CashierInfo {
-  id: string | null
-  name: string
-  role: string
-}
 
 // ── Preferences (persisted to localStorage) ────────────────────────────────
 
@@ -158,26 +153,11 @@ export default function PosTerminal() {
   const [customPrice,    setCustomPrice]    = useState('')
   const customNameRef    = useRef<HTMLInputElement>(null)
 
-  // ── Cashier identity ─────────────────────────────────────────────────────
+  // ── Cashier identity — reuses the shared useCurrentUser hook (F-2) ─────────
+  // Eliminates the duplicate ['pos-cashier'] query that fetched staff_profiles
+  // separately. useCurrentUser is already resolved from the app shell context.
 
-  const { data: cashier } = useQuery<CashierInfo>({
-    queryKey: ['pos-cashier'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return { id: null, name: 'Guest (not signed in)', role: '' }
-      const { data: profile } = await supabase
-        .from('staff_profiles')
-        .select('full_name, role')
-        .eq('email', user.email!)
-        .maybeSingle()
-      return {
-        id:   user.id,
-        name: profile?.full_name ?? user.email ?? 'Staff Member',
-        role: profile?.role ?? 'CASHIER',
-      }
-    },
-    staleTime: 300_000,
-  })
+  const { data: currentUser } = useCurrentUser()
 
   // ── GCT rate from pharmacy_settings ─────────────────────────────────────
 
@@ -323,7 +303,7 @@ export default function PosTerminal() {
           ref_number:              refNumber,
           transaction_type:        'RETAIL',
           payment_method:          payMethod,
-          cashier_id:              cashier?.id ?? null,
+          cashier_id:              currentUser?.id ?? null,
           subtotal,
           tax,
           discount:                0,
@@ -362,8 +342,8 @@ export default function PosTerminal() {
         const { error: e3 } = await supabase.rpc('decrement_product_stock', {
           p_product_id:     item.product_id,
           p_qty:            item.qty,
-          p_actor_id:       cashier?.id ?? null,
-          p_actor_name:     cashier?.name ?? null,
+          p_actor_id:       currentUser?.id ?? null,
+          p_actor_name:     currentUser?.name ?? null,
           p_reference_id:   txn.id,
           p_reference_type: 'SALE',
         })
@@ -372,8 +352,8 @@ export default function PosTerminal() {
 
       try {
         await supabase.from('audit_log').insert({
-          actor_id:   cashier?.id ?? null,
-          actor_name: cashier?.name ?? null,
+          actor_id:   currentUser?.id ?? null,
+          actor_name: currentUser?.name ?? null,
           action:     AUDIT_ACTIONS.TRANSACTION_CREATE,
           table_name: 'retail_transactions',
           record_id:  txn.id,
@@ -425,9 +405,9 @@ export default function PosTerminal() {
             <User size={15} weight="duotone" />
           </div>
           <div>
-            <p className="font-semibold text-sm leading-tight">{cashier?.name ?? '…'}</p>
-            {cashier?.role && (
-              <p className="text-xs text-gray-400 leading-none mt-0.5">{cashier.role}</p>
+            <p className="font-semibold text-sm leading-tight">{currentUser?.name ?? '…'}</p>
+            {currentUser?.role && (
+              <p className="text-xs text-gray-400 leading-none mt-0.5">{currentUser.role}</p>
             )}
           </div>
         </div>
