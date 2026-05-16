@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Export, ArrowUp, ArrowDown, MagnifyingGlass, ClockCounterClockwise } from '@phosphor-icons/react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Export, ArrowUp, ArrowDown, MagnifyingGlass, ClockCounterClockwise, Plus, X } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
 import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { PageHeader } from '../../components/Shell'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
 import type { StockMovementType } from '../../types/database'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -54,12 +55,89 @@ const TYPE_PILL: Record<StockMovementType, string> = {
   WRITE_OFF: 'pill pill-red',
 }
 
+// ── Simple product row type for adjustment selector ────────────────────────
+
+interface AdjProductRow {
+  id: string
+  name: string
+  barcode: string | null
+  stock_qty: number
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function StockMovements() {
+  const qc = useQueryClient()
+  const { data: currentUser } = useCurrentUser()
+
   const [range, setRange]    = useState(defaultRange)
   const [typeFilter, setTypeFilter] = useState<StockMovementType | 'ALL'>('ALL')
   const [search, setSearch]  = useState('')
+
+  // ── Adjustment drawer state ──────────────────────────────────────────────
+  const [showAdjust,    setShowAdjust]    = useState(false)
+  const [adjSearch,     setAdjSearch]     = useState('')
+  const [adjProductId,  setAdjProductId]  = useState('')
+  const [adjProductName, setAdjProductName] = useState('')
+  const [adjType,       setAdjType]       = useState<'ADJUST' | 'RETURN' | 'WRITE_OFF'>('ADJUST')
+  const [adjQty,        setAdjQty]        = useState('')
+  const [adjNotes,      setAdjNotes]      = useState('')
+
+  // Product search for the adjustment form
+  const { data: adjProducts = [] } = useQuery<AdjProductRow[]>({
+    queryKey: ['adj-product-search', adjSearch],
+    queryFn: async () => {
+      let q = supabase
+        .from('products')
+        .select('id, name, barcode, stock_qty')
+        .eq('is_active', true)
+      if (adjSearch.trim()) {
+        q = q.ilike('name', `%${adjSearch.trim()}%`)
+      }
+      const { data } = await q.order('name').limit(20)
+      return (data ?? []) as AdjProductRow[]
+    },
+    enabled: showAdjust,
+  })
+
+  const adjustMutation = useMutation({
+    mutationFn: async () => {
+      const delta = parseInt(adjQty, 10)
+      if (!adjProductId) throw new Error('Select a product before submitting.')
+      if (isNaN(delta) || delta === 0) throw new Error('Quantity must be a non-zero integer.')
+      const { error } = await supabase.rpc('adjust_product_stock', {
+        p_product_id:    adjProductId,
+        p_delta:         delta,
+        p_movement_type: adjType,
+        p_actor_id:      currentUser?.id ?? null,
+        p_actor_name:    currentUser?.name ?? null,
+        p_notes:         adjNotes.trim() || null,
+      })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['stock-movements'] })
+      void qc.invalidateQueries({ queryKey: ['pos-products'] })
+      setShowAdjust(false)
+      setAdjSearch('')
+      setAdjProductId('')
+      setAdjProductName('')
+      setAdjType('ADJUST')
+      setAdjQty('')
+      setAdjNotes('')
+    },
+  })
+
+  function resetAndCloseDrawer() {
+    setShowAdjust(false)
+    setAdjSearch('')
+    setAdjProductId('')
+    setAdjProductName('')
+    setAdjType('ADJUST')
+    setAdjQty('')
+    setAdjNotes('')
+    adjustMutation.reset()
+  }
 
   const { data, isLoading, isError } = useQuery<MovementRow[]>({
     queryKey: ['stock-movements', range],
@@ -123,15 +201,25 @@ export default function StockMovements() {
         subtitle="Audit trail of all inventory changes"
         breadcrumb={['Inventory', 'Stock Movements']}
         cta={
-          <button
-            onClick={exportCsv}
-            disabled={isLoading || filtered.length === 0}
-            className="btn btn-ghost gap-1.5 text-xs"
-            aria-label="Export stock movements as CSV"
-          >
-            <Export size={13} aria-hidden="true" />
-            Export CSV
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAdjust(true)}
+              className="btn btn-primary gap-1.5 text-xs"
+              aria-label="Open new stock adjustment form"
+            >
+              <Plus size={13} aria-hidden="true" />
+              New Adjustment
+            </button>
+            <button
+              onClick={exportCsv}
+              disabled={isLoading || filtered.length === 0}
+              className="btn btn-ghost gap-1.5 text-xs"
+              aria-label="Export stock movements as CSV"
+            >
+              <Export size={13} aria-hidden="true" />
+              Export CSV
+            </button>
+          </div>
         }
       />
 
@@ -280,6 +368,180 @@ export default function StockMovements() {
           </div>
         )}
       </div>
+
+      {/* ── Manual stock adjustment drawer ─────────────────────────────────── */}
+      {showAdjust && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            aria-hidden="true"
+            onClick={resetAndCloseDrawer}
+          />
+
+          {/* Side panel */}
+          <div
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-xl flex flex-col"
+            role="dialog"
+            aria-modal="true"
+            aria-label="New stock adjustment"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <h2 className="text-base font-semibold text-gray-900">New Stock Adjustment</h2>
+              <button
+                onClick={resetAndCloseDrawer}
+                className="btn btn-ghost p-1.5"
+                aria-label="Close adjustment panel"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+
+              {/* Product selector */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Product
+                </label>
+                {adjProductId ? (
+                  <div className="flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+                    <span className="font-medium text-gray-800">{adjProductName}</span>
+                    <button
+                      type="button"
+                      onClick={() => { setAdjProductId(''); setAdjProductName('') }}
+                      className="text-gray-400 hover:text-gray-600 ml-2 text-xs"
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="relative mb-2">
+                      <MagnifyingGlass size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+                      <input
+                        type="text"
+                        placeholder="Search by product name…"
+                        value={adjSearch}
+                        onChange={e => setAdjSearch(e.target.value)}
+                        className="input pl-8 text-sm w-full"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="border border-gray-200 rounded overflow-hidden max-h-48 overflow-y-auto">
+                      {adjProducts.length === 0 && (
+                        <p className="px-3 py-4 text-xs text-center text-gray-400">
+                          {adjSearch ? 'No products match your search.' : 'Start typing to search products.'}
+                        </p>
+                      )}
+                      {adjProducts.map(p => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 border-b border-gray-100 last:border-0 flex items-center justify-between"
+                          onClick={() => { setAdjProductId(p.id); setAdjProductName(p.name) }}
+                        >
+                          <span className="font-medium text-gray-800 truncate">{p.name}</span>
+                          <span className="text-xs text-gray-400 ml-2 shrink-0">stock: {p.stock_qty}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Movement type */}
+              <div>
+                <label htmlFor="adj-type" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Adjustment Type
+                </label>
+                <select
+                  id="adj-type"
+                  value={adjType}
+                  onChange={e => setAdjType(e.target.value as 'ADJUST' | 'RETURN' | 'WRITE_OFF')}
+                  className="input w-full"
+                >
+                  <option value="ADJUST">Adjustment — manual stock correction</option>
+                  <option value="RETURN">Return — supplier or customer return</option>
+                  <option value="WRITE_OFF">Write-off — expired or damaged stock</option>
+                </select>
+              </div>
+
+              {/* Quantity */}
+              <div>
+                <label htmlFor="adj-qty" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Quantity Change
+                </label>
+                <input
+                  id="adj-qty"
+                  type="number"
+                  step="1"
+                  value={adjQty}
+                  onChange={e => setAdjQty(e.target.value)}
+                  className="input w-full"
+                  placeholder="e.g. 10 to add, -5 to remove"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Positive = add stock. Negative = remove stock. Stock will not go below 0.
+                </p>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label htmlFor="adj-notes" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Reason / Notes
+                </label>
+                <textarea
+                  id="adj-notes"
+                  value={adjNotes}
+                  onChange={e => setAdjNotes(e.target.value)}
+                  className="input w-full resize-none"
+                  rows={3}
+                  placeholder="Describe the reason for this adjustment…"
+                />
+              </div>
+
+              {/* Error state */}
+              {adjustMutation.isError && (
+                <div role="alert" className="bg-red-50 border border-red-200 rounded px-3 py-2.5 text-sm text-red-700">
+                  {(adjustMutation.error as Error)?.message ?? 'Adjustment failed. Please try again.'}
+                </div>
+              )}
+
+              {/* Success state */}
+              {adjustMutation.isSuccess && (
+                <div role="status" className="bg-emerald-50 border border-emerald-200 rounded px-3 py-2.5 text-sm text-emerald-700">
+                  Adjustment recorded successfully.
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 py-4 border-t border-gray-200 flex gap-3">
+              <button
+                type="button"
+                className="btn btn-ghost flex-1"
+                onClick={resetAndCloseDrawer}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary flex-1"
+                disabled={!adjProductId || !adjQty || adjustMutation.isPending}
+                onClick={() => adjustMutation.mutate()}
+              >
+                {adjustMutation.isPending
+                  ? <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
+                  : 'Record Adjustment'
+                }
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

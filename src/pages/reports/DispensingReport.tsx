@@ -67,7 +67,7 @@ export function DispensingReport() {
   const totalNhf = nonVoided.reduce((s, r) => s + r.nhf_subsidy, 0)
   const totalQty = nonVoided.reduce((s, r) => s + r.quantity_dispensed, 0)
 
-  // CSV export
+  // CSV export — full dispensing report
   function exportCsv() {
     const rows = [
       ['Ref', 'Drug', 'Patient', 'Prescriber', 'Qty', 'Copay', 'NHF Subsidy', 'Date', 'Status'],
@@ -88,6 +88,34 @@ export function DispensingReport() {
     const a = document.createElement('a')
     a.href = url
     a.download = `dispensing-report-${from}-to-${to}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // C-2: NHF Claims export — filters to rows where nhf_subsidy > 0
+  // NHF Card No column is included but requires the insurance fields migration
+  // (pending worktree merge) to populate; shows — until available.
+  function exportNhfCsv() {
+    const nhfRows = nonVoided.filter(r => r.nhf_subsidy > 0)
+    const rows = [
+      ['Date', 'Rx Ref', 'Patient Name', 'NHF Card No', 'Drug Name', 'Qty', 'Copay (JMD)', 'NHF Subsidy (JMD)', 'Prescriber'],
+      ...nhfRows.map(r => [
+        r.created_at.slice(0, 10),
+        r.ref_number,
+        r.patient_name,
+        '—',  // nhf_card_no — available after insurance fields migration merges
+        r.drug_name,
+        String(r.quantity_dispensed),
+        r.patient_copay.toFixed(2),
+        r.nhf_subsidy.toFixed(2),
+        r.dispensed_by ?? '—',
+      ]),
+    ]
+    const csv = rows.map(row => row.map(v => `"${v}"`).join(',')).join('\n')
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `nhf-claims-${from}-to-${to}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -134,6 +162,16 @@ export function DispensingReport() {
           >
             <Export size={13} />
             Export CSV
+          </button>
+          <button
+            onClick={exportNhfCsv}
+            className="btn btn-ghost gap-1.5 text-xs"
+            disabled={isLoading || nonVoided.filter(r => r.nhf_subsidy > 0).length === 0}
+            aria-label="Export NHF claims as CSV"
+            title={totalNhf === 0 ? 'No NHF subsidy rows in this period' : `Export ${nonVoided.filter(r => r.nhf_subsidy > 0).length} NHF claim row(s)`}
+          >
+            <Export size={13} />
+            Export NHF Claims
           </button>
           <button
             onClick={() => window.print()}

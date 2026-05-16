@@ -3,13 +3,14 @@ import { useParams, Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
   User, Pill as PillIcon, Shield, Lock, CaretLeft,
-  Warning, CheckCircle, Clock,
+  Warning, CheckCircle, Clock, Export,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { formatPatientName } from '../../lib/formatting'
 import { MedicationReferenceThumb } from '../../components/MedicationVisualReference'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
 import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Patient, Prescription, PrescriptionStatus } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -177,6 +178,59 @@ function InsuranceTab() {
 
 function JdpaTab({ patient }: { patient: Patient }) {
   const hasConsent = !!patient.jdpa_consent_at
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  async function handleExport() {
+    setExporting(true)
+    setExportError(null)
+    try {
+      // Fetch all prescriptions linked to this patient
+      const { data: prescriptions, error: rxErr } = await supabase
+        .from('prescriptions')
+        .select('*')
+        .eq('patient_id', patient.id)
+        .order('created_at', { ascending: false })
+      if (rxErr) throw rxErr
+
+      // Assemble the export package
+      const exportPackage = {
+        export_generated_at: new Date().toISOString(),
+        jdpa_notice: 'This data export is provided under the Jamaica Data Protection Act 2020. Handle in accordance with applicable data protection obligations.',
+        patient,
+        prescriptions: prescriptions ?? [],
+        jdpa_consent_at: patient.jdpa_consent_at,
+      }
+
+      // Download as JSON
+      const blob = new Blob([JSON.stringify(exportPackage, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `patient-data-${patient.id.slice(0, 8)}-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+
+      // Write audit log entry
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.PATIENT_DATA_EXPORT,
+        table_name: 'patients',
+        record_id:  patient.id,
+        details: {
+          patient_id:    patient.id,
+          rx_count:      (prescriptions ?? []).length,
+          has_consent:   hasConsent,
+        },
+      })
+    } catch (err) {
+      setExportError((err as Error).message ?? 'Export failed. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="card divide-y divide-gray-100">
@@ -219,6 +273,36 @@ function JdpaTab({ patient }: { patient: Patient }) {
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <CheckCircle size={13} aria-hidden="true" />
             <span>Consent recorded: {fmtDateTime(patient.jdpa_consent_at)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* C-1: Patient data export — JDPA right to access */}
+      <div className="px-5 py-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Export Patient Data</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Downloads patient record and prescription history as JSON. Audit-logged.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost gap-1.5 text-sm"
+            onClick={handleExport}
+            disabled={exporting}
+            aria-label="Export patient data as JSON"
+          >
+            {exporting
+              ? <span className="inline-block w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" aria-hidden="true" />
+              : <Export size={15} aria-hidden="true" />
+            }
+            {exporting ? 'Exporting…' : 'Export Patient Data'}
+          </button>
+        </div>
+        {exportError && (
+          <div role="alert" className="mt-3 bg-red-50 border border-red-200 rounded px-3 py-2 text-sm text-red-700">
+            {exportError}
           </div>
         )}
       </div>
