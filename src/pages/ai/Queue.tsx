@@ -482,7 +482,7 @@ export default function AiQueue() {
           label="Needs Review"
           value={String(counts.review)}
           icon={Warning}
-          accent={counts.review > 0 ? 'red' : 'gray' as 'red'}
+          accent={counts.review > 0 ? 'red' : 'blue'}
         />
         <MetricCard label="Accepted Today"     value={String(counts.accepted)} icon={CheckCircle} accent="green" />
       </div>

@@ -7,7 +7,6 @@ import {
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds, todayJamaica } from '../../lib/date'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
-import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { usePermission } from '../../hooks/usePermission'
 import type { RetailTransaction, RxTransaction, PaymentMethod } from '../../types/database'
 
@@ -293,7 +292,6 @@ function useTodayTransactions(date: string) {
 export default function TransactionLog() {
   const today = todayJamaica()
   const qc    = useQueryClient()
-  const { data: _user } = useCurrentUser()
   const canVoid = usePermission('pos_void')
 
   const [date,           setDate]           = useState(today)
@@ -470,7 +468,7 @@ export default function TransactionLog() {
           value={String(voidCount)}
           sub={pendingVoidCount > 0 ? `${pendingVoidCount} awaiting approval` : 'no pending requests'}
           icon={Warning}
-          accent={voidCount > 0 ? 'red' : 'gray' as 'red'}
+          accent={voidCount > 0 ? 'red' : 'blue'}
         />
       </div>
 

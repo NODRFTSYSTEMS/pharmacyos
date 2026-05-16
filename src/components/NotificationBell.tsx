@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
-import { Bell, BellRinging, Check, Package, Robot, ClockCounterClockwise, Pill } from '@phosphor-icons/react'
+import { Bell, BellRinging, Check, Package, Robot, ClockCounterClockwise, Pill, Warning, ArrowBendUpLeft } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Notification {
   id: string
-  type: 'low_stock' | 'ai_review_needed' | 'eod_pending' | 'rx_ready' | 'rx_received' | 'system'
+  type: 'low_stock' | 'ai_review_needed' | 'eod_pending' | 'rx_ready' | 'rx_received' | 'system' | 'expiry_alert' | 'void_request' | 'void_decision'
   title: string
   body: string | null
   href: string | null
@@ -25,6 +25,9 @@ function typeIcon(type: Notification['type']) {
     case 'eod_pending':     return <ClockCounterClockwise size={13} className="text-yellow-500 shrink-0" />
     case 'rx_ready':
     case 'rx_received':     return <Pill size={13} className="text-purple-500 shrink-0" />
+    case 'expiry_alert':   return <Warning size={13} className="text-amber-500 shrink-0" />
+    case 'void_request':   return <ArrowBendUpLeft size={13} className="text-red-500 shrink-0" />
+    case 'void_decision':  return <Check size={13} className="text-blue-500 shrink-0" />
     default:                return <Bell size={13} className="text-gray-400 shrink-0" />
   }
 }
