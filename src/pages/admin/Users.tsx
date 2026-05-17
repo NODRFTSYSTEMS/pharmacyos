@@ -8,6 +8,7 @@ import {
   X,
   FloppyDisk,
   CheckCircle,
+  Envelope,
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell';
@@ -125,6 +126,8 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<DrawerFormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<DrawerErrors>({});
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -143,6 +146,8 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
         setForm(EMPTY_FORM);
       }
       setErrors({});
+      setResetSent(false);
+      setResetError(null);
     }
   }, [open, editTarget]);
 
@@ -204,6 +209,22 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staff_profiles'] });
       onClose();
+    },
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setResetSent(true);
+      setResetError(null);
+    },
+    onError: (err: Error) => {
+      setResetError(err.message ?? 'Failed to send reset email.');
     },
   });
 
@@ -390,6 +411,35 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
             </button>
             <label htmlFor="u-active" className="text-sm font-medium text-gray-700 cursor-pointer">Active</label>
           </div>
+
+          {/* Password reset — edit mode only */}
+          {editTarget && (
+            <div className="rounded border border-gray-200 bg-gray-50 p-4 space-y-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Account Actions</p>
+              <p className="text-xs text-gray-500">
+                Send a password reset email to <strong>{editTarget.email}</strong>. The link expires in 1 hour.
+              </p>
+              {resetSent ? (
+                <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                  <CheckCircle size={14} aria-hidden="true" />
+                  Reset email sent to {editTarget.email}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => resetMutation.mutate(editTarget.email)}
+                  disabled={resetMutation.isPending}
+                  className="btn btn-ghost flex items-center gap-2 text-xs border border-gray-300 hover:border-blue-400 hover:text-blue-600"
+                >
+                  <Envelope size={14} aria-hidden="true" />
+                  {resetMutation.isPending ? 'Sending…' : 'Send Password Reset Email'}
+                </button>
+              )}
+              {resetError && (
+                <p className="text-xs text-red-600" role="alert">{resetError}</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">

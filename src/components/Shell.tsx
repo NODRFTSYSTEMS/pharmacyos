@@ -194,7 +194,11 @@ export function Sidebar() {
 
   async function handleSignOut() {
     try {
-      await supabase.auth.signOut()
+      // scope: 'local' clears the session from localStorage immediately without
+      // a server round-trip. The server-side token expires naturally.
+      // Using the default (global) scope makes a POST to Supabase's /auth/v1/logout
+      // which can hang on production networks and leave the button appearing frozen.
+      await supabase.auth.signOut({ scope: 'local' })
     } catch {
       // signOut can fail on network errors — still clear local state
     } finally {

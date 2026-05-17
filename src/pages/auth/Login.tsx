@@ -1,16 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { Files } from '@phosphor-icons/react'
+import { Files, Eye, EyeSlash } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
 export default function Login() {
   const nav         = useNavigate()
   const queryClient = useQueryClient()
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
+  const [email,        setEmail]       = useState('')
+  const [password,     setPassword]    = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading,      setLoading]     = useState(false)
+  const [error,        setError]       = useState<string | null>(null)
+  const [now,          setNow]         = useState(() => new Date())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,12 +47,22 @@ export default function Login() {
       <div className="w-full max-w-sm">
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-8">
+        <div className="flex items-center justify-center gap-2.5 mb-4">
           <Files size={28} weight="duotone" className="text-blue-600" />
           <div>
             <p className="font-bold text-gray-900 text-lg leading-tight">PharmacyOS</p>
             <p className="text-xs text-gray-500 leading-tight">Pharmacy Operations Platform</p>
           </div>
+        </div>
+
+        {/* Live clock */}
+        <div className="text-center mb-6">
+          <p className="text-2xl font-semibold text-gray-800 tabular-nums tracking-tight">
+            {now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
         </div>
 
         <div className="card p-8">
@@ -74,16 +91,30 @@ export default function Login() {
               <label htmlFor="login-password" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                 Password
               </label>
-              <input
-                id="login-password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="input pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
+                >
+                  {showPassword
+                    ? <EyeSlash size={18} aria-hidden="true" />
+                    : <Eye size={18} aria-hidden="true" />
+                  }
+                </button>
+              </div>
             </div>
 
             {error && (
