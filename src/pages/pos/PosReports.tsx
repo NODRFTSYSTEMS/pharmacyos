@@ -231,6 +231,8 @@ export function PosReports() {
         />
       </div>
 
+      <ReportAssistant dataSummary={dataSummary} reportType="POS Revenue" />
+
       {isLoading ? (
         <div className="py-16 text-center text-gray-500 text-sm">Loading…</div>
       ) : (
@@ -324,7 +326,6 @@ export function PosReports() {
         </>
       )}
 
-      <ReportAssistant dataSummary={dataSummary} reportType="POS Revenue" />
     </div>
   );
 }

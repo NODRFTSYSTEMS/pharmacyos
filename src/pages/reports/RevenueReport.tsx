@@ -282,6 +282,8 @@ export function RevenueReport() {
         />
       </div>
 
+      <ReportAssistant dataSummary={dataSummary} reportType="Revenue" />
+
       {/* Daily breakdown */}
       <div className="mb-6">
         <h2 className="section-title mb-3">Daily Breakdown</h2>
@@ -380,7 +382,6 @@ export function RevenueReport() {
         </div>
       </div>
 
-      <ReportAssistant dataSummary={dataSummary} reportType="Revenue" />
     </div>
   )
 }
