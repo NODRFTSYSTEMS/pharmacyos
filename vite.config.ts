@@ -17,7 +17,7 @@ export default defineConfig({
   // Vercel (pharmacyos.vercel.app) → default '/'
   // GitHub Pages (nodrftsystems.github.io/pharmacyos) → '/pharmacyos/'
   base: process.env.VITE_BASE_PATH ?? '/',
-  server: { port: 5174 },
+  server: { port: 5174, host: '0.0.0.0', strictPort: true },
   build: {
     // Vendor chunks prevent the entire dependency tree from landing in a single bundle.
     // Each chunk is cached independently — a React upgrade doesn't bust the Supabase cache.
