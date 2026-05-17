@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Export, Package, Warning, MagnifyingGlass, Printer,
+  Export, Package, Warning, MagnifyingGlass, Printer, ArrowClockwise,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
@@ -43,7 +43,7 @@ function fmtDate(iso: string | null): string {
   })
 }
 
-type FilterTab = 'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'IN_STOCK' | 'EXPIRING_SOON'
+type FilterTab = 'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'IN_STOCK' | 'EXPIRING_SOON' | 'REORDER'
 
 const TAB_LABELS: Record<FilterTab, string> = {
   ALL:           'All',
@@ -51,6 +51,26 @@ const TAB_LABELS: Record<FilterTab, string> = {
   OUT_OF_STOCK:  'Out of Stock',
   IN_STOCK:      'In Stock',
   EXPIRING_SOON: 'Expiring Soon',
+  REORDER:       'Reorder',
+}
+
+// ── Reorder recommendation type (matches get_reorder_recommendations() RPC) ──
+
+interface ReorderRec {
+  product_id:      string
+  product_name:    string
+  category:        string | null
+  stock_qty:       number
+  reorder_level:   number
+  avg_daily_sales: number
+  days_to_stockout: number | null
+  urgency:         'OUT_OF_STOCK' | 'CRITICAL' | 'LOW'
+}
+
+const URGENCY_PILL: Record<ReorderRec['urgency'], { label: string; variant: 'red' | 'yellow' | 'gray' }> = {
+  OUT_OF_STOCK: { label: 'Out of Stock', variant: 'red'    },
+  CRITICAL:     { label: 'Critical',     variant: 'red'    },
+  LOW:          { label: 'Low Stock',    variant: 'yellow' },
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -70,6 +90,18 @@ export function InventoryReport() {
       if (error) throw error
       return (data ?? []) as Product[]
     },
+    enabled: tab !== 'REORDER',
+  })
+
+  const { data: reorderData, isLoading: reorderLoading, isError: reorderError } = useQuery<ReorderRec[]>({
+    queryKey: ['reorder-recommendations'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_reorder_recommendations')
+      if (error) throw error
+      return (data ?? []) as ReorderRec[]
+    },
+    enabled: tab === 'REORDER',
+    staleTime: 2 * 60 * 1000,
   })
 
   const products = data ?? []
@@ -239,41 +271,135 @@ export function InventoryReport() {
           ))}
         </div>
 
-        {/* Search */}
-        <div className="relative ml-auto">
-          <MagnifyingGlass
-            size={13}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-            aria-hidden="true"
-          />
-          <input
-            id="inv-search"
-            type="text"
-            placeholder="Search by name or barcode…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="input pl-7 w-52 text-xs"
-            aria-label="Search products by name or barcode"
-          />
-        </div>
+        {/* Search — hidden on Reorder tab (RPC result is already filtered) */}
+        {tab !== 'REORDER' && (
+          <div className="relative ml-auto">
+            <MagnifyingGlass
+              size={13}
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+              aria-hidden="true"
+            />
+            <input
+              id="inv-search"
+              type="text"
+              placeholder="Search by name or barcode…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="input pl-7 w-52 text-xs"
+              aria-label="Search products by name or barcode"
+            />
+          </div>
+        )}
 
-        {!isLoading && (
+        {!isLoading && tab !== 'REORDER' && (
           <span className="text-xs text-gray-400">
             {filtered.length} of {products.length} products
           </span>
         )}
+        {tab === 'REORDER' && !reorderLoading && (
+          <span className="text-xs text-gray-400 ml-auto">
+            {(reorderData ?? []).length} item{(reorderData ?? []).length !== 1 ? 's' : ''} need reordering
+          </span>
+        )}
       </div>
 
-      {/* Error state */}
-      {isError && (
+      {/* Error states */}
+      {isError && tab !== 'REORDER' && (
         <div className="card p-4 mb-4 flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200">
           <Warning size={15} weight="duotone" aria-hidden="true" />
           Failed to load inventory. Check your connection and try again.
         </div>
       )}
+      {reorderError && tab === 'REORDER' && (
+        <div className="card p-4 mb-4 flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200">
+          <Warning size={15} weight="duotone" aria-hidden="true" />
+          Failed to load reorder recommendations. Check your connection and try again.
+        </div>
+      )}
 
-      {/* Table */}
-      {!isError && (
+      {/* Reorder recommendations table */}
+      {tab === 'REORDER' && !reorderError && (
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full table-compact text-sm" aria-label="Reorder recommendations">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Urgency</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock Qty</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reorder At</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Avg Daily Sales</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Days to Stockout</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {reorderLoading && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">
+                      <ArrowClockwise size={14} className="inline mr-1 animate-spin" aria-hidden="true" />
+                      Loading reorder recommendations…
+                    </td>
+                  </tr>
+                )}
+                {!reorderLoading && (reorderData ?? []).length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">
+                      No products need reordering at this time.
+                    </td>
+                  </tr>
+                )}
+                {!reorderLoading && (reorderData ?? []).map(rec => {
+                  const pill = URGENCY_PILL[rec.urgency]
+                  const daysClass =
+                    rec.days_to_stockout === null           ? 'text-gray-400'
+                    : rec.days_to_stockout <= 3             ? 'text-red-600 font-semibold'
+                    : rec.days_to_stockout <= 7             ? 'text-amber-700 font-semibold'
+                    : 'text-gray-700'
+                  const rowBg =
+                    rec.urgency === 'OUT_OF_STOCK' ? 'bg-red-50 hover:bg-red-100'
+                    : rec.urgency === 'CRITICAL'   ? 'bg-amber-50 hover:bg-amber-100'
+                    : 'hover:bg-gray-50'
+                  return (
+                    <tr key={rec.product_id} className={rowBg}>
+                      <td className="px-4 py-3">
+                        <StatusPill label={pill.label} variant={pill.variant} />
+                      </td>
+                      <td className="px-4 py-3 font-medium text-sm text-gray-800 max-w-[200px] truncate">
+                        {rec.product_name}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-600">
+                        {rec.category ?? '—'}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-gray-800 tabular-nums">
+                        {rec.stock_qty}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-gray-500 tabular-nums">
+                        {rec.reorder_level}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-gray-600 tabular-nums">
+                        {rec.avg_daily_sales > 0
+                          ? `${rec.avg_daily_sales.toFixed(1)} /day`
+                          : '—'
+                        }
+                      </td>
+                      <td className={`px-4 py-3 text-right font-mono text-xs tabular-nums ${daysClass}`}>
+                        {rec.days_to_stockout !== null
+                          ? `${Math.round(rec.days_to_stockout)} days`
+                          : '—'
+                        }
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Products table — all tabs except REORDER */}
+      {tab !== 'REORDER' && !isError && (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full table-compact text-sm" aria-label="Inventory stock levels">

@@ -42,6 +42,7 @@ import PatientProfile       from './pages/patients/PatientProfile'
 // Inventory
 import ReceiveStock         from './pages/inventory/ReceiveStock'
 import StockMovements       from './pages/inventory/StockMovements'
+import PurchaseOrders       from './pages/inventory/PurchaseOrders'
 
 // Staff / Timecards
 import TimecardClock        from './pages/staff/TimecardClock'
@@ -153,6 +154,9 @@ export default function App() {
                 } />
                 <Route path="/inventory/stock-movements" element={
                   <RoleGuard permission="inventory_manage"><StockMovements /></RoleGuard>
+                } />
+                <Route path="/inventory/purchase-orders" element={
+                  <RoleGuard permission="inventory_manage"><PurchaseOrders /></RoleGuard>
                 } />
 
                 {/* Staff / Timecards */}

@@ -48,6 +48,7 @@ const NAV: NavItem[] = [
   { label: 'Inventory',   icon: Warehouse, children: [
     { label: 'Receive Stock',   href: '/inventory/receive-stock' },
     { label: 'Stock Movements', href: '/inventory/stock-movements' },
+    { label: 'Purchase Orders', href: '/inventory/purchase-orders' },
   ]},
   { label: 'Staff',       icon: Clock, children: [
     { label: 'My Timecard',      href: '/staff/timecard' },
