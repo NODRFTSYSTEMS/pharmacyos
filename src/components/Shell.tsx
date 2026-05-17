@@ -50,8 +50,10 @@ const NAV: NavItem[] = [
     { label: 'Stock Movements', href: '/inventory/stock-movements' },
   ]},
   { label: 'Staff',       icon: Clock, children: [
-    { label: 'My Timecard',   href: '/staff/timecard' },
+    { label: 'My Timecard',      href: '/staff/timecard' },
     { label: 'Manage Timecards', href: '/staff/timecards' },
+    { label: 'Leave Requests',   href: '/hr/leave' },
+    { label: 'Certifications',   href: '/hr/certifications' },
   ]},
   { label: 'Reports',     icon: ChartBar, children: [
     { label: 'Revenue',       href: '/reports/revenue' },
@@ -103,9 +105,11 @@ function useFilteredNav(): NavItem[] {
       if (item.label === 'Staff' && item.children) {
         return {
           ...item,
-          children: item.children.filter(c =>
-            c.label !== 'Manage Timecards' || canManageTimecards
-          ),
+          children: item.children.filter(c => {
+            if (c.label === 'Manage Timecards') return canManageTimecards
+            if (c.label === 'Certifications')   return canManageStaff
+            return true
+          }),
         }
       }
       // Admin child filtering: Users and Security require staff_manage;

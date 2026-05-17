@@ -47,6 +47,10 @@ import StockMovements       from './pages/inventory/StockMovements'
 import TimecardClock        from './pages/staff/TimecardClock'
 import TimecardManager      from './pages/staff/TimecardManager'
 
+// HR
+import LeaveRequests        from './pages/hr/LeaveRequests'
+import Certifications       from './pages/hr/Certifications'
+
 // Reports
 import RevenueReport        from './pages/reports/RevenueReport'
 import DispensingReport     from './pages/reports/DispensingReport'
@@ -156,6 +160,13 @@ export default function App() {
                 <Route path="/staff/timecard" element={<TimecardClock />} />
                 <Route path="/staff/timecards" element={
                   <RoleGuard permission="timecard_manage"><TimecardManager /></RoleGuard>
+                } />
+
+                {/* HR */}
+                {/* /hr/leave — session-only; managers see all pending, staff see own */}
+                <Route path="/hr/leave" element={<LeaveRequests />} />
+                <Route path="/hr/certifications" element={
+                  <RoleGuard permission="staff_manage"><Certifications /></RoleGuard>
                 } />
 
                 {/* Reports */}

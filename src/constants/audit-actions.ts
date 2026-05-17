@@ -68,6 +68,14 @@ export const AUDIT_ACTIONS = {
   VOID_APPROVED:            'void_approved',
   VOID_DENIED:              'void_denied',
 
+  // ── HR — Leave & Certifications ──────────────────────────────────────────────
+  LEAVE_REQUEST_SUBMIT:     'leave_request_submit',
+  LEAVE_REQUEST_APPROVE:    'leave_request_approve',
+  LEAVE_REQUEST_DENY:       'leave_request_deny',
+  LEAVE_REQUEST_CANCEL:     'leave_request_cancel',
+  CERT_CREATE:              'cert_create',
+  CERT_UPDATE:              'cert_update',
+
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',
   PERMISSIONS_UPDATE:       'permissions_update',
