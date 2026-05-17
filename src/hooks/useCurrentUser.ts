@@ -38,9 +38,17 @@ export function useCurrentUser() {
       // staff_profiles.id = auth.uid() on sign-up. Querying by email risks
       // returning null if the email casing drifts or the trigger claimed the
       // wrong row. id is the authoritative join key.
+      //
+      // AU-06: avatar_alt and avatar_source_status are NOT selected here.
+      // Migration 028 adds those columns but was not yet applied to production.
+      // Selecting missing columns causes a 400 / code 42703 error that is
+      // silently swallowed (only `data` is destructured, not `error`), making
+      // profile null and triggering 'Unknown User'/'CASHIER' fallbacks.
+      // Once migration 028 is applied to production, restore the full select:
+      //   .select('full_name, role, avatar_url, avatar_alt, avatar_source_status')
       const { data: profile } = await supabase
         .from('staff_profiles')
-        .select('full_name, role, avatar_url, avatar_alt, avatar_source_status')
+        .select('full_name, role, avatar_url')
         .eq('id', user.id)
         .maybeSingle()
       // I-20: If no staff_profiles record exists, surface the data integrity
