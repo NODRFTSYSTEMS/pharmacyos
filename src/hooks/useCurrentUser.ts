@@ -60,8 +60,8 @@ export function useCurrentUser() {
         name:  profile?.full_name?.trim() || 'Unknown User',
         role:  (profile?.role ?? 'CASHIER') as StaffRole,
         avatarUrl: profile?.avatar_url ?? null,
-        avatarAlt: profile?.avatar_alt ?? null,
-        avatarSourceStatus: (profile?.avatar_source_status ?? null) as StaffAvatarSourceStatus | null,
+        avatarAlt: null,              // AU-06: restored after migration 028 applied to production
+        avatarSourceStatus: null,     // AU-06: restored after migration 028 applied to production
       }
     },
     staleTime: 60_000,   // 1 min — tighter window so role/name changes propagate quickly

@@ -21,7 +21,7 @@ const AAL_TIMEOUT_MS = 3_000
 
 type AalResult = Awaited<ReturnType<typeof supabase.auth.mfa.getAuthenticatorAssuranceLevel>>
 function getAalWithTimeout(): Promise<AalResult> {
-  const fallback: AalResult = { data: { currentLevel: 'aal1', nextLevel: 'aal1' }, error: null }
+  const fallback: AalResult = { data: { currentLevel: 'aal1', nextLevel: 'aal1', currentAuthenticationMethods: [] }, error: null }
   return Promise.race([
     supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
     new Promise<AalResult>(resolve =>
