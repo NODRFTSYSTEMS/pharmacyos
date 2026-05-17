@@ -222,6 +222,7 @@ export function AuditLog() {
         title="Audit Log"
         subtitle="System activity log — read only"
         breadcrumb={['Admin', 'Audit Log']}
+        showSession
       />
 
       {/* Read-only notice */}

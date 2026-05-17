@@ -257,6 +257,7 @@ export function ScheduleLog() {
         title="Schedule Drug Log"
         subtitle="Controlled Substances Register — Jamaica Dangerous Drugs Act, Chapter 92 — Pharmacist signature required for all entries"
         breadcrumb={['Prescriptions', 'Schedule Log']}
+        showSession
         cta={
           <button className="btn btn-primary flex items-center gap-2" onClick={() => setDrawerOpen(true)}>
             <Plus size={18} aria-hidden="true" />

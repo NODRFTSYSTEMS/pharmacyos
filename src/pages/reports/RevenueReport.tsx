@@ -204,6 +204,7 @@ export function RevenueReport() {
         title="Revenue Report"
         subtitle="Retail and Rx revenue by date range"
         breadcrumb={['Reports', 'Revenue']}
+        showSession
       />
 
       {/* Date range + export row */}

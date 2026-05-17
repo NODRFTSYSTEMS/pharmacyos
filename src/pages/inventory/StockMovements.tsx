@@ -200,6 +200,7 @@ export default function StockMovements() {
         title="Stock Movements"
         subtitle="Audit trail of all inventory changes"
         breadcrumb={['Inventory', 'Stock Movements']}
+        showSession
         cta={
           <div className="flex items-center gap-2">
             <button

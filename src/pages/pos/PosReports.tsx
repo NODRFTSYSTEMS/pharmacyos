@@ -153,6 +153,7 @@ export function PosReports() {
         title="POS Reports"
         subtitle="Payment and shift-level reporting"
         breadcrumb={['Retail POS', 'Reports']}
+        showSession
       />
 
       {/* Date range + export */}

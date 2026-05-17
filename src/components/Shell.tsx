@@ -273,9 +273,16 @@ interface PageHeaderProps {
   subtitle?: string
   cta?: React.ReactNode
   breadcrumb?: string[]
+  showSession?: boolean
 }
 
-export function PageHeader({ title, subtitle, cta, breadcrumb }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, cta, breadcrumb, showSession }: PageHeaderProps) {
+  const { data: sessionUser } = useCurrentUser()
+  // showSession: renders the logged-in user's name and role beneath the page title.
+  // Used on all report and log pages so every view is stamped with who is viewing it.
+  const sessionStamp = showSession && sessionUser
+    ? `Viewed by: ${sessionUser.name} · ${sessionUser.role}`
+    : null
   return (
     <div className="flex items-start justify-between gap-4 mb-6">
       <div>
@@ -284,6 +291,9 @@ export function PageHeader({ title, subtitle, cta, breadcrumb }: PageHeaderProps
         )}
         <h1 className="page-title">{title}</h1>
         {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        {sessionStamp && (
+          <p className="text-xs text-gray-400 mt-0.5">{sessionStamp}</p>
+        )}
       </div>
       {cta && <div className="shrink-0">{cta}</div>}
     </div>

@@ -422,6 +422,7 @@ export default function TransactionLog() {
         title="Transaction Log"
         subtitle="Real-time record of all retail and Rx transactions"
         breadcrumb={['Retail POS', 'Transactions']}
+        showSession
         cta={
           <div className="flex gap-2">
             <button

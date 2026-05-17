@@ -190,6 +190,7 @@ export function InventoryReport() {
         title="Inventory Report"
         subtitle="Current stock levels and reorder status"
         breadcrumb={['Reports', 'Inventory']}
+        showSession
         cta={
           <div className="flex items-center gap-2">
             <button

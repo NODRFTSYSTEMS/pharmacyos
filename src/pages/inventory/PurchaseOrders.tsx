@@ -119,6 +119,7 @@ export default function PurchaseOrders() {
         title="Purchase Orders"
         subtitle="Stock receipt history — click any row to view line items"
         breadcrumb={['Inventory', 'Purchase Orders']}
+        showSession
         cta={
           <button
             onClick={exportCsv}

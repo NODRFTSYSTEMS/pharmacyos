@@ -215,6 +215,7 @@ export default function EodReport() {
         title="End-of-Day Report"
         subtitle="Daily summary of transactions, collections, and close-out status"
         breadcrumb={['Retail POS', 'EOD Report']}
+        showSession
         cta={
           <div className="flex gap-2">
             <button onClick={printReport} className="btn btn-ghost gap-1.5">

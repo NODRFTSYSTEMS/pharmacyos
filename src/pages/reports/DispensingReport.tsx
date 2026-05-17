@@ -129,6 +129,7 @@ export function DispensingReport() {
         title="Dispensing Report"
         subtitle="Prescription dispensing activity and Rx collections"
         breadcrumb={['Reports', 'Dispensing']}
+        showSession
       />
 
       {/* Date range + export row */}

@@ -114,6 +114,7 @@ export function TimecardReport() {
         title="Timecard Report"
         subtitle="Shift hours and attendance summary by staff member"
         breadcrumb={['Reports', 'Timecards']}
+        showSession
         cta={
           <div className="flex items-center gap-2 no-print">
             <button
