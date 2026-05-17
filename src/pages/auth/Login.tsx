@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router'
+import { Link } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Files, Eye, EyeSlash } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
 export default function Login() {
-  const nav         = useNavigate()
   const queryClient = useQueryClient()
   const [email,        setEmail]       = useState('')
   const [password,     setPassword]    = useState('')
@@ -29,16 +28,20 @@ export default function Login() {
       setError(authErr.message)
       return
     }
-    // Clear any cached queries from a previous session so the incoming user
-    // never sees another user's profile, role, or data mid-session.
+    // Clear React Query cache so the previous user's profile is never served
+    // to the incoming user. Redundant after a full reload but explicit.
     queryClient.clear()
     // I-09: Check if user has enrolled MFA — redirect to verify-mfa if AAL2 is required
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-    setLoading(false)
+    // Full page reload on login — flushes Supabase JS SDK in-memory session state
+    // and the React Query module singleton so this user starts from a clean slate.
+    // SPA nav (nav()) keeps module-level singletons alive, which allows a window
+    // where supabase.auth.getUser() resolves stale context from the previous user.
+    // setLoading(false) omitted — page is about to fully reload.
     if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
-      nav('/verify-mfa', { replace: true })
+      window.location.replace('/verify-mfa')
     } else {
-      nav('/dashboard', { replace: true })
+      window.location.replace('/dashboard')
     }
   }
 

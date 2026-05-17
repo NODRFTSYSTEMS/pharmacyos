@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight, LockSimple,
@@ -181,7 +181,6 @@ function NavGroup({ item }: { item: NavItem }) {
 }
 
 export function Sidebar() {
-  const nav            = useNavigate()
   const filteredNav    = useFilteredNav()
   const { data: user } = useCurrentUser()
   const pharmacyName   = usePharmacyName()
@@ -193,20 +192,20 @@ export function Sidebar() {
     : '—'
 
   async function handleSignOut() {
+    // Clear React Query cache FIRST — before signOut fires onAuthStateChange,
+    // which can unmount this component before the finally block executes.
+    queryClient.clear()
     try {
-      // scope: 'local' clears the session from localStorage immediately without
-      // a server round-trip. The server-side token expires naturally.
-      // Using the default (global) scope makes a POST to Supabase's /auth/v1/logout
-      // which can hang on production networks and leave the button appearing frozen.
+      // scope: 'local' clears localStorage immediately without a server round-trip.
       await supabase.auth.signOut({ scope: 'local' })
     } catch {
-      // signOut can fail on network errors — still clear local state
-    } finally {
-      // Clear ALL cached queries so the next user starts with a clean slate.
-      // Without this, user B logging in after user A sees A's stale profile.
-      queryClient.clear()
-      nav('/login', { replace: true })
+      // Network errors are safe to ignore — local cache is already cleared above.
     }
+    // Full page reload instead of SPA nav. nav() keeps module-level singletons
+    // alive (Supabase JS SDK in-memory session, React Query client) which can
+    // cause the next user to briefly see the previous user's cached profile.
+    // window.location.replace flushes everything and is the reliable path.
+    window.location.replace('/login')
   }
 
   return (
