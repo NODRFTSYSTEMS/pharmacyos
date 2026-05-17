@@ -19,8 +19,21 @@ export function useCurrentUser() {
     // after user A sees A's stale profile until the 5-min staleTime expires.
     queryKey: ['current-user'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      // ── AU-05: Use getSession() not getUser() ─────────────────────────────
+      // supabase-js v2.x holds an internal async lock for all auth operations.
+      // getUser() makes a network call and contends for this lock — the same
+      // lock that caused the ProtectedRoute spinner freeze (AU-04). When
+      // autoRefreshToken holds the lock on page load, getUser() waits
+      // indefinitely, profile never loads, and the fallbacks 'Unknown User' /
+      // 'CASHIER' render instead of the real name and role.
+      //
+      // getSession() reads directly from localStorage (no network, no lock).
+      // It returns the cached session including the user object with id/email.
+      // This is safe for display data: ProtectedRoute already validates the
+      // session cryptographically before this component ever mounts.
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return null
+      const user = session.user
       // Query by id (= auth.uid()) — the handle_new_auth_user trigger sets
       // staff_profiles.id = auth.uid() on sign-up. Querying by email risks
       // returning null if the email casing drifts or the trigger claimed the
