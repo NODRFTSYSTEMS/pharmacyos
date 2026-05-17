@@ -1,25 +1,31 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router'
-import { MagnifyingGlass, X, Pill, User, Package, Receipt } from '@phosphor-icons/react'
+import { MagnifyingGlass, X, Pill, User, Package, Receipt, Users, Storefront } from '@phosphor-icons/react'
 import { useGlobalSearch, type SearchResult } from '../hooks/useGlobalSearch'
 
 const TYPE_LABELS: Record<SearchResult['type'], string> = {
-  patient: 'Patients',
+  patient:      'Patients',
   prescription: 'Prescriptions',
-  product: 'Products',
-  transaction: 'Transactions',
+  product:      'Products',
+  transaction:  'Transactions',
+  staff:        'Staff',
+  supplier:     'Suppliers',
 }
 
-const TYPE_ORDER: SearchResult['type'][] = ['patient', 'prescription', 'product', 'transaction']
+const TYPE_ORDER: SearchResult['type'][] = [
+  'patient', 'prescription', 'product', 'transaction', 'staff', 'supplier',
+]
 
 function ResultIcon({ type }: { type: SearchResult['type'] }) {
   const cls = 'shrink-0 text-gray-400'
   switch (type) {
-    case 'patient':      return <User      size={16} weight="duotone" className={cls} />
-    case 'prescription': return <Pill      size={16} weight="duotone" className={cls} />
-    case 'product':      return <Package   size={16} weight="duotone" className={cls} />
-    case 'transaction':  return <Receipt   size={16} weight="duotone" className={cls} />
+    case 'patient':      return <User       size={16} weight="duotone" className={cls} />
+    case 'prescription': return <Pill       size={16} weight="duotone" className={cls} />
+    case 'product':      return <Package    size={16} weight="duotone" className={cls} />
+    case 'transaction':  return <Receipt    size={16} weight="duotone" className={cls} />
+    case 'staff':        return <Users      size={16} weight="duotone" className={cls} />
+    case 'supplier':     return <Storefront size={16} weight="duotone" className={cls} />
   }
 }
 

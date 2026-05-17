@@ -5,10 +5,11 @@ import {
   CurrencyDollar,
   Receipt,
   Calculator,
+  Printer,
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
 import { toJamaicaBounds, toJamaicaDate, todayJamaica } from '../../lib/date';
-import { PageHeader, MetricCard } from '../../components/Shell';
+import { PageHeader, MetricCard, PrintHeader } from '../../components/Shell';
 import { ReportAssistant } from '../../components/ReportAssistant';
 
 interface RetailTransaction {
@@ -147,6 +148,7 @@ export function PosReports() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PrintHeader reportTitle="POS Reports" />
       <PageHeader
         title="POS Reports"
         subtitle="Payment and shift-level reporting"
@@ -183,15 +185,26 @@ export function PosReports() {
             />
           </div>
         </div>
-        <button
-          className="btn btn-ghost flex items-center gap-2"
-          onClick={() => exportCsv(dailySales)}
-          disabled={dailySales.length === 0}
-          aria-label="Export daily sales as CSV"
-        >
-          <Export size={16} aria-hidden="true" />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="btn btn-ghost flex items-center gap-2"
+            onClick={() => exportCsv(dailySales)}
+            disabled={dailySales.length === 0}
+            aria-label="Export daily sales as CSV"
+          >
+            <Export size={16} aria-hidden="true" />
+            Export CSV
+          </button>
+          <button
+            className="btn btn-ghost flex items-center gap-2 no-print"
+            onClick={() => window.print()}
+            disabled={isLoading}
+            aria-label="Print POS report"
+          >
+            <Printer size={16} aria-hidden="true" />
+            Print
+          </button>
+        </div>
       </div>
 
       {/* Metrics */}

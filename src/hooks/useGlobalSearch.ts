@@ -5,7 +5,7 @@ import type { Patient, Prescription, Product, RetailTransaction } from '../types
 
 export interface SearchResult {
   id: string
-  type: 'patient' | 'prescription' | 'product' | 'transaction'
+  type: 'patient' | 'prescription' | 'product' | 'transaction' | 'staff' | 'supplier'
   title: string
   subtitle: string
   href: string
@@ -14,7 +14,7 @@ export interface SearchResult {
 async function fetchSearchResults(query: string): Promise<SearchResult[]> {
   const pattern = `%${query}%`
 
-  const [patientsRes, prescriptionsRes, productsRes, transactionsRes] = await Promise.all([
+  const [patientsRes, prescriptionsRes, productsRes, transactionsRes, staffRes, suppliersRes] = await Promise.all([
     supabase
       .from('patients')
       .select('id, first_name, last_name, phone')
@@ -38,12 +38,28 @@ async function fetchSearchResults(query: string): Promise<SearchResult[]> {
       .select('id, ref_number, total, payment_method')
       .ilike('ref_number', pattern)
       .limit(8),
+
+    supabase
+      .from('staff_profiles')
+      .select('id, full_name, role, email')
+      .eq('is_active', true)
+      .ilike('full_name', pattern)
+      .limit(6),
+
+    supabase
+      .from('retail_suppliers')
+      .select('id, name, contact_name, phone')
+      .eq('is_active', true)
+      .or(`name.ilike.${pattern},contact_name.ilike.${pattern}`)
+      .limit(6),
   ])
 
   const patients = (patientsRes.data ?? []) as Pick<Patient, 'id' | 'first_name' | 'last_name' | 'phone'>[]
   const prescriptions = (prescriptionsRes.data ?? []) as Pick<Prescription, 'id' | 'drug_name' | 'ref_number' | 'patient_name'>[]
   const products = (productsRes.data ?? []) as Pick<Product, 'id' | 'name' | 'barcode' | 'stock_qty'>[]
   const transactions = (transactionsRes.data ?? []) as Pick<RetailTransaction, 'id' | 'ref_number' | 'total' | 'payment_method'>[]
+  const staff = (staffRes.data ?? []) as { id: string; full_name: string; role: string; email: string }[]
+  const suppliers = (suppliersRes.data ?? []) as { id: string; name: string; contact_name: string | null; phone: string | null }[]
 
   const results: SearchResult[] = [
     ...patients.map((row): SearchResult => ({
@@ -76,6 +92,22 @@ async function fetchSearchResults(query: string): Promise<SearchResult[]> {
       title: `Transaction ${row.ref_number}`,
       subtitle: `JMD ${row.total.toFixed(2)} · ${row.payment_method}`,
       href: '/pos/transactions',
+    })),
+
+    ...staff.map((row): SearchResult => ({
+      id: row.id,
+      type: 'staff',
+      title: row.full_name,
+      subtitle: `Staff · ${row.role}`,
+      href: '/admin/users',
+    })),
+
+    ...suppliers.map((row): SearchResult => ({
+      id: row.id,
+      type: 'supplier',
+      title: row.name,
+      subtitle: `Supplier${row.contact_name ? ` · ${row.contact_name}` : ''}${row.phone ? ` · ${row.phone}` : ''}`,
+      href: '/pos/suppliers',
     })),
   ]
 
