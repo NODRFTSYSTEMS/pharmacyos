@@ -35,6 +35,7 @@ interface SettingsFormState {
   gct_rate: string;
   default_shift: string;
   loyalty_rate: string;
+  loyalty_redemption_value: string;
   // Receipt
   receipt_footer: string;
   // Reliability reports
@@ -54,6 +55,7 @@ const SETTING_KEYS: Array<keyof SettingsFormState> = [
   'gct_rate',
   'default_shift',
   'loyalty_rate',
+  'loyalty_redemption_value',
   'receipt_footer',
   'daily_inconsistency_report_enabled',
   'daily_inconsistency_report_time',
@@ -71,8 +73,9 @@ function mapToForm(map: SettingsMap): SettingsFormState {
     opening_float:    map['opening_float']    ?? '',
     gct_rate:         map['gct_rate']         ?? '15',
     default_shift:    map['default_shift']    ?? 'MORNING',
-    loyalty_rate:     map['loyalty_rate']     ?? '1',
-    receipt_footer:   map['receipt_footer']   ?? '',
+    loyalty_rate:              map['loyalty_rate']              ?? '1',
+    loyalty_redemption_value:  map['loyalty_redemption_value']  ?? '0.01',
+    receipt_footer:            map['receipt_footer']            ?? '',
     daily_inconsistency_report_enabled:  map['daily_inconsistency_report_enabled']  ?? 'true',
     daily_inconsistency_report_time:     map['daily_inconsistency_report_time']     ?? '18:00',
     daily_inconsistency_report_timezone: map['daily_inconsistency_report_timezone'] ?? 'America/Jamaica',
@@ -557,7 +560,7 @@ export function Settings() {
             </div>
             <div>
               <label htmlFor="s-loyalty" className="block text-sm font-medium text-gray-700 mb-1">
-                Loyalty Points Rate
+                Loyalty Earn Rate
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -573,6 +576,26 @@ export function Settings() {
                 <span className="text-sm text-gray-500 shrink-0">pts / J$1</span>
               </div>
               <p className="mt-1 text-xs text-gray-400">Points earned per dollar spent</p>
+            </div>
+            <div>
+              <label htmlFor="s-loyalty-redeem" className="block text-sm font-medium text-gray-700 mb-1">
+                Point Redemption Value
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 shrink-0">J$</span>
+                <input
+                  id="s-loyalty-redeem"
+                  type="number"
+                  min={0}
+                  step={0.001}
+                  className="input w-full"
+                  placeholder="0.01"
+                  value={form.loyalty_redemption_value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('loyalty_redemption_value', e.target.value)}
+                />
+                <span className="text-sm text-gray-500 shrink-0">/ pt</span>
+              </div>
+              <p className="mt-1 text-xs text-gray-400">Cash value of 1 point when redeemed</p>
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
   User, Pill as PillIcon, Shield, Lock, CaretLeft,
-  Warning, CheckCircle, Clock, Export,
+  Warning, CheckCircle, Clock, Export, Star,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { formatPatientName } from '../../lib/formatting'
@@ -156,6 +156,68 @@ function MedicationTab({ patientId }: { patientId: string }) {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+// ── Loyalty card (shown below Details tab) ────────────────────────────────────
+
+const TIER_PILL: Record<string, string> = {
+  STANDARD: 'pill-gray',
+  SILVER:   'pill-blue',
+  GOLD:     'pill-yellow',
+  PLATINUM: 'pill-purple',
+}
+
+interface LoyaltyRecord {
+  id: string
+  tier: string
+  points_balance: number
+  joined_date: string
+}
+
+function LoyaltyCard({ patientId, phone }: { patientId: string; phone: string | null }) {
+  const { data: loyalty, isLoading } = useQuery<LoyaltyRecord | null>({
+    queryKey: ['patient-loyalty', patientId, phone],
+    queryFn: async () => {
+      const filters: string[] = [`patient_id.eq.${patientId}`]
+      if (phone) filters.push(`phone.eq.${phone}`)
+      const { data, error } = await supabase
+        .from('loyalty_customers')
+        .select('id, tier, points_balance, joined_date')
+        .or(filters.join(','))
+        .eq('is_active', true)
+        .maybeSingle()
+      if (error) throw error
+      return data as LoyaltyRecord | null
+    },
+  })
+
+  if (isLoading) return null
+
+  return (
+    <div className={`card mt-4 flex items-center gap-4 px-5 py-4 ${loyalty ? 'border-amber-200 bg-amber-50' : ''}`}>
+      <Star
+        size={20}
+        weight={loyalty ? 'duotone' : 'regular'}
+        className={loyalty ? 'text-amber-500 shrink-0' : 'text-gray-300 shrink-0'}
+        aria-hidden="true"
+      />
+      {loyalty ? (
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-semibold text-gray-800">Loyalty Member</p>
+            <span className={`pill ${TIER_PILL[loyalty.tier] ?? 'pill-gray'} text-xs`}>
+              {loyalty.tier.charAt(0) + loyalty.tier.slice(1).toLowerCase()}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {loyalty.points_balance.toLocaleString()} points · Member since {fmtDate(loyalty.joined_date)}
+          </p>
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400">Not enrolled in the loyalty programme</p>
+      )}
     </div>
   )
 }
@@ -394,7 +456,12 @@ export default function PatientProfile() {
 
       {/* Tab panels */}
       <div id={`tabpanel-${activeTab}`} role="tabpanel" aria-label={TABS.find(t => t.id === activeTab)?.label}>
-        {activeTab === 'details'    && <DetailsTab patient={patient} />}
+        {activeTab === 'details'    && (
+          <>
+            <DetailsTab patient={patient} />
+            <LoyaltyCard patientId={patient.id} phone={patient.phone ?? null} />
+          </>
+        )}
         {activeTab === 'medication' && <MedicationTab patientId={patient.id} />}
         {activeTab === 'insurance'  && <InsuranceTab />}
         {activeTab === 'jdpa'       && <JdpaTab patient={patient} />}
