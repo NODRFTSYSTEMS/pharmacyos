@@ -156,16 +156,27 @@ export default function TimecardClock() {
         1,
         Math.round((now.getTime() - new Date(activeShift.clocked_in_at).getTime()) / 60_000),
       )
+      // Set status to CLOCKED_OUT atomically with clocked_out_at.
+      // Do NOT rely on analyze_timecard RPC to set the status — if the RPC
+      // fails after this update, the user would be stuck in CLOCKED_IN state
+      // even though clocked_out_at is written. The RPC is best-effort only;
+      // it may upgrade status to APPROVED or FLAGGED but cannot block clock-out.
       const { error: updateErr } = await supabase
         .from('timecards')
-        .update({ clocked_out_at: now.toISOString(), total_minutes: totalMinutes })
+        .update({
+          clocked_out_at: now.toISOString(),
+          total_minutes:  totalMinutes,
+          status:         'CLOCKED_OUT',
+        })
         .eq('id', activeShift.id)
       if (updateErr) throw updateErr
 
-      const { error: analyzeErr } = await supabase.rpc('analyze_timecard', {
-        p_timecard_id: activeShift.id,
-      })
-      if (analyzeErr) throw analyzeErr
+      // analyze_timecard may upgrade to APPROVED or FLAGGED — best-effort only
+      try {
+        await supabase.rpc('analyze_timecard', { p_timecard_id: activeShift.id })
+      } catch {
+        // RPC failure does not block clock-out — status is already CLOCKED_OUT
+      }
 
       try {
         await supabase.from('audit_log').insert({
