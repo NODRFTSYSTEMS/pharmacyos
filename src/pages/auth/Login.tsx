@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import { Files } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
 export default function Login() {
-  const nav = useNavigate()
+  const nav         = useNavigate()
+  const queryClient = useQueryClient()
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
@@ -20,6 +22,9 @@ export default function Login() {
       setError(authErr.message)
       return
     }
+    // Clear any cached queries from a previous session so the incoming user
+    // never sees another user's profile, role, or data mid-session.
+    queryClient.clear()
     // I-09: Check if user has enrolled MFA — redirect to verify-mfa if AAL2 is required
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     setLoading(false)

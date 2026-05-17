@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
@@ -185,17 +185,24 @@ export function Sidebar() {
   const filteredNav    = useFilteredNav()
   const { data: user } = useCurrentUser()
   const pharmacyName   = usePharmacyName()
+  const queryClient    = useQueryClient()
 
   // I-20: display name fallback — never show raw email as a person's name
-  const displayName = user?.name && user.name !== user?.email
+  const displayName = user?.name && user.name !== 'Unknown User'
     ? user.name
-    : user?.email
-      ? 'Staff Member'   // fallback when profile name is missing
-      : '—'
+    : '—'
 
   async function handleSignOut() {
-    await supabase.auth.signOut()
-    nav('/login', { replace: true })
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // signOut can fail on network errors — still clear local state
+    } finally {
+      // Clear ALL cached queries so the next user starts with a clean slate.
+      // Without this, user B logging in after user A sees A's stale profile.
+      queryClient.clear()
+      nav('/login', { replace: true })
+    }
   }
 
   return (
