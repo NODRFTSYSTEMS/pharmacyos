@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   User, Pill as PillIcon, Shield, Lock, CaretLeft,
-  Warning, CheckCircle, Clock, Export, Star,
+  Warning, CheckCircle, Clock, Export, Star, Trash,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { usePermission } from '../../hooks/usePermission'
 import { formatPatientName } from '../../lib/formatting'
 import { MedicationReferenceThumb } from '../../components/MedicationVisualReference'
 import { PageHeader, Pill as StatusPill } from '../../components/Shell'
@@ -239,9 +240,15 @@ function InsuranceTab() {
 // ── JDPA tab ──────────────────────────────────────────────────────────────────
 
 function JdpaTab({ patient }: { patient: Patient }) {
-  const hasConsent = !!patient.jdpa_consent_at
-  const [exporting, setExporting] = useState(false)
-  const [exportError, setExportError] = useState<string | null>(null)
+  const hasConsent    = !!patient.jdpa_consent_at
+  const canDeactivate = usePermission('staff_manage')
+  const queryClient   = useQueryClient()
+
+  const [exporting,         setExporting]         = useState(false)
+  const [exportError,       setExportError]        = useState<string | null>(null)
+  const [deactivateConfirm, setDeactivateConfirm]  = useState(false)
+  const [deactivating,      setDeactivating]       = useState(false)
+  const [deactivateError,   setDeactivateError]    = useState<string | null>(null)
 
   async function handleExport() {
     if (!hasConsent) {
@@ -295,6 +302,33 @@ function JdpaTab({ patient }: { patient: Patient }) {
       setExportError((err as Error).message ?? 'Export failed. Please try again.')
     } finally {
       setExporting(false)
+    }
+  }
+
+  async function handleDeactivate() {
+    setDeactivating(true)
+    setDeactivateError(null)
+    try {
+      const { error: updateErr } = await supabase
+        .from('patients')
+        .update({ is_active: false })
+        .eq('id', patient.id)
+      if (updateErr) throw updateErr
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.PATIENT_DATA_DELETE,
+        table_name: 'patients',
+        record_id:  patient.id,
+        details: { patient_id: patient.id, action: 'record_deactivated' },
+      })
+      queryClient.invalidateQueries({ queryKey: ['patient', patient.id] })
+    } catch (err) {
+      setDeactivateError((err as Error).message ?? 'Deactivation failed. Please try again.')
+    } finally {
+      setDeactivating(false)
+      setDeactivateConfirm(false)
     }
   }
 
@@ -372,6 +406,60 @@ function JdpaTab({ patient }: { patient: Patient }) {
           </div>
         )}
       </div>
+
+      {/* Deactivated banner */}
+      {!patient.is_active && (
+        <div className="px-5 py-4 bg-red-50 border-t border-red-200">
+          <div className="flex items-center gap-2 text-red-800">
+            <Trash size={16} weight="duotone" aria-hidden="true" />
+            <p className="text-sm font-semibold">Patient Record Deactivated</p>
+          </div>
+          <p className="text-xs text-red-700 mt-1">
+            This record has been deactivated. The patient will no longer appear in active patient lists or POS lookup. Contact an administrator to reinstate the record if required.
+          </p>
+        </div>
+      )}
+
+      {/* Deactivation section — admin only, active records only */}
+      {canDeactivate && patient.is_active && (
+        <div className="px-5 py-4">
+          <div className="border border-red-200 rounded-lg p-4 bg-red-50 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-red-900">Deactivate Patient Record</p>
+              <p className="text-xs text-red-700 mt-0.5">
+                Deactivation removes this patient from active lists and blocks new transactions. The record is retained for compliance. This action is audit-logged and cannot be undone from the UI.
+              </p>
+            </div>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={deactivateConfirm}
+                onChange={e => setDeactivateConfirm(e.target.checked)}
+                className="mt-0.5 shrink-0"
+                aria-label="Confirm patient deactivation"
+              />
+              <span className="text-xs text-red-800">
+                I understand this will deactivate the patient record and is audit-logged under my account.
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={handleDeactivate}
+              disabled={!deactivateConfirm || deactivating}
+              className="btn bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50 flex items-center gap-1.5"
+              aria-label="Deactivate patient record"
+            >
+              <Trash size={14} aria-hidden="true" />
+              {deactivating ? 'Deactivating…' : 'Deactivate Record'}
+            </button>
+            {deactivateError && (
+              <div role="alert" className="bg-white border border-red-300 rounded px-3 py-2 text-sm text-red-700">
+                {deactivateError}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
