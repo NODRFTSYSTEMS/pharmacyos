@@ -238,6 +238,38 @@ function useDashboardUpdates() {
   })
 }
 
+function useExpiringCertsCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['dashboard-expiring-certs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('staff_certifications')
+        .select('id')
+        .in('status', ['EXPIRING_SOON', 'EXPIRED'])
+      if (error) throw error
+      return (data ?? []).length
+    },
+    enabled,
+    refetchInterval: 300_000,
+  })
+}
+
+function usePendingLeaveCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['dashboard-pending-leave'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('staff_leaves')
+        .select('id')
+        .eq('status', 'PENDING')
+      if (error) throw error
+      return (data ?? []).length
+    },
+    enabled,
+    refetchInterval: 120_000,
+  })
+}
+
 function useLatestInconsistencyReport(enabled: boolean) {
   return useQuery<DailyInconsistencyReport | null>({
     queryKey: ['latest-daily-inconsistency-report'],
@@ -281,6 +313,8 @@ export function Dashboard() {
   const canUsePOS           = usePermission('pos_terminal')
   const canViewAIQueue      = usePermission('ai_queue')
   const canManageInventory  = usePermission('inventory_manage')
+  const canManageStaff      = usePermission('staff_manage')
+  const canManageTimecards  = usePermission('timecard_manage')
 
   const retailQ        = useTodayRetail(today)
   const rxQ            = useTodayRx(today)
@@ -292,6 +326,8 @@ export function Dashboard() {
   const reorderQ       = useReorderRecommendations(canManageInventory)
   const updatesQ       = useDashboardUpdates()
   const dailyReportQ   = useLatestInconsistencyReport(canViewReports)
+  const certAlertsQ    = useExpiringCertsCount(canManageStaff)
+  const pendingLeaveQ  = usePendingLeaveCount(canManageTimecards)
 
   const isCashier      = user?.role === 'CASHIER'
   const isPharmacist   = user?.role === 'PHARMACIST'
@@ -499,6 +535,34 @@ export function Dashboard() {
             <>{aiQueueQ.data} document{(aiQueueQ.data ?? 0) !== 1 ? 's' : ''} in the extraction queue need{(aiQueueQ.data ?? 0) === 1 ? 's' : ''} review.{' '}
               <Link to="/ai/queue" className="underline font-medium hover:opacity-75">
                 Go to Document Review →
+              </Link>
+            </>
+          }
+        />
+      )}
+
+      {/* Certification expiry alert — shown to staff managers only */}
+      {canManageStaff && (certAlertsQ.data ?? 0) > 0 && (
+        <ClosableAlert
+          variant="red"
+          message={
+            <>{certAlertsQ.data} staff certification{(certAlertsQ.data ?? 0) !== 1 ? 's' : ''} expiring soon or already expired.{' '}
+              <Link to="/hr/certifications" className="underline font-medium hover:opacity-75">
+                Review Certifications →
+              </Link>
+            </>
+          }
+        />
+      )}
+
+      {/* Pending leave alert — shown to managers with timecard_manage */}
+      {canManageTimecards && (pendingLeaveQ.data ?? 0) > 0 && (
+        <ClosableAlert
+          variant="yellow"
+          message={
+            <>{pendingLeaveQ.data} leave request{(pendingLeaveQ.data ?? 0) !== 1 ? 's' : ''} pending your approval.{' '}
+              <Link to="/hr/leave" className="underline font-medium hover:opacity-75">
+                Review Leave Requests →
               </Link>
             </>
           }

@@ -92,14 +92,31 @@ const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
   [AUDIT_ACTIONS.STOCK_ADJUST]:            'pill-blue',
   [AUDIT_ACTIONS.PRODUCT_CREATE]:          'pill-blue',
   [AUDIT_ACTIONS.PRODUCT_UPDATE]:          'pill-blue',
+  // Timecards
+  [AUDIT_ACTIONS.TIMECARD_CLOCK_IN]:       'pill-green',
+  [AUDIT_ACTIONS.TIMECARD_CLOCK_OUT]:      'pill-green',
+  [AUDIT_ACTIONS.TIMECARD_APPROVE]:        'pill-green',
+  [AUDIT_ACTIONS.TIMECARD_FLAG]:           'pill-yellow',
+  // Void requests
+  [AUDIT_ACTIONS.VOID_REQUEST]:            'pill-yellow',
+  [AUDIT_ACTIONS.VOID_APPROVED]:           'pill-green',
+  [AUDIT_ACTIONS.VOID_DENIED]:             'pill-red',
   // Staff / Auth
   [AUDIT_ACTIONS.STAFF_CREATE]:            'pill-green',
   [AUDIT_ACTIONS.STAFF_UPDATE]:            'pill-green',
   [AUDIT_ACTIONS.STAFF_DEACTIVATE]:        'pill-green',
   [AUDIT_ACTIONS.STAFF_LOGIN]:             'pill-green',
   [AUDIT_ACTIONS.STAFF_LOGOUT]:            'pill-green',
-  [AUDIT_ACTIONS.STAFF_LOGIN_FAILED]:      'pill-green',
-  [AUDIT_ACTIONS.SESSION_TIMEOUT]:         'pill-green',
+  [AUDIT_ACTIONS.STAFF_LOGIN_FAILED]:      'pill-red',
+  [AUDIT_ACTIONS.SESSION_TIMEOUT]:         'pill-yellow',
+  [AUDIT_ACTIONS.ACCESS_DENIED]:           'pill-red',
+  // HR — Leave & Certifications
+  [AUDIT_ACTIONS.LEAVE_REQUEST_SUBMIT]:    'pill-blue',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_APPROVE]:   'pill-green',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_DENY]:      'pill-red',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_CANCEL]:    'pill-gray',
+  [AUDIT_ACTIONS.CERT_CREATE]:             'pill-green',
+  [AUDIT_ACTIONS.CERT_UPDATE]:             'pill-green',
   // Settings / Permissions
   [AUDIT_ACTIONS.SETTINGS_UPDATE]:         'pill-gray',
   [AUDIT_ACTIONS.PERMISSIONS_UPDATE]:      'pill-gray',
