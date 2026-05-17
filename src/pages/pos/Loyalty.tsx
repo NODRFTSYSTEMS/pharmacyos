@@ -17,6 +17,7 @@ interface LoyaltyCustomer {
   name: string;
   phone: string | null;
   email: string | null;
+  notes: string | null;
   points_balance: number;
   tier: 'STANDARD' | 'SILVER' | 'GOLD' | 'PLATINUM';
   is_active: boolean;
@@ -81,11 +82,11 @@ function LoyaltyDrawer({ open, editTarget, onClose }: LoyaltyDrawerProps) {
     if (open) {
       if (editTarget) {
         setForm({
-          name: editTarget.name,
-          phone: editTarget.phone ?? '',
-          email: editTarget.email ?? '',
-          tier: editTarget.tier,
-          notes: '',
+          name:      editTarget.name,
+          phone:     editTarget.phone ?? '',
+          email:     editTarget.email ?? '',
+          tier:      editTarget.tier,
+          notes:     editTarget.notes ?? '',
           is_active: editTarget.is_active,
         });
       } else {
@@ -99,10 +100,11 @@ function LoyaltyDrawer({ open, editTarget, onClose }: LoyaltyDrawerProps) {
     mutationFn: async (data: DrawerFormState) => {
       const { data: { user } } = await supabase.auth.getUser();
       const payload = {
-        name: data.name.trim(),
-        phone: data.phone.trim() || null,
-        email: data.email.trim() || null,
-        tier: data.tier,
+        name:      data.name.trim(),
+        phone:     data.phone.trim() || null,
+        email:     data.email.trim() || null,
+        notes:     data.notes.trim() || null,
+        tier:      data.tier,
         is_active: data.is_active,
       };
       if (editTarget) {

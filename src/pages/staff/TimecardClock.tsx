@@ -108,6 +108,17 @@ export default function TimecardClock() {
   const clockIn = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('No authenticated user')
+      // Guard against duplicate CLOCKED_IN entry for today (race condition defence)
+      const { gte, lte } = toJamaicaBounds(today, today)
+      const { data: existing } = await supabase
+        .from('timecards')
+        .select('id')
+        .eq('staff_id', user.id)
+        .eq('status', 'CLOCKED_IN')
+        .gte('clocked_in_at', gte)
+        .lte('clocked_in_at', lte)
+        .maybeSingle()
+      if (existing) throw new Error('You already have an open shift today. Please clock out first.')
       const { data: tc, error } = await supabase.from('timecards').insert({
         staff_id:     user.id,
         staff_name:   user.name,

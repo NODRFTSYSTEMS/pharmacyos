@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Certificate, Plus, X, Warning, CheckCircle, PencilSimple,
@@ -85,16 +85,16 @@ function CertDrawer({
   })
   const [errors, setErrors] = useState<Partial<Record<keyof DrawerState, string>>>({})
 
-  // Sync form when drawer opens
-  useState(() => {
+  // Sync form when drawer opens or edit target changes
+  useEffect(() => {
     if (open) {
       if (editTarget) {
         setForm({
-          staff_id:   editTarget.staff_id,
-          staff_name: editTarget.staff_name,
-          cert_type:  editTarget.cert_type,
+          staff_id:    editTarget.staff_id,
+          staff_name:  editTarget.staff_name,
+          cert_type:   editTarget.cert_type,
           cert_number: editTarget.cert_number ?? '',
-          issued_by:  editTarget.issued_by ?? '',
+          issued_by:   editTarget.issued_by ?? '',
           issued_date: editTarget.issued_date ?? '',
           expiry_date: editTarget.expiry_date,
           alert_days:  String(editTarget.alert_days),
@@ -108,7 +108,7 @@ function CertDrawer({
       }
       setErrors({})
     }
-  })
+  }, [open, editTarget])
 
   function set<K extends keyof DrawerState>(k: K, v: DrawerState[K]) {
     setForm(prev => ({ ...prev, [k]: v }))

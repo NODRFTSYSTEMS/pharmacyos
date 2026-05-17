@@ -96,17 +96,22 @@ function LeaveDrawer({ open, onClose }: { open: boolean; onClose: () => void }) 
   const mutation = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      const daysRequested = Math.max(
+        1,
+        Math.round((new Date(form.end_date).getTime() - new Date(form.start_date).getTime()) / 86_400_000) + 1,
+      )
       const { data: inserted, error } = await supabase
         .from('staff_leaves')
         .insert({
-          staff_id:   currentUser?.id ?? user?.id,
-          staff_name: currentUser?.name ?? user?.email ?? 'Unknown',
-          staff_role: currentUser?.role ?? 'UNKNOWN',
-          leave_type: form.leave_type,
-          start_date: form.start_date,
-          end_date:   form.end_date,
-          reason:     form.reason.trim() || null,
-          status:     'PENDING',
+          staff_id:       currentUser?.id ?? user?.id,
+          staff_name:     currentUser?.name ?? user?.email ?? 'Unknown',
+          staff_role:     currentUser?.role ?? 'UNKNOWN',
+          leave_type:     form.leave_type,
+          start_date:     form.start_date,
+          end_date:       form.end_date,
+          days_requested: daysRequested,
+          reason:         form.reason.trim() || null,
+          status:         'PENDING',
         })
         .select('id')
         .single()
@@ -245,6 +250,8 @@ export default function LeaveRequests() {
   const { data: currentUser } = useCurrentUser()
   const canManage = usePermission('timecard_manage')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  // Inline deny confirmation state — tracks which leave is being denied + the reason note
+  const [denyState, setDenyState] = useState<{ id: string; note: string } | null>(null)
 
   // Own leave history
   const { data: myLeaves = [], isLoading: loadingOwn } = useQuery<LeaveRecord[]>({
@@ -353,37 +360,78 @@ export default function LeaveRequests() {
           </h2>
           <div className="card divide-y divide-gray-100">
             {pendingAll.map(leave => (
-              <div key={leave.id} className="flex items-center justify-between gap-4 px-5 py-4 flex-wrap">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">{leave.staff_name}
-                    <span className="ml-2 text-xs text-gray-400 font-normal">{leave.staff_role}</span>
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {LEAVE_LABELS[leave.leave_type]} · {fmtDate(leave.start_date)} – {fmtDate(leave.end_date)}
-                    {' '}({leave.days_requested} day{leave.days_requested !== 1 ? 's' : ''})
-                  </p>
-                  {leave.reason && <p className="text-xs text-gray-400 italic mt-0.5">"{leave.reason}"</p>}
+              <div key={leave.id} className="px-5 py-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{leave.staff_name}
+                      <span className="ml-2 text-xs text-gray-400 font-normal">{leave.staff_role}</span>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {LEAVE_LABELS[leave.leave_type]} · {fmtDate(leave.start_date)} – {fmtDate(leave.end_date)}
+                      {' '}({leave.days_requested} day{leave.days_requested !== 1 ? 's' : ''})
+                    </p>
+                    {leave.reason && <p className="text-xs text-gray-400 italic mt-0.5">"{leave.reason}"</p>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      className="btn btn-ghost text-xs gap-1.5 text-emerald-700 hover:bg-emerald-50"
+                      onClick={() => reviewMutation.mutate({ id: leave.id, decision: 'APPROVED' })}
+                      disabled={reviewMutation.isPending}
+                    >
+                      <CheckCircle size={14} aria-hidden="true" />
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost text-xs gap-1.5 text-red-600 hover:bg-red-50"
+                      onClick={() => setDenyState(prev =>
+                        prev?.id === leave.id ? null : { id: leave.id, note: '' }
+                      )}
+                      disabled={reviewMutation.isPending}
+                    >
+                      <XCircle size={14} aria-hidden="true" />
+                      Deny
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    className="btn btn-ghost text-xs gap-1.5 text-emerald-700 hover:bg-emerald-50"
-                    onClick={() => reviewMutation.mutate({ id: leave.id, decision: 'APPROVED' })}
-                    disabled={reviewMutation.isPending}
-                  >
-                    <CheckCircle size={14} aria-hidden="true" />
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost text-xs gap-1.5 text-red-600 hover:bg-red-50"
-                    onClick={() => reviewMutation.mutate({ id: leave.id, decision: 'DENIED' })}
-                    disabled={reviewMutation.isPending}
-                  >
-                    <XCircle size={14} aria-hidden="true" />
-                    Deny
-                  </button>
-                </div>
+
+                {/* Inline deny confirmation */}
+                {denyState?.id === leave.id && (
+                  <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 space-y-2">
+                    <p className="text-xs font-semibold text-red-800">Confirm denial — provide a reason (optional)</p>
+                    <textarea
+                      rows={2}
+                      placeholder="Reason for denial…"
+                      className="input w-full text-xs resize-none"
+                      value={denyState.note}
+                      onChange={e => setDenyState(prev => prev ? { ...prev, note: e.target.value } : null)}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-ghost text-xs"
+                        onClick={() => setDenyState(null)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary text-xs bg-red-600 hover:bg-red-700 border-red-600 gap-1.5"
+                        disabled={reviewMutation.isPending}
+                        onClick={() => {
+                          reviewMutation.mutate(
+                            { id: leave.id, decision: 'DENIED', note: denyState.note.trim() || undefined },
+                            { onSuccess: () => setDenyState(null) },
+                          )
+                        }}
+                      >
+                        <XCircle size={13} aria-hidden="true" />
+                        Confirm Denial
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

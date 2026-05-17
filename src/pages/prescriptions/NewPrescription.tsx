@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
-import { useMutation } from '@tanstack/react-query'
-import { Shield, ArrowLeft } from '@phosphor-icons/react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Shield, ArrowLeft, MagnifyingGlass, X, LinkSimple } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader } from '../../components/Shell'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
@@ -48,6 +48,45 @@ export default function NewPrescription() {
   const [form, setForm]     = useState<RxDraft>({ ...BLANK })
   const [errors, setErrors] = useState<Partial<Record<keyof RxDraft, string>>>({})
 
+  // Patient registry linkage (optional — C-1)
+  const [linkedPatientId, setLinkedPatientId] = useState<string | null>(null)
+  const [linkedPatientName, setLinkedPatientName] = useState<string | null>(null)
+  const [patientSearch, setPatientSearch] = useState('')
+
+  interface PatientResult { id: string; first_name: string; last_name: string; date_of_birth: string | null }
+
+  const { data: patientResults = [] } = useQuery<PatientResult[]>({
+    queryKey: ['patient-search-rx', patientSearch],
+    queryFn: async () => {
+      const q = patientSearch.trim()
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, first_name, last_name, date_of_birth')
+        .eq('is_active', true)
+        .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
+        .order('last_name')
+        .limit(8)
+      if (error) throw error
+      return (data ?? []) as PatientResult[]
+    },
+    enabled: patientSearch.trim().length >= 2 && !linkedPatientId,
+    staleTime: 10_000,
+  })
+
+  function linkPatient(p: PatientResult) {
+    const fullName = `${p.first_name} ${p.last_name}`
+    setLinkedPatientId(p.id)
+    setLinkedPatientName(fullName)
+    set('patient_name', fullName)
+    setPatientSearch('')
+  }
+
+  function unlinkPatient() {
+    setLinkedPatientId(null)
+    setLinkedPatientName(null)
+    setPatientSearch('')
+  }
+
   function set<K extends keyof RxDraft>(key: K, value: RxDraft[K]) {
     setForm(f => ({ ...f, [key]: value }))
     if (errors[key]) setErrors(e => ({ ...e, [key]: undefined }))
@@ -80,7 +119,7 @@ export default function NewPrescription() {
         expiry_date:     form.expiry_date || null,
         notes:           form.notes.trim() || null,
         status:          'RECEIVED' as const,
-        patient_id:      null,
+        patient_id:      linkedPatientId,
         dispensed_by:    null,
         dispensed_at:    null,
         extraction_queue_id: null,
@@ -161,6 +200,68 @@ export default function NewPrescription() {
             </h2>
 
             <div className="space-y-4">
+              {/* Patient registry link (optional) */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 space-y-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <LinkSimple size={13} aria-hidden="true" />
+                  Link to Patient Registry
+                  <span className="font-normal normal-case text-gray-400">(optional)</span>
+                </p>
+                {linkedPatientId ? (
+                  <div className="flex items-center justify-between gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2">
+                    <span className="text-sm font-medium text-blue-800">{linkedPatientName}</span>
+                    <button
+                      type="button"
+                      onClick={unlinkPatient}
+                      className="p-1 text-blue-400 hover:text-blue-600"
+                      aria-label="Unlink patient"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="relative">
+                      <MagnifyingGlass size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true" />
+                      <input
+                        type="search"
+                        placeholder="Search by name…"
+                        value={patientSearch}
+                        onChange={e => setPatientSearch(e.target.value)}
+                        className="input pl-8 w-full text-sm"
+                        aria-label="Search patient registry"
+                      />
+                    </div>
+                    {patientSearch.trim().length >= 2 && (
+                      <div className="border border-gray-200 rounded-lg mt-1 overflow-hidden bg-white">
+                        {patientResults.length === 0 ? (
+                          <p className="px-3 py-2.5 text-xs text-gray-400 text-center">No matching patients found</p>
+                        ) : (
+                          patientResults.map(p => (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => linkPatient(p)}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors"
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-800">{p.first_name} {p.last_name}</p>
+                                {p.date_of_birth && (
+                                  <p className="text-xs text-gray-400">DOB: {new Date(p.date_of_birth).toLocaleDateString('en-JM')}</p>
+                                )}
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                    {patientSearch.trim().length < 2 && (
+                      <p className="text-xs text-gray-400 mt-1">Type at least 2 characters to search</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Patient Name — full width */}
               <div>
                 <label htmlFor="rx-patient" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
@@ -177,6 +278,9 @@ export default function NewPrescription() {
                   aria-describedby={errors.patient_name ? 'rx-patient-err' : undefined}
                   aria-invalid={!!errors.patient_name}
                 />
+                {linkedPatientId && (
+                  <p className="text-xs text-blue-600 mt-1">Linked to patient registry — edit to override name on this Rx.</p>
+                )}
                 {errors.patient_name && (
                   <p id="rx-patient-err" className="text-xs text-red-500 mt-1" role="alert">
                     {errors.patient_name}

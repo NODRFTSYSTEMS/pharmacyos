@@ -107,11 +107,12 @@ export default function EodReport() {
       if (updateError) throw updateError
 
       await supabase.from('audit_log').insert({
-        action: AUDIT_ACTIONS.EOD_APPROVE,
-        entity_type: 'eod_closeout',
-        entity_id: closeoutId,
-        performed_by: user.id,
-        metadata: { closeout_date: date },
+        actor_id:   user.id,
+        actor_name: user.email ?? 'System',
+        action:     AUDIT_ACTIONS.EOD_APPROVE,
+        table_name: 'eod_closeouts',
+        record_id:  closeoutId,
+        details:    { closeout_date: date },
       })
     },
     onSuccess: () => {

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Receipt, Plus, Minus, X, ShoppingCart,
   MagnifyingGlass, ArrowRight, User, Trash,
-  Tag, Clock, Star,
+  Tag, Clock, Star, Printer, CheckCircle,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { ProductImageThumb } from '../../components/MedicationVisualReference'
@@ -82,6 +82,164 @@ function todayLabel() {
   return new Date().toLocaleDateString('en-JM', {
     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
   })
+}
+
+// ── Receipt ───────────────────────────────────────────────────────────────────
+
+interface ReceiptData {
+  refNumber:       string
+  items:           CartItem[]
+  subtotal:        number
+  tax:             number
+  gctRatePct:      number
+  total:           number
+  payMethod:       PayMethod
+  cashTendered:    number | null
+  changeDue:       number | null
+  loyaltyCustomer: LoyaltyCustomerRow | null
+  loyaltyEarned:   number
+  cashierName:     string | null
+  timestamp:       string
+}
+
+function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => void }) {
+  const fmt = (n: number) =>
+    new Intl.NumberFormat('en-JM', { style: 'currency', currency: 'JMD', minimumFractionDigits: 2 }).format(n)
+
+  const dateStr = new Date(data.timestamp).toLocaleString('en-JM', {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+
+  return (
+    <>
+      {/* Backdrop — hidden on print */}
+      <div
+        className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 print:hidden"
+        onClick={onClose}
+      >
+        <div
+          className="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+            <div className="flex items-center gap-2 text-emerald-700">
+              <CheckCircle size={18} weight="duotone" aria-hidden="true" />
+              <span className="font-semibold text-sm">Sale Complete</span>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-ghost p-1.5"
+              aria-label="Close receipt"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Receipt body */}
+          <div className="px-5 py-4 font-mono text-sm space-y-3">
+            {/* Pharmacy + ref */}
+            <div className="text-center border-b border-dashed border-gray-300 pb-3">
+              <p className="font-bold text-base text-gray-900 not-italic">Winchester Global Pharmacy</p>
+              <p className="text-xs text-gray-500 mt-0.5">{dateStr}</p>
+              <p className="text-xs text-gray-500">Ref: {data.refNumber}</p>
+              {data.cashierName && (
+                <p className="text-xs text-gray-500">Cashier: {data.cashierName}</p>
+              )}
+            </div>
+
+            {/* Line items */}
+            <div className="space-y-1.5 border-b border-dashed border-gray-300 pb-3">
+              {data.items.map(item => (
+                <div key={item.product_id} className="flex justify-between gap-2">
+                  <span className="text-gray-800 flex-1 break-words leading-snug">
+                    {item.product_name}
+                    <span className="text-gray-400"> ×{item.qty}</span>
+                  </span>
+                  <span className="shrink-0 tabular-nums">{fmt(item.unit_price * item.qty)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Totals */}
+            <div className="space-y-1 border-b border-dashed border-gray-300 pb-3">
+              <div className="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span className="tabular-nums">{fmt(data.subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>GCT ({data.gctRatePct.toFixed(0)}%)</span>
+                <span className="tabular-nums">{fmt(data.tax)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-gray-900 text-base">
+                <span>Total</span>
+                <span className="tabular-nums">{fmt(data.total)}</span>
+              </div>
+            </div>
+
+            {/* Payment */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-gray-600">
+                <span>Payment</span>
+                <span>{data.payMethod}</span>
+              </div>
+              {data.payMethod === 'CASH' && data.cashTendered !== null && (
+                <>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Tendered</span>
+                    <span className="tabular-nums">{fmt(data.cashTendered)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-emerald-700">
+                    <span>Change</span>
+                    <span className="tabular-nums">{fmt(data.changeDue ?? 0)}</span>
+                  </div>
+                </>
+              )}
+              {data.loyaltyEarned > 0 && data.loyaltyCustomer && (
+                <div className="flex justify-between text-amber-600 font-medium mt-1">
+                  <span>Loyalty ({data.loyaltyCustomer.name})</span>
+                  <span>+{data.loyaltyEarned} pts</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-center text-xs text-gray-400 pt-2 border-t border-dashed border-gray-300">
+              Thank you for your purchase
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 px-5 pb-5">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="btn btn-ghost flex-1 gap-2 text-sm"
+            >
+              <Printer size={15} aria-hidden="true" />
+              Print
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-primary flex-1 gap-2 text-sm"
+            >
+              New Sale
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Print-only styles: hide everything except receipt */}
+      <style>{`
+        @media print {
+          body > * { display: none !important; }
+          .pos-receipt-print { display: block !important; }
+        }
+      `}</style>
+    </>
+  )
 }
 
 // ── CartRow ───────────────────────────────────────────────────────────────────
@@ -171,6 +329,7 @@ export default function PosTerminal() {
   const [loyaltySearch,  setLoyaltySearch]  = useState('')
   const [loyaltyCustomer, setLoyaltyCustomer] = useState<LoyaltyCustomerRow | null>(null)
   const loyaltySearchRef = useRef<HTMLInputElement>(null)
+  const [receiptData,    setReceiptData]    = useState<ReceiptData | null>(null)
 
   // ── Cashier identity — reuses the shared useCurrentUser hook (F-2) ─────────
   // Eliminates the duplicate ['pos-cashier'] query that fetched staff_profiles
@@ -449,9 +608,25 @@ export default function PosTerminal() {
         if (loyaltyAuditError) console.error('audit_log write failed', loyaltyAuditError)
       }
 
-      return { txnId: txn.id, stockFailures, loyaltyEarned }
+      return { txnId: txn.id, refNumber, stockFailures, loyaltyEarned }
     },
-    onSuccess: ({ stockFailures, loyaltyEarned }) => {
+    onSuccess: ({ stockFailures, loyaltyEarned, refNumber }) => {
+      // Capture receipt snapshot BEFORE clearing cart state
+      setReceiptData({
+        refNumber,
+        items:           [...cart],
+        subtotal,
+        tax,
+        gctRatePct,
+        total,
+        payMethod,
+        cashTendered:    payMethod === 'CASH' ? cashTendered : null,
+        changeDue:       payMethod === 'CASH' ? Math.max(0, changeDue) : null,
+        loyaltyCustomer,
+        loyaltyEarned,
+        cashierName:     currentUser?.name ?? null,
+        timestamp:       new Date().toISOString(),
+      })
       clearCart()
       qc.invalidateQueries({ queryKey: ['retail-txns'] })
       qc.invalidateQueries({ queryKey: ['pos-products'] })
@@ -461,12 +636,7 @@ export default function PosTerminal() {
           `Sale recorded. Stock count could not be updated for: ${stockFailures.join(', ')}. Please adjust stock in the Inventory module.`,
           false,
         )
-      } else if (loyaltyEarned > 0) {
-        showToast(`Sale processed. ${loyaltyEarned} loyalty point${loyaltyEarned !== 1 ? 's' : ''} added.`, true)
-      } else {
-        showToast('Sale processed successfully', true)
       }
-      searchRef.current?.focus()
     },
     onError: (e: Error) => showToast(`Sale failed: ${e.message}`, false),
   })
@@ -1033,6 +1203,14 @@ export default function PosTerminal() {
         </div>
 
       </div>
+
+      {/* Receipt modal — shown after every successful sale */}
+      {receiptData && (
+        <ReceiptModal
+          data={receiptData}
+          onClose={() => { setReceiptData(null); searchRef.current?.focus() }}
+        />
+      )}
     </div>
   )
 }

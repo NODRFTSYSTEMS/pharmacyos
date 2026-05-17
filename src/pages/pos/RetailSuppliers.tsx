@@ -124,7 +124,7 @@ function SupplierDrawer({ initial, editingId, onClose }: DrawerProps) {
         </div>
 
         {/* Form body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
+        <form id="supplier-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
 
           {/* Name */}
           <div>
