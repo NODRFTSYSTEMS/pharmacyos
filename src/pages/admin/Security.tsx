@@ -25,8 +25,7 @@ interface StaffProfile {
   role: string
   is_active: boolean
   avatar_url: string | null
-  avatar_alt: string | null
-  avatar_source_status: string | null
+  // avatar_alt and avatar_source_status intentionally omitted (AU-06 — migration 028 unapplied)
   created_at: string
   updated_at: string
 }
@@ -100,7 +99,10 @@ function useStaffProfiles() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('staff_profiles')
-        .select('id, email, full_name, role, is_active, avatar_url, avatar_alt, avatar_source_status, created_at, updated_at')
+        // AU-06: avatar_alt and avatar_source_status excluded — migration 028 not applied to production.
+        // Selecting missing columns returns 400/42703, breaking the entire staff list.
+        // Restore after migration 028 is applied: add avatar_alt, avatar_source_status
+        .select('id, email, full_name, role, is_active, avatar_url, created_at, updated_at')
         .order('full_name')
       if (error) throw error
       return (data ?? []) as StaffProfile[]
@@ -236,7 +238,7 @@ function StaffSecurityTable() {
                         email={s.email}
                         role={s.role}
                         avatarUrl={s.avatar_url}
-                        avatarAlt={s.avatar_alt}
+                        avatarAlt={null}
                         size="sm"
                       />
                       <div className="min-w-0">
