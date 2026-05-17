@@ -9,6 +9,30 @@ import { supabase } from '../lib/supabase'
 const IDLE_TIMEOUT_MS = 20 * 60 * 1000  // 20 minutes
 const WARN_BEFORE_MS  =  2 * 60 * 1000  //  2 minutes before timeout
 
+// ── AAL check with timeout ────────────────────────────────────────────────────
+// supabase-js v2.x uses an internal async lock for all auth operations.
+// On page load, autoRefreshToken can hold this lock while refreshing the session,
+// causing mfa.getAuthenticatorAssuranceLevel() to wait indefinitely — freezing
+// the spinner. We race against a 3 s timeout and fail open (authed) so users
+// with a valid session never see a permanently stuck spinner.
+// Login.tsx already enforces MFA requirements before redirecting here,
+// so failing open is safe for the common (no-MFA) path.
+const AAL_TIMEOUT_MS = 3_000
+
+type AalResult = Awaited<ReturnType<typeof supabase.auth.mfa.getAuthenticatorAssuranceLevel>>
+function getAalWithTimeout(): Promise<AalResult> {
+  const fallback: AalResult = { data: { currentLevel: 'aal1', nextLevel: 'aal1' }, error: null }
+  return Promise.race([
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    new Promise<AalResult>(resolve =>
+      setTimeout(() => {
+        console.warn('[ProtectedRoute] getAuthenticatorAssuranceLevel timed out — failing open')
+        resolve(fallback)
+      }, AAL_TIMEOUT_MS)
+    ),
+  ])
+}
+
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<'loading' | 'authed' | 'mfa-required' | 'unauthed'>('loading')
   const [showWarning, setShowWarning] = useState(false)
@@ -49,7 +73,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
           return
         }
         // If the user has enrolled MFA and the session is at AAL1, gate on MFA
-        const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+        const { data: aal, error: aalError } = await getAalWithTimeout()
         if (aalError) {
           // MFA check failed — fail open (authed) rather than blocking login
           console.warn('[ProtectedRoute] MFA AAL check failed:', aalError.message)
@@ -76,7 +100,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
           setState('unauthed')
           return
         }
-        const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+        const { data: aal } = await getAalWithTimeout()
         if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
           setState('mfa-required')
         } else {
