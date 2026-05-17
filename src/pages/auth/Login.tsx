@@ -88,9 +88,18 @@ export default function Login() {
             </div>
 
             <div>
-              <label htmlFor="login-password" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="login-password" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  tabIndex={-1}
+                >
+                  Reset password
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   id="login-password"
@@ -135,14 +144,6 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-5 text-center">
-            <Link
-              to="/forgot-password"
-              className="text-xs text-gray-400 hover:text-gray-600"
-            >
-              Forgot your password?
-            </Link>
-          </div>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
