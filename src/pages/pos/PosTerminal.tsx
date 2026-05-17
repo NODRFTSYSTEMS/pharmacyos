@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Receipt, Plus, Minus, X, ShoppingCart,
   MagnifyingGlass, ArrowRight, User, Trash,
-  Tag, Clock,
+  Tag, Clock, Star,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { ProductImageThumb } from '../../components/MedicationVisualReference'
@@ -34,6 +34,21 @@ interface CartItem {
 }
 
 type PayMethod = 'CASH' | 'CARD' | 'LYNK'
+
+interface LoyaltyCustomerRow {
+  id: string
+  name: string
+  phone: string | null
+  points_balance: number
+  tier: 'STANDARD' | 'SILVER' | 'GOLD' | 'PLATINUM'
+}
+
+const TIER_PILL: Record<LoyaltyCustomerRow['tier'], string> = {
+  STANDARD: 'pill-gray',
+  SILVER:   'pill-blue',
+  GOLD:     'pill-yellow',
+  PLATINUM: 'pill-purple',
+}
 
 // ── Preferences (persisted to localStorage) ────────────────────────────────
 
@@ -152,6 +167,10 @@ export default function PosTerminal() {
   const [customName,     setCustomName]     = useState('')
   const [customPrice,    setCustomPrice]    = useState('')
   const customNameRef    = useRef<HTMLInputElement>(null)
+  const [loyaltyOpen,    setLoyaltyOpen]    = useState(false)
+  const [loyaltySearch,  setLoyaltySearch]  = useState('')
+  const [loyaltyCustomer, setLoyaltyCustomer] = useState<LoyaltyCustomerRow | null>(null)
+  const loyaltySearchRef = useRef<HTMLInputElement>(null)
 
   // ── Cashier identity — reuses the shared useCurrentUser hook (F-2) ─────────
   // Eliminates the duplicate ['pos-cashier'] query that fetched staff_profiles
@@ -172,6 +191,41 @@ export default function PosTerminal() {
       return data ? parseFloat(data.value) : 15
     },
     staleTime: 300_000,
+  })
+
+  // ── Loyalty rate from pharmacy_settings (points per $1 spent) ────────────
+
+  const { data: loyaltyRate = 1 } = useQuery<number>({
+    queryKey: ['setting-loyalty-rate'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('pharmacy_settings')
+        .select('value')
+        .eq('key', 'loyalty_rate')
+        .maybeSingle()
+      return data ? parseFloat(data.value) : 1
+    },
+    staleTime: 300_000,
+  })
+
+  // ── Loyalty customer search ───────────────────────────────────────────────
+
+  const { data: loyaltyResults = [] } = useQuery<LoyaltyCustomerRow[]>({
+    queryKey: ['pos-loyalty-search', loyaltySearch],
+    queryFn: async () => {
+      const q = loyaltySearch.trim()
+      const { data, error } = await supabase
+        .from('loyalty_customers')
+        .select('id, name, phone, points_balance, tier')
+        .eq('is_active', true)
+        .or(`name.ilike.%${q}%,phone.ilike.%${q}%`)
+        .order('name')
+        .limit(8)
+      if (error) throw error
+      return (data ?? []) as LoyaltyCustomerRow[]
+    },
+    enabled: loyaltySearch.trim().length >= 2,
+    staleTime: 10_000,
   })
 
   // ── Product search / browse ──────────────────────────────────────────────
@@ -250,6 +304,9 @@ export default function PosTerminal() {
   function clearCart() {
     setCart([])
     setCashInput('')
+    setLoyaltyCustomer(null)
+    setLoyaltySearch('')
+    setLoyaltyOpen(false)
   }
 
   function addCustomItem() {
@@ -287,6 +344,7 @@ export default function PosTerminal() {
   const cashTendered  = parseFloat(cashInput) || 0
   const changeDue     = cashTendered - total
   const canSubmit     = cart.length > 0 && (payMethod !== 'CASH' || cashTendered >= total)
+  const pointsToEarn  = loyaltyCustomer ? Math.floor(total * loyaltyRate) : 0
 
   // ── Process sale mutation ────────────────────────────────────────────────
 
@@ -295,6 +353,8 @@ export default function PosTerminal() {
       // Generate ref number using Jamaica local date (UTC-5) — avoids UTC date mismatch for evening sales
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' }).replace(/-/g, '')
       const refNumber = `TXN-${today}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+
+      const loyaltyEarned = loyaltyCustomer ? Math.floor(total * loyaltyRate) : 0
 
       // Insert transaction header
       const { data: txn, error: e1 } = await supabase
@@ -310,7 +370,8 @@ export default function PosTerminal() {
           total,
           cash_tendered:           payMethod === 'CASH' ? cashTendered : null,
           change_given:            payMethod === 'CASH' ? Math.max(0, changeDue) : null,
-          loyalty_points_earned:   0,
+          loyalty_customer_id:     loyaltyCustomer?.id ?? null,
+          loyalty_points_earned:   loyaltyEarned,
           loyalty_points_redeemed: 0,
           voided:                  false,
         })
@@ -366,17 +427,42 @@ export default function PosTerminal() {
         })
       } catch { /* best-effort — sale already committed */ }
 
-      return { txnId: txn.id, stockFailures }
+      // Credit loyalty points if a customer is attached
+      if (loyaltyCustomer && loyaltyEarned > 0) {
+        const { error: pointsError } = await supabase
+          .from('loyalty_customers')
+          .update({
+            points_balance: loyaltyCustomer.points_balance + loyaltyEarned,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', loyaltyCustomer.id)
+        if (pointsError) console.error('loyalty points update failed', pointsError)
+
+        const { error: loyaltyAuditError } = await supabase.from('audit_log').insert({
+          actor_id:   currentUser?.id ?? null,
+          actor_name: currentUser?.name ?? null,
+          action:     AUDIT_ACTIONS.LOYALTY_POINTS_EARN,
+          table_name: 'loyalty_customers',
+          record_id:  loyaltyCustomer.id,
+          details:    { points_earned: loyaltyEarned, transaction_id: txn.id, customer_name: loyaltyCustomer.name },
+        })
+        if (loyaltyAuditError) console.error('audit_log write failed', loyaltyAuditError)
+      }
+
+      return { txnId: txn.id, stockFailures, loyaltyEarned }
     },
-    onSuccess: ({ stockFailures }) => {
+    onSuccess: ({ stockFailures, loyaltyEarned }) => {
       clearCart()
       qc.invalidateQueries({ queryKey: ['retail-txns'] })
       qc.invalidateQueries({ queryKey: ['pos-products'] })
+      if (loyaltyEarned > 0) qc.invalidateQueries({ queryKey: ['loyalty_customers'] })
       if (stockFailures.length > 0) {
         showToast(
           `Sale recorded. Stock count could not be updated for: ${stockFailures.join(', ')}. Please adjust stock in the Inventory module.`,
           false,
         )
+      } else if (loyaltyEarned > 0) {
+        showToast(`Sale processed. ${loyaltyEarned} loyalty point${loyaltyEarned !== 1 ? 's' : ''} added.`, true)
       } else {
         showToast('Sale processed successfully', true)
       }
@@ -501,6 +587,103 @@ export default function PosTerminal() {
                   />
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* Loyalty customer lookup */}
+          <div className="card p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Star size={15} weight="duotone" className="text-amber-500" />
+                <h2 className="section-title mb-0 text-sm">Loyalty Customer</h2>
+              </div>
+              {!loyaltyCustomer && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoyaltyOpen(o => !o)
+                    if (!loyaltyOpen) setTimeout(() => loyaltySearchRef.current?.focus(), 50)
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {loyaltyOpen ? 'Cancel' : 'Attach'}
+                </button>
+              )}
+            </div>
+
+            {loyaltyCustomer ? (
+              /* Customer attached — show summary */
+              <div className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-gray-900">{loyaltyCustomer.name}</p>
+                    <span className={`pill ${TIER_PILL[loyaltyCustomer.tier]} text-xs`}>
+                      {loyaltyCustomer.tier.charAt(0) + loyaltyCustomer.tier.slice(1).toLowerCase()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {loyaltyCustomer.points_balance.toLocaleString()} pts current
+                    {pointsToEarn > 0 && (
+                      <span className="text-emerald-600 font-medium"> · +{pointsToEarn} pts this sale</span>
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setLoyaltyCustomer(null); setLoyaltySearch('') }}
+                  className="p-1 text-gray-400 hover:text-gray-600 shrink-0"
+                  aria-label="Remove loyalty customer"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : loyaltyOpen ? (
+              /* Search panel */
+              <div>
+                <div className="relative mb-2">
+                  <MagnifyingGlass size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <input
+                    ref={loyaltySearchRef}
+                    type="search"
+                    placeholder="Name or phone number…"
+                    value={loyaltySearch}
+                    onChange={e => setLoyaltySearch(e.target.value)}
+                    className="input pl-8 w-full text-sm"
+                    aria-label="Search loyalty customer"
+                  />
+                </div>
+                {loyaltySearch.trim().length >= 2 && (
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    {loyaltyResults.length === 0 ? (
+                      <p className="px-3 py-3 text-xs text-gray-400 text-center">No members found</p>
+                    ) : (
+                      loyaltyResults.map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => { setLoyaltyCustomer(c); setLoyaltySearch(''); setLoyaltyOpen(false) }}
+                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-800">{c.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {c.phone ?? 'No phone'} · {c.points_balance.toLocaleString()} pts
+                            </p>
+                          </div>
+                          <span className={`pill ${TIER_PILL[c.tier]} text-xs shrink-0`}>
+                            {c.tier.charAt(0) + c.tier.slice(1).toLowerCase()}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+                {loyaltySearch.trim().length < 2 && (
+                  <p className="text-xs text-gray-400">Type at least 2 characters to search members.</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400">No loyalty customer attached to this sale.</p>
             )}
           </div>
 
