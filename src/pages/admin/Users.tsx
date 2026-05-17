@@ -13,6 +13,7 @@ import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell';
 import { StaffAvatar } from '../../components/StaffAvatar';
 import { getDemoStaffPortrait } from '../../data/demoStaffPortraits';
+import { AUDIT_ACTIONS } from '../../constants/audit-actions';
 import type { StaffAvatarSourceStatus, StaffProfile, StaffRole } from '../../types/database';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -147,6 +148,7 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: DrawerFormState) => {
+      const { data: { user } } = await supabase.auth.getUser();
       const email = data.email.trim().toLowerCase();
       const fullName = data.full_name.trim();
       const demoPortrait = getDemoStaffPortrait(email);
@@ -175,9 +177,28 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
           .update({ ...payload, updated_at: new Date().toISOString() })
           .eq('id', editTarget.id);
         if (error) throw error;
+        const action = !data.is_active ? AUDIT_ACTIONS.STAFF_DEACTIVATE : AUDIT_ACTIONS.STAFF_UPDATE;
+        const { error: auditError } = await supabase.from('audit_log').insert({
+          actor_id:   user?.id ?? null,
+          actor_name: user?.email ?? 'System',
+          action,
+          table_name: 'staff_profiles',
+          record_id:  editTarget.id,
+          details:    { email, role: data.role, is_active: data.is_active },
+        });
+        if (auditError) console.error('audit_log write failed', auditError);
       } else {
         const { error } = await supabase.from('staff_profiles').insert(payload);
         if (error) throw error;
+        const { error: auditError } = await supabase.from('audit_log').insert({
+          actor_id:   user?.id ?? null,
+          actor_name: user?.email ?? 'System',
+          action:     AUDIT_ACTIONS.STAFF_CREATE,
+          table_name: 'staff_profiles',
+          record_id:  email,
+          details:    { email, role: data.role },
+        });
+        if (auditError) console.error('audit_log write failed', auditError);
       }
     },
     onSuccess: () => {
@@ -422,6 +443,7 @@ function PermissionsMatrix() {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       const serialized: RolePermsRecord = Object.fromEntries(
         ROLES_LIST.map(r => [r, Array.from(matrix[r] ?? [])])
       );
@@ -429,6 +451,15 @@ function PermissionsMatrix() {
         .from('pharmacy_settings')
         .upsert({ key: 'role_permissions', value: JSON.stringify(serialized) }, { onConflict: 'key' });
       if (error) throw error;
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.PERMISSIONS_UPDATE,
+        table_name: 'pharmacy_settings',
+        record_id:  'role_permissions',
+        details:    { updated_by: user?.id ?? null },
+      });
+      if (auditError) console.error('audit_log write failed', auditError);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pharmacy_settings'] });

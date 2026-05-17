@@ -218,8 +218,17 @@ export function Settings() {
         created_by: user?.id ?? null,
         created_by_name: user?.email ?? 'System',
       };
-      const { error } = await supabase.from('dashboard_updates').insert(payload);
+      const { data: created, error } = await supabase.from('dashboard_updates').insert(payload).select('id').single();
       if (error) throw error;
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.SETTINGS_UPDATE,
+        table_name: 'dashboard_updates',
+        record_id:  created.id,
+        details:    { subtype: 'dashboard_update_create', title: payload.title, category: payload.category },
+      });
+      if (auditError) console.error('audit_log write failed', auditError);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard-updates'] });
@@ -256,6 +265,15 @@ export function Settings() {
         })
         .eq('id', role.id);
       if (error) throw error;
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.SETTINGS_UPDATE,
+        table_name: 'ai_role_settings',
+        record_id:  role.id,
+        details:    { subtype: 'ai_role_prompt_update', role_key: role.role_key },
+      });
+      if (auditError) console.error('audit_log write failed', auditError);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ai-role-settings'] });
@@ -276,6 +294,15 @@ export function Settings() {
         })
         .eq('id', role.id);
       if (error) throw error;
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.SETTINGS_UPDATE,
+        table_name: 'ai_role_settings',
+        record_id:  role.id,
+        details:    { subtype: 'ai_role_toggle', role_key: role.role_key, enabled: !role.enabled },
+      });
+      if (auditError) console.error('audit_log write failed', auditError);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ai-role-settings'] });

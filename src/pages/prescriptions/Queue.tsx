@@ -10,6 +10,7 @@ import { MedicationReferenceThumb } from '../../components/MedicationVisualRefer
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Prescription, PrescriptionStatus } from '../../types/database'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -55,7 +56,7 @@ const STATUS_LABEL: Record<PrescriptionStatus, string> = {
 
 interface AdvanceButtonProps {
   rx: Prescription
-  onAdvance: (id: string, next: PrescriptionStatus) => void
+  onAdvance: (id: string, next: PrescriptionStatus, prevStatus: PrescriptionStatus) => void
   isPending: boolean
   isPharmacist: boolean
 }
@@ -64,7 +65,7 @@ function AdvanceButton({ rx, onAdvance, isPending, isPharmacist }: AdvanceButton
   if (rx.status === 'RECEIVED') {
     return (
       <button
-        onClick={() => onAdvance(rx.id, 'VERIFYING')}
+        onClick={() => onAdvance(rx.id, 'VERIFYING', rx.status)}
         disabled={isPending}
         className="btn btn-ghost text-xs h-7 px-2.5 gap-1"
         aria-label={`Begin verification of prescription ${rx.ref_number}`}
@@ -77,7 +78,7 @@ function AdvanceButton({ rx, onAdvance, isPending, isPharmacist }: AdvanceButton
   if (rx.status === 'VERIFYING') {
     return (
       <button
-        onClick={() => onAdvance(rx.id, 'READY')}
+        onClick={() => onAdvance(rx.id, 'READY', rx.status)}
         disabled={isPending}
         className="btn btn-ghost text-xs h-7 px-2.5 gap-1"
         aria-label={`Mark prescription ${rx.ref_number} as ready to dispense`}
@@ -101,7 +102,7 @@ function AdvanceButton({ rx, onAdvance, isPending, isPharmacist }: AdvanceButton
     }
     return (
       <button
-        onClick={() => onAdvance(rx.id, 'DISPENSED')}
+        onClick={() => onAdvance(rx.id, 'DISPENSED', rx.status)}
         disabled={isPending}
         className="btn btn-primary text-xs h-7 px-2.5 gap-1"
         aria-label={`Dispense prescription ${rx.ref_number}`}
@@ -172,13 +173,13 @@ export default function Queue() {
 
   // Status advance mutation
   const advance = useMutation({
-    mutationFn: async ({ id, next }: { id: string; next: PrescriptionStatus }) => {
+    mutationFn: async ({ id, next, prevStatus }: { id: string; next: PrescriptionStatus; prevStatus: PrescriptionStatus }) => {
+      const { data: { user } } = await supabase.auth.getUser()
       const patch: Partial<Prescription> & { updated_at: string } = {
         status:     next,
         updated_at: new Date().toISOString(),
       }
       if (next === 'DISPENSED') {
-        const { data: { user } } = await supabase.auth.getUser()
         patch.dispensed_at = new Date().toISOString()
         patch.dispensed_by = user?.id ?? null
       }
@@ -187,6 +188,16 @@ export default function Queue() {
         .update(patch)
         .eq('id', id)
       if (error) throw error
+      const action = next === 'DISPENSED' ? AUDIT_ACTIONS.RX_DISPENSE : AUDIT_ACTIONS.RX_STATUS_ADVANCE
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action,
+        table_name: 'prescriptions',
+        record_id:  id,
+        details:    { from: prevStatus, to: next },
+      })
+      if (auditError) console.error('audit_log write failed', auditError)
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['prescriptions'] })
@@ -386,7 +397,7 @@ export default function Queue() {
                       <td className="px-4 py-3 text-right">
                         <AdvanceButton
                           rx={rx}
-                          onAdvance={(id, next) => advance.mutate({ id, next })}
+                          onAdvance={(id, next, prevStatus) => advance.mutate({ id, next, prevStatus })}
                           isPending={advance.isPending}
                           isPharmacist={isPharmacist}
                         />

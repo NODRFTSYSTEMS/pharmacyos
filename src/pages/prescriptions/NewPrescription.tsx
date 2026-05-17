@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Shield, ArrowLeft } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 
 // ─── Form state type ───────────────────────────────────────────────────────────
 
@@ -86,10 +87,22 @@ export default function NewPrescription() {
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       }
-      const { error } = await supabase
+      const { data: rx, error } = await supabase
         .from('prescriptions')
         .insert([payload])
+        .select('id')
+        .single()
       if (error) throw error
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.RX_CREATE,
+        table_name: 'prescriptions',
+        record_id:  rx.id,
+        details:    { ref_number: payload.ref_number, drug_name: payload.drug_name, quantity: payload.quantity },
+      })
+      if (auditError) console.error('audit_log write failed', auditError)
     },
     onSuccess: () => {
       navigate('/prescriptions')

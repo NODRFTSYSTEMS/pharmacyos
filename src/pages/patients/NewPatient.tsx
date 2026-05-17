@@ -71,15 +71,25 @@ export function NewPatient() {
         .single()
       if (insertError) throw insertError
 
-      // I-13: Write JDPA consent audit trail
       const { data: { user } } = await supabase.auth.getUser()
-      await supabase.from('audit_log').insert({
-        action:      AUDIT_ACTIONS.PATIENT_JDPA_CONSENT,
-        entity_type: 'patient',
-        entity_id:   patient.id,
-        performed_by: user?.id ?? null,
-        metadata:    { consent_at: consentAt },
+      const { error: auditCreate } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.PATIENT_CREATE,
+        table_name: 'patients',
+        record_id:  patient.id,
+        details:    { first_name: values.first_name.trim(), last_name: values.last_name.trim() },
       })
+      if (auditCreate) console.error('audit_log write failed', auditCreate)
+      const { error: auditConsent } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.PATIENT_JDPA_CONSENT,
+        table_name: 'patients',
+        record_id:  patient.id,
+        details:    { consent_at: consentAt, source: 'patient_registration' },
+      })
+      if (auditConsent) console.error('audit_log write failed', auditConsent)
     },
     onSuccess: () => {
       void navigate('/patients')

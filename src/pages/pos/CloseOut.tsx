@@ -7,6 +7,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { todayJamaica, toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { EodCloseout, ShiftType } from '../../types/database'
 
 function fmtCurrency(n: number) {
@@ -133,6 +134,16 @@ export default function CloseOut() {
       }
       const { error } = await supabase.from('eod_closeouts').insert([payload])
       if (error) throw error
+      const auditAction = payload.status === 'DISCREPANCY' ? AUDIT_ACTIONS.EOD_DISCREPANCY : AUDIT_ACTIONS.EOD_SUBMIT
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     auditAction,
+        table_name: 'eod_closeouts',
+        record_id:  date,
+        details:    { shift, system_total: payload.system_total, cash_variance: payload.cash_variance, status: payload.status },
+      })
+      if (auditError) console.error('audit_log write failed', auditError)
     },
     onSuccess: () => {
       setSubmitted(true)

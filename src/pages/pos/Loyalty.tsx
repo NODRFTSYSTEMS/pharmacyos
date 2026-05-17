@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/react';
 import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell';
+import { AUDIT_ACTIONS } from '../../constants/audit-actions';
 
 interface LoyaltyCustomer {
   id: string;
@@ -96,6 +97,7 @@ function LoyaltyDrawer({ open, editTarget, onClose }: LoyaltyDrawerProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: DrawerFormState) => {
+      const { data: { user } } = await supabase.auth.getUser();
       const payload = {
         name: data.name.trim(),
         phone: data.phone.trim() || null,
@@ -109,11 +111,31 @@ function LoyaltyDrawer({ open, editTarget, onClose }: LoyaltyDrawerProps) {
           .update({ ...payload, updated_at: new Date().toISOString() })
           .eq('id', editTarget.id);
         if (error) throw error;
+        const { error: auditError } = await supabase.from('audit_log').insert({
+          actor_id:   user?.id ?? null,
+          actor_name: user?.email ?? 'System',
+          action:     AUDIT_ACTIONS.LOYALTY_CUSTOMER_UPDATE,
+          table_name: 'loyalty_customers',
+          record_id:  editTarget.id,
+          details:    { name: payload.name, tier: data.tier, is_active: data.is_active },
+        });
+        if (auditError) console.error('audit_log write failed', auditError);
       } else {
-        const { error } = await supabase
+        const { data: created, error } = await supabase
           .from('loyalty_customers')
-          .insert({ ...payload, points_balance: 0, joined_date: new Date().toISOString() });
+          .insert({ ...payload, points_balance: 0, joined_date: new Date().toISOString() })
+          .select('id')
+          .single();
         if (error) throw error;
+        const { error: auditError } = await supabase.from('audit_log').insert({
+          actor_id:   user?.id ?? null,
+          actor_name: user?.email ?? 'System',
+          action:     AUDIT_ACTIONS.LOYALTY_CUSTOMER_CREATE,
+          table_name: 'loyalty_customers',
+          record_id:  created.id,
+          details:    { name: payload.name, tier: data.tier },
+        });
+        if (auditError) console.error('audit_log write failed', auditError);
       }
     },
     onSuccess: () => {

@@ -182,6 +182,10 @@ function JdpaTab({ patient }: { patient: Patient }) {
   const [exportError, setExportError] = useState<string | null>(null)
 
   async function handleExport() {
+    if (!hasConsent) {
+      setExportError('Cannot export: JDPA consent has not been recorded for this patient.')
+      return
+    }
     setExporting(true)
     setExportError(null)
     try {
@@ -290,7 +294,7 @@ function JdpaTab({ patient }: { patient: Patient }) {
             type="button"
             className="btn btn-ghost gap-1.5 text-sm"
             onClick={handleExport}
-            disabled={exporting}
+            disabled={exporting || !hasConsent}
             aria-label="Export patient data as JSON"
           >
             {exporting
