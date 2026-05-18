@@ -46,7 +46,9 @@ function fmtRelativeTime(iso: string): string {
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 })
+  const ref       = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const nav = useNavigate()
   const qc  = useQueryClient()
 
@@ -58,6 +60,16 @@ export function NotificationBell() {
     if (open) document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [open])
+
+  function handleToggle() {
+    if (!open && buttonRef.current) {
+      // Calculate dropdown position from the button's viewport coords so the
+      // panel escapes the sidebar's overflow-y-auto clipping context.
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropPos({ top: rect.bottom + 4, left: Math.max(8, rect.left - 256) })
+    }
+    setOpen(o => !o)
+  }
 
   const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ['notifications'],
@@ -104,7 +116,8 @@ export function NotificationBell() {
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={buttonRef}
+        onClick={handleToggle}
         className="relative p-2 rounded text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
         aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
         aria-haspopup="true"
@@ -126,7 +139,8 @@ export function NotificationBell() {
 
       {open && (
         <div
-          className="absolute left-0 top-full mt-1 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+          style={{ position: 'fixed', top: dropPos.top, left: dropPos.left }}
+          className="w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
           role="menu"
           aria-label="Notifications"
         >
