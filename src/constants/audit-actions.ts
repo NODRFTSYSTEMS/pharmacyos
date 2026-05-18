@@ -64,6 +64,7 @@ export const AUDIT_ACTIONS = {
   STAFF_CREATE:             'staff_create',
   STAFF_UPDATE:             'staff_update',
   STAFF_DEACTIVATE:         'staff_deactivate',
+  STAFF_REMOVE:             'staff_remove',        // ADMIN-only permanent deletion
   STAFF_LOGIN:              'staff_login',
   STAFF_LOGOUT:             'staff_logout',
   STAFF_LOGIN_FAILED:       'staff_login_failed',
@@ -72,6 +73,8 @@ export const AUDIT_ACTIONS = {
 
   // ── Void Requests ────────────────────────────────────────────────────────────
   VOID_REQUEST:             'void_request',
+  VOID_OTP_ISSUED:          'void_otp_issued',     // manager approved + OTP generated
+  VOID_CONFIRMED:           'void_confirmed',       // cashier entered valid OTP, void executed
   VOID_APPROVED:            'void_approved',
   VOID_DENIED:              'void_denied',
 
@@ -85,6 +88,7 @@ export const AUDIT_ACTIONS = {
   // ── HR — Salaries ────────────────────────────────────────────────────────────
   SALARY_CREATE:            'salary_create',
   SALARY_UPDATE:            'salary_update',
+  SALARY_REPORT_EXPORT:     'salary_report_export',
 
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',

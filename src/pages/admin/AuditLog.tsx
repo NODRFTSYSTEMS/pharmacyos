@@ -99,6 +99,8 @@ const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
   [AUDIT_ACTIONS.TIMECARD_FLAG]:           'pill-yellow',
   // Void requests
   [AUDIT_ACTIONS.VOID_REQUEST]:            'pill-yellow',
+  [AUDIT_ACTIONS.VOID_OTP_ISSUED]:         'pill-yellow',
+  [AUDIT_ACTIONS.VOID_CONFIRMED]:          'pill-green',
   [AUDIT_ACTIONS.VOID_APPROVED]:           'pill-green',
   [AUDIT_ACTIONS.VOID_DENIED]:             'pill-red',
   // Staff / Auth
@@ -123,9 +125,99 @@ const ACTION_BADGE_MAP: Record<string, BadgeVariant> = {
   [AUDIT_ACTIONS.SYSTEM_ERROR]:            'pill-red',
 }
 
+// Human-readable label map — every action in the registry should have an entry.
+// Unknown actions fall through to a formatted version of the raw constant.
+const ACTION_LABEL_MAP: Partial<Record<string, string>> = {
+  // POS / Retail
+  [AUDIT_ACTIONS.TRANSACTION_CREATE]:       'Sale Completed',
+  [AUDIT_ACTIONS.TRANSACTION_VOID]:         'Transaction Voided',
+  [AUDIT_ACTIONS.LOYALTY_POINTS_EARN]:      'Loyalty Points Earned',
+  [AUDIT_ACTIONS.LOYALTY_POINTS_REDEEM]:    'Loyalty Points Redeemed',
+  [AUDIT_ACTIONS.LOYALTY_CUSTOMER_CREATE]:  'Loyalty Customer Added',
+  [AUDIT_ACTIONS.LOYALTY_CUSTOMER_UPDATE]:  'Loyalty Customer Updated',
+  // EOD
+  [AUDIT_ACTIONS.EOD_SUBMIT]:               'EOD Submitted',
+  [AUDIT_ACTIONS.EOD_APPROVE]:              'EOD Approved',
+  [AUDIT_ACTIONS.EOD_DISCREPANCY]:          'EOD Discrepancy Flagged',
+  // Void Requests
+  [AUDIT_ACTIONS.VOID_REQUEST]:             'Void Requested',
+  [AUDIT_ACTIONS.VOID_OTP_ISSUED]:          'Void OTP Issued',
+  [AUDIT_ACTIONS.VOID_CONFIRMED]:           'Void Confirmed',
+  [AUDIT_ACTIONS.VOID_APPROVED]:            'Void Approved',
+  [AUDIT_ACTIONS.VOID_DENIED]:              'Void Denied',
+  // Prescriptions / Schedule
+  [AUDIT_ACTIONS.RX_CREATE]:               'Prescription Created',
+  [AUDIT_ACTIONS.RX_STATUS_ADVANCE]:       'Rx Status Advanced',
+  [AUDIT_ACTIONS.RX_DISPENSE]:             'Prescription Dispensed',
+  [AUDIT_ACTIONS.RX_CANCEL]:              'Prescription Cancelled',
+  [AUDIT_ACTIONS.RX_TRANSACTION_CREATE]:   'Rx Transaction Created',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_ENTRY]:     'Schedule Drug Logged',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_UPDATE]:    'Schedule Drug Entry Updated',
+  [AUDIT_ACTIONS.SCHEDULE_DRUG_DELETE]:    'Schedule Drug Entry Deleted',
+  // Reports / Exports
+  [AUDIT_ACTIONS.DISPENSING_REPORT_EXPORT]:'Dispensing Report Exported',
+  [AUDIT_ACTIONS.NHF_REPORT_EXPORT]:       'NHF Report Exported',
+  [AUDIT_ACTIONS.SALARY_REPORT_EXPORT]:    'Salary Report Exported',
+  // Inventory / Stock
+  [AUDIT_ACTIONS.STOCK_DECREMENT]:         'Stock Decremented',
+  [AUDIT_ACTIONS.STOCK_RECEIVE]:           'Stock Received',
+  [AUDIT_ACTIONS.STOCK_ADJUST]:            'Stock Adjusted',
+  [AUDIT_ACTIONS.PRODUCT_CREATE]:          'Product Added',
+  [AUDIT_ACTIONS.PRODUCT_UPDATE]:          'Product Updated',
+  // Patients
+  [AUDIT_ACTIONS.PATIENT_CREATE]:          'Patient Record Created',
+  [AUDIT_ACTIONS.PATIENT_UPDATE]:          'Patient Record Updated',
+  [AUDIT_ACTIONS.PATIENT_JDPA_CONSENT]:    'Patient Consent Updated',
+  [AUDIT_ACTIONS.PATIENT_DATA_EXPORT]:     'Patient Data Exported',
+  [AUDIT_ACTIONS.PATIENT_DATA_DELETE]:     'Patient Data Deleted',
+  // AI Queue
+  [AUDIT_ACTIONS.AI_EXTRACTION_ACCEPT]:    'AI Extraction Accepted',
+  [AUDIT_ACTIONS.AI_EXTRACTION_REJECT]:    'AI Extraction Rejected',
+  [AUDIT_ACTIONS.AI_EXTRACTION_BLOCKED_NO_CONSENT]: 'AI Blocked — No Consent',
+  [AUDIT_ACTIONS.AI_EXTRACTION_DENIED_INSUFFICIENT_ROLE]: 'AI Denied — Insufficient Role',
+  [AUDIT_ACTIONS.AI_EXTRACTION_DENIED_TECHNICIAN_UNAUTHORIZED]: 'AI Denied — Technician',
+  // Timecards
+  [AUDIT_ACTIONS.TIMECARD_CLOCK_IN]:       'Clock In',
+  [AUDIT_ACTIONS.TIMECARD_CLOCK_OUT]:      'Clock Out',
+  [AUDIT_ACTIONS.TIMECARD_APPROVE]:        'Timecard Approved',
+  [AUDIT_ACTIONS.TIMECARD_FLAG]:           'Timecard Flagged',
+  // Staff / Auth
+  [AUDIT_ACTIONS.STAFF_CREATE]:            'Staff Account Created',
+  [AUDIT_ACTIONS.STAFF_UPDATE]:            'Staff Profile Updated',
+  [AUDIT_ACTIONS.STAFF_DEACTIVATE]:        'Staff Deactivated',
+  [AUDIT_ACTIONS.STAFF_REMOVE]:            'Staff Record Removed',
+  [AUDIT_ACTIONS.STAFF_LOGIN]:             'Login',
+  [AUDIT_ACTIONS.STAFF_LOGOUT]:            'Logout',
+  [AUDIT_ACTIONS.STAFF_LOGIN_FAILED]:      'Login Failed',
+  [AUDIT_ACTIONS.SESSION_TIMEOUT]:         'Session Timed Out',
+  [AUDIT_ACTIONS.ACCESS_DENIED]:           'Access Denied',
+  // HR — Leave & Certs
+  [AUDIT_ACTIONS.LEAVE_REQUEST_SUBMIT]:    'Leave Request Submitted',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_APPROVE]:   'Leave Approved',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_DENY]:      'Leave Denied',
+  [AUDIT_ACTIONS.LEAVE_REQUEST_CANCEL]:    'Leave Request Cancelled',
+  [AUDIT_ACTIONS.CERT_CREATE]:             'Certification Added',
+  [AUDIT_ACTIONS.CERT_UPDATE]:             'Certification Updated',
+  // Salaries
+  [AUDIT_ACTIONS.SALARY_CREATE]:           'Salary Record Created',
+  [AUDIT_ACTIONS.SALARY_UPDATE]:           'Salary Record Updated',
+  // Settings
+  [AUDIT_ACTIONS.SETTINGS_UPDATE]:         'Settings Updated',
+  [AUDIT_ACTIONS.PERMISSIONS_UPDATE]:      'Permissions Updated',
+  [AUDIT_ACTIONS.SYSTEM_ERROR]:            'System Error',
+}
+
+// Converts raw constant (e.g. "transaction_create") to "Transaction Create" fallback
+function humanizeFallback(action: string): string {
+  return action
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function getActionBadge(action: string): ActionBadge {
   const variant = ACTION_BADGE_MAP[action] ?? 'pill-gray'
-  return { label: action, cls: `pill ${variant}` }
+  const label   = ACTION_LABEL_MAP[action] ?? humanizeFallback(action)
+  return { label, cls: `pill ${variant}` }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────

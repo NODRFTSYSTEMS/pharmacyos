@@ -103,15 +103,16 @@ function LeaveDrawer({ open, onClose }: { open: boolean; onClose: () => void }) 
       const { data: inserted, error } = await supabase
         .from('staff_leaves')
         .insert({
-          staff_id:       currentUser?.id ?? user?.id,
-          staff_name:     currentUser?.name ?? user?.email ?? 'Unknown',
-          staff_role:     currentUser?.role ?? 'UNKNOWN',
-          leave_type:     form.leave_type,
-          start_date:     form.start_date,
-          end_date:       form.end_date,
-          days_requested: daysRequested,
-          reason:         form.reason.trim() || null,
-          status:         'PENDING',
+          staff_id:   currentUser?.id ?? user?.id,
+          staff_name: currentUser?.name ?? user?.email ?? 'Unknown',
+          staff_role: currentUser?.role ?? 'UNKNOWN',
+          leave_type: form.leave_type,
+          start_date: form.start_date,
+          end_date:   form.end_date,
+          // days_requested is GENERATED ALWAYS AS (end_date - start_date + 1) STORED
+          // in migration 032 — must NOT be included in INSERT; DB computes it automatically.
+          reason:     form.reason.trim() || null,
+          status:     'PENDING',
         })
         .select('id')
         .single()

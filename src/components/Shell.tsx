@@ -4,8 +4,9 @@ import { Link, useLocation } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, UsersThree, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight, LockSimple,
-  Warehouse,
+  Warehouse, Sun, Moon, Monitor,
 } from '@phosphor-icons/react'
+import { useThemeMode } from '../hooks/useThemeMode'
 import { supabase } from '../lib/supabase'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useAnyPermission, usePermission } from '../hooks/usePermission'
@@ -52,16 +53,18 @@ const NAV: NavItem[] = [
   ]},
   { label: 'Staff',       icon: UsersThree, children: [
     { label: 'My Timecard',      href: '/staff/timecard' },
+    { label: 'My Hours',         href: '/staff/my-timecards' },
     { label: 'Manage Timecards', href: '/staff/timecards' },
     { label: 'Leave Requests',   href: '/hr/leave' },
     { label: 'Certifications',   href: '/hr/certifications' },
     { label: 'HR Manager',       href: '/hr/manager' },
   ]},
   { label: 'Reports',     icon: ChartBar, children: [
-    { label: 'Revenue',       href: '/reports/revenue' },
-    { label: 'Dispensing',    href: '/reports/dispensing' },
-    { label: 'Inventory',     href: '/reports/inventory' },
-    { label: 'Timecards',     href: '/reports/timecards' },
+    { label: 'Revenue',        href: '/reports/revenue' },
+    { label: 'Dispensing',     href: '/reports/dispensing' },
+    { label: 'Inventory',      href: '/reports/inventory' },
+    { label: 'Timecards',      href: '/reports/timecards' },
+    { label: 'Salary Report',  href: '/reports/salary' },
   ]},
   { label: 'AI Queue', href: '/ai/queue', icon: Robot },
   { label: 'Admin',       icon: Gear, children: [
@@ -112,6 +115,7 @@ function useFilteredNav(): NavItem[] {
             if (c.label === 'Manage Timecards') return canManageTimecards
             if (c.label === 'Certifications')   return canManageStaff
             if (c.label === 'HR Manager')       return canManageStaff
+            // My Timecard, My Hours, Leave Requests: all authenticated staff
             return true
           }),
         }
@@ -191,6 +195,7 @@ export function Sidebar() {
   const { data: user } = useCurrentUser()
   const pharmacyName   = usePharmacyName()
   const queryClient    = useQueryClient()
+  const { theme, setTheme } = useThemeMode()
 
   // I-20: display name fallback — never show raw email as a person's name
   const displayName = user?.name && user.name !== 'Unknown User'
@@ -238,6 +243,36 @@ export function Sidebar() {
           )
         )}
       </nav>
+
+      {/* Theme toggle: Light / System / Dark — 3-state segmented control */}
+      <div className="px-3 pb-2 pt-2 border-t border-white/10">
+        <div className="flex rounded-md overflow-hidden border border-white/15" role="group" aria-label="Display theme">
+          {(
+            [
+              { mode: 'light',  Icon: Sun,     label: 'Light'  },
+              { mode: 'system', Icon: Monitor,  label: 'System' },
+              { mode: 'dark',   Icon: Moon,     label: 'Dark'   },
+            ] as const
+          ).map(({ mode, Icon, label }) => (
+            <button
+              key={mode}
+              type="button"
+              aria-pressed={theme === mode}
+              aria-label={`${label} mode`}
+              title={`${label} mode`}
+              onClick={() => setTheme(mode)}
+              className={`flex-1 flex items-center justify-center py-1.5 text-xs transition-colors ${
+                theme === mode
+                  ? 'bg-white/20 text-white'
+                  : 'text-gray-400 hover:bg-white/8 hover:text-gray-200'
+              }`}
+            >
+              <Icon size={13} aria-hidden="true" />
+              <span className="ml-1 hidden sm:inline">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* User identity + sign out */}
       <div className="px-3 py-3 border-t border-white/10 space-y-1">

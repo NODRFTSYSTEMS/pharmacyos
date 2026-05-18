@@ -9,7 +9,10 @@ import {
   FloppyDisk,
   CheckCircle,
   Envelope,
+  Trash,
+  Warning,
 } from '@phosphor-icons/react';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { supabase } from '../../lib/supabase';
 import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell';
 import { StaffAvatar } from '../../components/StaffAvatar';
@@ -132,10 +135,12 @@ interface SalaryRecord {
 
 function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
   const queryClient = useQueryClient();
+  const { data: currentUser } = useCurrentUser();
   const [form, setForm] = useState<DrawerFormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<DrawerErrors>({});
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   // Salary quick-view — queries active salary record for this staff member.
   // RLS restricts to ADMIN/MANAGER only; query returns empty for other roles.
@@ -176,6 +181,7 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
       setErrors({});
       setResetSent(false);
       setResetError(null);
+      setConfirmRemove(false);
     }
   }, [open, editTarget]);
 
@@ -253,6 +259,34 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
     },
     onError: (err: Error) => {
       setResetError(err.message ?? 'Failed to send reset email.');
+    },
+  });
+
+  // ADMIN-only: permanently remove the staff_profiles record.
+  // Note: this removes the profile record only — the Supabase auth.users entry
+  // remains (requires Supabase dashboard or service-role API to delete auth user).
+  const removeMutation = useMutation({
+    mutationFn: async () => {
+      if (!editTarget) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('staff_profiles')
+        .delete()
+        .eq('id', editTarget.id);
+      if (error) throw error;
+      const { error: auditError } = await supabase.from('audit_log').insert({
+        actor_id:   user?.id ?? null,
+        actor_name: user?.email ?? 'System',
+        action:     AUDIT_ACTIONS.STAFF_REMOVE,
+        table_name: 'staff_profiles',
+        record_id:  editTarget.id,
+        details:    { removed_email: editTarget.email, removed_role: editTarget.role },
+      });
+      if (auditError) console.error('audit_log write failed', auditError);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff_profiles'] });
+      onClose();
     },
   });
 
@@ -490,6 +524,63 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
               )}
               {resetError && (
                 <p className="text-xs text-red-600" role="alert">{resetError}</p>
+              )}
+            </div>
+          )}
+
+          {/* ADMIN-only: Remove Employee — only appears when editing another user */}
+          {editTarget && currentUser?.role === 'ADMIN' && editTarget.id !== currentUser?.id && (
+            <div className="rounded border border-red-200 bg-red-50 p-4 space-y-2">
+              <p className="text-xs font-semibold text-red-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Warning size={13} aria-hidden="true" />
+                Danger Zone
+              </p>
+              {!confirmRemove ? (
+                <>
+                  <p className="text-xs text-red-700">
+                    Permanently removes this staff profile from PharmacyOS. This action cannot be undone
+                    and is recorded in the audit log.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRemove(true)}
+                    className="btn btn-ghost text-xs border border-red-300 text-red-600 hover:bg-red-100 flex items-center gap-1.5"
+                  >
+                    <Trash size={13} aria-hidden="true" />
+                    Remove Employee
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold text-red-800">
+                    Remove <strong>{editTarget.full_name}</strong> permanently?
+                    This cannot be undone.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setConfirmRemove(false)}
+                      className="btn btn-ghost text-xs"
+                      disabled={removeMutation.isPending}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeMutation.mutate()}
+                      disabled={removeMutation.isPending}
+                      className="btn text-xs bg-red-600 text-white hover:bg-red-700 border-red-600 flex items-center gap-1.5"
+                    >
+                      <Trash size={13} aria-hidden="true" />
+                      {removeMutation.isPending ? 'Removing…' : 'Confirm Removal'}
+                    </button>
+                  </div>
+                  {removeMutation.isError && (
+                    <p className="text-xs text-red-600" role="alert">
+                      Failed to remove. Ensure this staff member has no active records.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )}

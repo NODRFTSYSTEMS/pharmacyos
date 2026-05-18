@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   MagnifyingGlass, ArrowClockwise, Export, Receipt,
   Pill, Warning, CheckCircle, X, ArrowBendUpLeft, Check,
+  Key, LockKey,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds, todayJamaica } from '../../lib/date'
@@ -154,9 +155,10 @@ interface VoidDecisionModalProps {
   onApprove: () => void
   onDeny: (note: string) => void
   isPending: boolean
+  issuedOtp: string | null   // set after OTP is generated — shows on manager's screen
 }
 
-function VoidDecisionModal({ tx, onClose, onApprove, onDeny, isPending }: VoidDecisionModalProps) {
+function VoidDecisionModal({ tx, onClose, onApprove, onDeny, isPending, issuedOtp }: VoidDecisionModalProps) {
   const [denying,  setDenying]  = useState(false)
   const [denyNote, setDenyNote] = useState('')
 
@@ -200,10 +202,30 @@ function VoidDecisionModal({ tx, onClose, onApprove, onDeny, isPending }: VoidDe
           </div>
         </div>
 
-        {!denying ? (
+        {/* OTP issued — show prominently to manager; they give this code to the cashier */}
+        {issuedOtp ? (
+          <div className="rounded-lg border-2 border-emerald-400 bg-emerald-50 p-5 text-center space-y-3">
+            <div className="flex items-center justify-center gap-2 text-emerald-700 font-semibold text-sm">
+              <LockKey size={18} aria-hidden="true" />
+              Void Authorization Code
+            </div>
+            <p className="font-mono text-5xl font-bold tracking-[0.25em] text-emerald-800 select-all">
+              {issuedOtp}
+            </p>
+            <p className="text-xs text-emerald-700">
+              Give this code to the cashier verbally or on paper.
+              They must enter it on their terminal to complete the void.
+              Code expires in <strong>15 minutes</strong>.
+            </p>
+            <button onClick={onClose} className="btn btn-ghost text-xs mt-1">
+              Done — close
+            </button>
+          </div>
+        ) : !denying ? (
           <>
             <p className="text-xs text-gray-500">
-              Approving will void this transaction and automatically restore inventory stock. Both actions are recorded in the audit log.
+              Approving generates a one-time authorization code that you will give to the cashier.
+              The void executes only when the cashier enters that code. Both actions are recorded in the audit log.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDenying(true)} disabled={isPending} className="btn btn-ghost flex-1">
@@ -211,8 +233,8 @@ function VoidDecisionModal({ tx, onClose, onApprove, onDeny, isPending }: VoidDe
               </button>
               <button onClick={onApprove} disabled={isPending} className="btn btn-primary flex-1 gap-2">
                 {isPending
-                  ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />Approving…</>
-                  : <><Check size={14} weight="bold" aria-hidden="true" />Approve Void</>
+                  ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />Generating code…</>
+                  : <><Key size={14} weight="bold" aria-hidden="true" />Approve &amp; Generate Code</>
                 }
               </button>
             </div>
@@ -244,6 +266,83 @@ function VoidDecisionModal({ tx, onClose, onApprove, onDeny, isPending }: VoidDe
             </div>
           </>
         )}
+      </div>
+    </div>
+  )
+}
+
+// ── Void OTP Confirm Modal (cashier) ──────────────────────────────────────────
+
+interface VoidOtpConfirmModalProps {
+  tx: RetailTransaction
+  onClose: () => void
+  onConfirm: (otp: string) => void
+  isPending: boolean
+}
+
+function VoidOtpConfirmModal({ tx, onClose, onConfirm, isPending }: VoidOtpConfirmModalProps) {
+  const [otp, setOtp] = useState('')
+  const invalid = otp.trim().length !== 6 || !/^\d{6}$/.test(otp.trim())
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="vc-title">
+      <div className="card w-full max-w-sm p-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <h2 id="vc-title" className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+            <LockKey size={16} className="text-amber-600" aria-hidden="true" />
+            Enter Authorization Code
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="bg-gray-50 rounded-lg p-3 space-y-1 text-xs border border-gray-200">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Transaction</span>
+            <span className="font-mono font-medium">{tx.ref_number}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Amount</span>
+            <span className="font-semibold">{fmtCurrency(tx.total)}</span>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="vc-otp" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            6-Digit Code from Manager
+          </label>
+          <input
+            id="vc-otp"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            value={otp}
+            onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="input w-full text-center font-mono text-3xl tracking-[0.4em] py-3"
+            placeholder="——————"
+            autoFocus
+            aria-describedby="vc-hint"
+          />
+          <p id="vc-hint" className="mt-1.5 text-xs text-gray-400 text-center">
+            Enter the code your manager gave you. Code expires 15 minutes from issuance.
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+          <button onClick={onClose} className="btn btn-ghost flex-1" disabled={isPending}>Cancel</button>
+          <button
+            onClick={() => onConfirm(otp.trim())}
+            disabled={invalid || isPending}
+            className="btn btn-primary flex-1 gap-2"
+          >
+            {isPending
+              ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />Processing…</>
+              : <><Check size={14} weight="bold" aria-hidden="true" />Confirm Void</>
+            }
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -299,6 +398,8 @@ export default function TransactionLog() {
   const [filter,         setFilter]         = useState<FilterTab>('ALL')
   const [voidTarget,     setVoidTarget]     = useState<RetailTransaction | null>(null)
   const [decisionTarget, setDecisionTarget] = useState<RetailTransaction | null>(null)
+  const [otpTarget,      setOtpTarget]      = useState<RetailTransaction | null>(null)
+  const [issuedOtp,      setIssuedOtp]      = useState<string | null>(null)
   const [actionError,    setActionError]    = useState<string | null>(null)
 
   const { retail, rx } = useTodayTransactions(date)
@@ -355,14 +456,32 @@ export default function TransactionLog() {
     onError: (err: Error) => setActionError(err.message),
   })
 
+  // Manager approves: issues OTP. Void executes only after cashier enters the OTP.
   const approveVoid = useMutation({
     mutationFn: async (txId: string) => {
-      const { error } = await supabase.rpc('approve_void_transaction', { p_tx_id: txId })
+      const { data: otp, error } = await supabase.rpc('issue_void_otp', { p_tx_id: txId })
+      if (error) throw error
+      return otp as string
+    },
+    onSuccess: (otp: string) => {
+      // Keep modal open — show OTP to manager. Cashier will enter it separately.
+      setIssuedOtp(otp)
+      setActionError(null)
+      // Refresh transaction list so cashier's view updates to "OTP Issued"
+      qc.invalidateQueries({ queryKey: ['retail-txns', date] })
+    },
+    onError: (err: Error) => setActionError(err.message),
+  })
+
+  // Cashier confirms void by entering the OTP received from manager
+  const confirmVoid = useMutation({
+    mutationFn: async ({ txId, otp }: { txId: string; otp: string }) => {
+      const { error } = await supabase.rpc('confirm_void_with_otp', { p_tx_id: txId, p_otp: otp })
       if (error) throw error
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['retail-txns', date] })
-      setDecisionTarget(null)
+      setOtpTarget(null)
       setActionError(null)
     },
     onError: (err: Error) => setActionError(err.message),
@@ -384,7 +503,7 @@ export default function TransactionLog() {
     onError: (err: Error) => setActionError(err.message),
   })
 
-  const anyPending = requestVoid.isPending || approveVoid.isPending || denyVoid.isPending
+  const anyPending = requestVoid.isPending || approveVoid.isPending || denyVoid.isPending || confirmVoid.isPending
 
   // ── Export ───────────────────────────────────────────────────────────────────
 
@@ -594,11 +713,19 @@ export default function TransactionLog() {
                       <td className="px-4 py-2.5">
                         {t.voided ? (
                           <StatusPill label="Voided" variant="red" />
-                        ) : isPending ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">
-                            Void Pending
-                          </span>
-                        ) : isDenied ? (
+                        ) : isPending ? (() => {
+                          const rtExt = rt as (RetailTransaction & { void_otp?: string | null }) | null
+                          return rtExt?.void_otp ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                              <LockKey size={9} aria-hidden="true" />
+                              Code Issued
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                              Void Pending
+                            </span>
+                          )
+                        })() : isDenied ? (
                           <StatusPill label="Void Denied" variant="gray" />
                         ) : (
                           <StatusPill label="Complete" variant="green" />
@@ -607,14 +734,32 @@ export default function TransactionLog() {
                       {/* Actions */}
                       <td className="px-4 py-2.5">
                         {rt && !rt.voided && (() => {
+                          // Check if OTP has been issued (new columns from migration 041)
+                          const rtExt = rt as RetailTransaction & { void_otp?: string | null }
+                          const hasOtp = !!(rtExt.void_otp)
+
                           if (isPending) {
+                            // OTP issued — cashier can now enter the code
+                            if (hasOtp && !canVoid) {
+                              return (
+                                <button
+                                  onClick={() => { setActionError(null); setOtpTarget(rt) }}
+                                  disabled={anyPending}
+                                  className="btn btn-ghost text-xs h-7 px-2.5 text-emerald-700 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 gap-1"
+                                >
+                                  <LockKey size={11} aria-hidden="true" />
+                                  Enter Code
+                                </button>
+                              )
+                            }
+                            // Manager review button
                             return canVoid ? (
                               <button
-                                onClick={() => { setActionError(null); setDecisionTarget(rt) }}
+                                onClick={() => { setActionError(null); setIssuedOtp(null); setDecisionTarget(rt) }}
                                 disabled={anyPending}
                                 className="btn btn-ghost text-xs h-7 px-2.5 text-amber-700 border-amber-200 bg-amber-50 hover:bg-amber-100"
                               >
-                                Review
+                                {hasOtp ? 'View Code' : 'Review'}
                               </button>
                             ) : (
                               <span className="text-xs text-amber-600 font-medium">Awaiting manager</span>
@@ -666,10 +811,19 @@ export default function TransactionLog() {
       {decisionTarget && (
         <VoidDecisionModal
           tx={decisionTarget}
-          onClose={() => { setDecisionTarget(null); setActionError(null) }}
+          onClose={() => { setDecisionTarget(null); setIssuedOtp(null); setActionError(null) }}
           onApprove={() => approveVoid.mutate(decisionTarget.id)}
           onDeny={note => denyVoid.mutate({ txId: decisionTarget.id, note })}
           isPending={approveVoid.isPending || denyVoid.isPending}
+          issuedOtp={issuedOtp}
+        />
+      )}
+      {otpTarget && (
+        <VoidOtpConfirmModal
+          tx={otpTarget}
+          onClose={() => { setOtpTarget(null); setActionError(null) }}
+          onConfirm={otp => confirmVoid.mutate({ txId: otpTarget.id, otp })}
+          isPending={confirmVoid.isPending}
         />
       )}
     </div>

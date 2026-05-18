@@ -180,8 +180,8 @@ function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => voi
             </button>
           </div>
 
-          {/* Receipt body */}
-          <div className="px-5 py-4 font-mono text-sm space-y-3">
+          {/* Receipt body — pos-receipt-print class used by @media print to isolate this element */}
+          <div className="pos-receipt-print px-5 py-4 font-mono text-sm space-y-3">
             {/* Pharmacy + ref */}
             <div className="text-center border-b border-dashed border-gray-300 pb-3">
               <p className="font-bold text-base text-gray-900 not-italic">Winchester Global Pharmacy</p>
@@ -273,11 +273,20 @@ function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => voi
         </div>
       </div>
 
-      {/* Print-only styles: hide everything except receipt */}
+      {/* Print-only styles: visibility approach avoids display:none on React root.
+          body { visibility: hidden } hides all content; .pos-receipt-print and its
+          children override to visible so only the receipt body prints. */}
       <style>{`
         @media print {
-          body > * { display: none !important; }
-          .pos-receipt-print { display: block !important; }
+          body { visibility: hidden !important; }
+          .pos-receipt-print,
+          .pos-receipt-print * { visibility: visible !important; }
+          .pos-receipt-print {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+          }
         }
       `}</style>
     </>

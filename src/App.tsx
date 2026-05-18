@@ -63,6 +63,7 @@ import RevenueReport        from './pages/reports/RevenueReport'
 import DispensingReport     from './pages/reports/DispensingReport'
 import InventoryReport      from './pages/reports/InventoryReport'
 import TimecardReport       from './pages/reports/TimecardReport'
+import SalaryReport         from './pages/reports/SalaryReport'
 
 // Admin
 import { UsersAdmin }       from './pages/admin/Users'
@@ -203,6 +204,9 @@ export default function App() {
                 } />
                 <Route path="/reports/timecards" element={
                   <RoleGuard permission="reports_view"><TimecardReport /></RoleGuard>
+                } />
+                <Route path="/reports/salary" element={
+                  <RoleGuard permission="reports_view"><SalaryReport /></RoleGuard>
                 } />
 
                 {/* Admin */}
