@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Navigate } from 'react-router'
 import { supabase } from '../lib/supabase'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 
 // ── Session timeout configuration (I-12) ─────────────────────────────────────
 // Idle sessions are signed out after IDLE_TIMEOUT_MS of no user activity.
@@ -34,13 +35,17 @@ function getAalWithTimeout(): Promise<AalResult> {
 }
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<'loading' | 'authed' | 'mfa-required' | 'unauthed'>('loading')
+  const [state, setState] = useState<'loading' | 'authed' | 'mfa-required' | 'unauthed' | 'pharmacy-closed'>('loading')
   const [showWarning,  setShowWarning]  = useState(false)
   const [idleExpired,  setIdleExpired]  = useState(false)
   const [secondsLeft,  setSecondsLeft]  = useState<number | null>(null)
   const idleTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
   const warnTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Check pharmacy hours and user role for after-hours access gating (staff access control)
+  const { data: user } = useCurrentUser()
+  const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER'
 
   const signOutIdle = useCallback(async () => {
     setShowWarning(false)
@@ -137,6 +142,36 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // ── Pharmacy hours gate (staff access control) ──────────────────────────────
+  // Check if pharmacy is closed and redirect non-ADMIN/MANAGER users
+  useEffect(() => {
+    if (state !== 'authed' || !user) return
+
+    async function checkPharmacyHours() {
+      try {
+        const { data } = await supabase
+          .from('pharmacy_settings')
+          .select('value')
+          .eq('key', 'pharmacy_operating_hours')
+          .maybeSingle()
+
+        const hours = data?.value
+          ? (typeof data.value === 'string' ? JSON.parse(data.value) : data.value)
+          : { is_currently_open: true }
+
+        // If pharmacy is closed and user is NOT admin/manager, redirect to closed page
+        if (!hours.is_currently_open && !isAdminOrManager) {
+          setState('pharmacy-closed')
+        }
+      } catch (err) {
+        // If we can't check hours, allow access (fail open)
+        console.warn('[ProtectedRoute] Pharmacy hours check failed:', err)
+      }
+    }
+
+    checkPharmacyHours()
+  }, [state, user, isAdminOrManager])
+
   useEffect(() => {
     // ── Idle timer — only active when authenticated ─────────────────────────
     if (state !== 'authed') return
@@ -177,6 +212,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   // I-09: User has a session but MFA is required — redirect to verify page
   if (state === 'mfa-required') {
     return <Navigate to="/verify-mfa" replace />
+  }
+
+  // Pharmacy hours gate — non-admin/manager users redirected when closed
+  if (state === 'pharmacy-closed') {
+    return <Navigate to="/pharmacy-closed" replace />
   }
 
   return (

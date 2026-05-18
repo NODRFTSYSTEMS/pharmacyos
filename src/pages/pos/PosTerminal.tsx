@@ -10,7 +10,9 @@ import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { useActiveTimecard } from '../../hooks/useActiveTimecard'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useNavigate } from 'react-router'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -352,6 +354,7 @@ function CartRow({ item, onIncrement, onDecrement, onRemove, onSetQty }: CartRow
 export default function PosTerminal() {
   usePageTitle('POS Terminal')
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const searchRef = useRef<HTMLInputElement>(null)
 
   // Load persisted preferences once on mount
@@ -377,6 +380,12 @@ export default function PosTerminal() {
   // separately. useCurrentUser is already resolved from the app shell context.
 
   const { data: currentUser } = useCurrentUser()
+
+  // ── Clock-in requirement check ─────────────────────────────────────────────
+  // ADMIN role bypasses this check; all other staff must be clocked in to access POS
+  const { data: activeTimecard, isLoading: timecardLoading } = useActiveTimecard(
+    currentUser?.role !== 'ADMIN' ? currentUser?.id : undefined
+  )
 
   // ── GCT rate from pharmacy_settings ─────────────────────────────────────
 
@@ -556,78 +565,43 @@ export default function PosTerminal() {
 
       const loyaltyEarned = loyaltyCustomer ? Math.floor(total * loyaltyRate) : 0
 
-      // Insert transaction header
-      const { data: txn, error: e1 } = await supabase
-        .from('retail_transactions')
-        .insert({
-          ref_number:              refNumber,
-          transaction_type:        'RETAIL',
-          payment_method:          payMethod,
-          cashier_id:              currentUser?.id ?? null,
-          subtotal,
-          tax,
-          discount:                0,
-          total,
-          cash_tendered:           payMethod === 'CASH' ? cashTendered : null,
-          change_given:            payMethod === 'CASH' ? Math.max(0, changeDue) : null,
-          loyalty_customer_id:     loyaltyCustomer?.id ?? null,
-          loyalty_points_earned:   loyaltyEarned,
-          loyalty_points_redeemed: 0,
-          voided:                  false,
-        })
-        .select('id')
-        .single()
+      // Build JSONB cart items matching the process_retail_sale RPC schema.
+      // is_custom items pass null product_id and skip stock decrement inside the RPC.
+      const cartItems = cart.map(i => ({
+        product_id:   i.is_custom ? null : i.product_id,
+        product_name: i.product_name,
+        barcode:      i.barcode ?? null,
+        quantity:     i.qty,
+        unit_price:   i.unit_price,
+        line_total:   r2(i.unit_price * i.qty),
+        is_custom:    !!i.is_custom,
+      }))
 
-      if (e1 || !txn) throw e1 ?? new Error('Transaction insert returned no data')
+      // Single atomic RPC — wraps header INSERT + line items INSERT + stock decrement
+      // + stock_movements INSERT + audit_log INSERT in one Postgres transaction.
+      // If any step fails, the entire transaction rolls back — no split-brain state.
+      const { data: rpcResult, error: rpcError } = await supabase.rpc('process_retail_sale', {
+        p_ref_number:            refNumber,
+        p_cashier_id:            currentUser?.id ?? null,
+        p_cashier_name:          currentUser?.name ?? null,
+        p_payment_method:        payMethod,
+        p_subtotal:              subtotal,
+        p_tax:                   tax,
+        p_total:                 total,
+        p_cash_tendered:         payMethod === 'CASH' ? cashTendered : null,
+        p_change_given:          payMethod === 'CASH' ? Math.max(0, changeDue) : null,
+        p_loyalty_customer_id:   loyaltyCustomer?.id ?? null,
+        p_loyalty_points_earned: loyaltyEarned,
+        p_cart_items:            cartItems,
+      })
 
-      // Insert line items — custom items send null product_id (no FK)
-      const { error: e2 } = await supabase
-        .from('retail_transaction_items')
-        .insert(
-          cart.map(i => ({
-            transaction_id: txn.id,
-            product_id:     i.is_custom ? null : i.product_id,
-            product_name:   i.product_name,
-            barcode:        i.barcode,
-            quantity:       i.qty,
-            unit_price:     i.unit_price,
-            line_total:     r2(i.unit_price * i.qty),
-          }))
-        )
+      if (rpcError) throw new Error(rpcError.message)
 
-      if (e2) throw e2
+      const result = rpcResult as { transaction_id: string; ref_number: string; stock_failures: string[] }
+      const stockFailures = result.stock_failures ?? []
 
-      // Decrement stock — only for real catalog products, not custom items
-      const stockFailures: string[] = []
-      for (const item of cart.filter(i => !i.is_custom)) {
-        const { error: e3 } = await supabase.rpc('decrement_product_stock', {
-          p_product_id:     item.product_id,
-          p_qty:            item.qty,
-          p_actor_id:       currentUser?.id ?? null,
-          p_actor_name:     currentUser?.name ?? null,
-          p_reference_id:   txn.id,
-          p_reference_type: 'SALE',
-        })
-        if (e3) stockFailures.push(item.product_name)
-      }
-
-      try {
-        await supabase.from('audit_log').insert({
-          actor_id:   currentUser?.id ?? null,
-          actor_name: currentUser?.name ?? null,
-          action:     AUDIT_ACTIONS.TRANSACTION_CREATE,
-          table_name: 'retail_transactions',
-          record_id:  txn.id,
-          details: {
-            ref_number:     refNumber,
-            total,
-            payment_method: payMethod,
-            item_count:     cart.length,
-          },
-        })
-      } catch { /* best-effort — sale already committed */ }
-
-      // Credit loyalty points if a customer is attached
+      // Credit loyalty points — post-sale, separate from the atomic RPC.
+      // A loyalty update failure does not roll back the completed transaction.
       if (loyaltyCustomer && loyaltyEarned > 0) {
         const { error: pointsError } = await supabase
           .from('loyalty_customers')
@@ -644,12 +618,12 @@ export default function PosTerminal() {
           action:     AUDIT_ACTIONS.LOYALTY_POINTS_EARN,
           table_name: 'loyalty_customers',
           record_id:  loyaltyCustomer.id,
-          details:    { points_earned: loyaltyEarned, transaction_id: txn.id, customer_name: loyaltyCustomer.name },
+          details:    { points_earned: loyaltyEarned, transaction_id: result.transaction_id, customer_name: loyaltyCustomer.name },
         })
         if (loyaltyAuditError) console.error('audit_log write failed', loyaltyAuditError)
       }
 
-      return { txnId: txn.id, refNumber, stockFailures, loyaltyEarned }
+      return { txnId: result.transaction_id, refNumber, stockFailures, loyaltyEarned }
     },
     onSuccess: ({ stockFailures, loyaltyEarned, refNumber }) => {
       // Capture receipt snapshot BEFORE clearing cart state
@@ -691,6 +665,56 @@ export default function PosTerminal() {
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
+
+  // Show clock-in modal if not ADMIN and not clocked in
+  const isAdmin = currentUser?.role === 'ADMIN'
+  const clockedIn = !!activeTimecard
+  const shouldShowClockInModal = !isAdmin && !clockedIn && !timecardLoading
+
+  if (shouldShowClockInModal) {
+    return (
+      <div
+        className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+        role="presentation"
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="clockin-modal-title"
+          className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6"
+        >
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+              <Clock size={32} weight="duotone" className="text-amber-600" aria-hidden="true" />
+            </div>
+            <h2 id="clockin-modal-title" className="text-lg font-bold text-gray-900 mb-2">
+              Clock In Required
+            </h2>
+            <p className="text-sm text-gray-600">
+              You must be clocked in to access the POS terminal. Clock in first and then return.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/staff/timecard')}
+              className="btn btn-primary w-full"
+            >
+              Clock In Now
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="btn btn-ghost w-full"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>

@@ -12,8 +12,10 @@ import ForgotPassword       from './pages/auth/ForgotPassword'
 import ResetPassword        from './pages/auth/ResetPassword'
 
 // Error pages
-import { Forbidden }        from './pages/errors/Forbidden'
-import { NotFound }         from './pages/errors/NotFound'
+import { Forbidden }             from './pages/errors/Forbidden'
+import { NotFound }              from './pages/errors/NotFound'
+import { PharmacyClosed }        from './pages/errors/PharmacyClosed'
+import { InternalServerError }   from './pages/errors/InternalServerError'
 
 // Dashboard
 import { Dashboard }        from './pages/Dashboard'
@@ -82,6 +84,8 @@ export default function App() {
 
       {/* Error pages — accessible without AppShell */}
       <Route path="/403" element={<Forbidden />} />
+      <Route path="/500" element={<InternalServerError />} />
+      <Route path="/pharmacy-closed" element={<PharmacyClosed />} />
 
       {/* Protected — all routes inside AppShell */}
       <Route

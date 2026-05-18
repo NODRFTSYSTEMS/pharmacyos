@@ -7,6 +7,8 @@ import {
 import { supabase } from '../../lib/supabase'
 import { formatPatientName } from '../../lib/formatting'
 import { PageHeader, Pill as StatusPill, MetricCard } from '../../components/Shell'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { Patient } from '../../types/database'
 
 // ── Edit Patient Drawer ───────────────────────────────────────────────────────
@@ -29,6 +31,7 @@ interface EditFormState {
 
 function EditPatientDrawer({ patient, onClose }: EditDrawerProps) {
   const qc = useQueryClient()
+  const { data: currentUser } = useCurrentUser()
   const [form, setForm] = useState<EditFormState>({
     first_name:    patient.first_name,
     last_name:     patient.last_name,
@@ -57,6 +60,33 @@ function EditPatientDrawer({ patient, onClose }: EditDrawerProps) {
         })
         .eq('id', patient.id)
       if (error) throw error
+
+      // ── Audit logging for patient update (JDPA 2020) ──
+      await supabase
+        .from('audit_log')
+        .insert({
+          actor_id: currentUser?.id,
+          actor_name: currentUser?.name,
+          action: AUDIT_ACTIONS.PATIENT_UPDATE,
+          table_name: 'patients',
+          record_id: patient.id,
+          details: {
+            first_name: values.first_name.trim(),
+            last_name: values.last_name.trim(),
+            date_of_birth: values.date_of_birth || null,
+            phone: values.phone.trim() || null,
+            address: values.address.trim() || null,
+            allergies: values.allergies.trim() || null,
+            notes: values.notes.trim() || null,
+            is_active: values.is_active,
+          },
+          created_at: new Date().toISOString(),
+        })
+        .then(({ error: auditError }) => {
+          if (auditError) {
+            console.error('[PatientList] Failed to log patient update:', auditError.message)
+          }
+        })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['patients'] })
@@ -228,14 +258,35 @@ function truncateAllergies(s: string | null): string {
 export function PatientList() {
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Patient | null>(null)
+  const { data: currentUser } = useCurrentUser()
 
   const { data, isLoading, isError } = useQuery<Patient[]>({
-    queryKey: ['patients'],
+    queryKey: ['patients', currentUser?.id, currentUser?.role],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('patients')
         .select('*')
         .order('last_name', { ascending: true })
+
+      // ── Technician Scope Restriction (JDPA 2020) ──────────────────────────────
+      // Technicians can only see patients they have dispensed prescriptions for
+      if (currentUser?.role === 'TECHNICIAN' && currentUser?.id) {
+        // 1. Find all patients this technician has dispensed for
+        const { data: dispensedTxns } = await supabase
+          .from('rx_transactions')
+          .select('patient_id', { count: 'exact', head: true })
+          .eq('dispensed_by', currentUser.id)
+
+        if (dispensedTxns && dispensedTxns.length > 0) {
+          const patientIds = [...new Set(dispensedTxns.map(t => t.patient_id))]
+          q = q.in('id', patientIds)
+        } else {
+          // Technician has never dispensed anything — return empty list
+          q = q.in('id', [])
+        }
+      }
+
+      const { data, error } = await q
       if (error) throw error
       return (data ?? []) as Patient[]
     },

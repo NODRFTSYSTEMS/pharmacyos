@@ -9,6 +9,8 @@ import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../c
 import { ReportAssistant } from '../../components/ReportAssistant'
 import { PrintPreviewModal } from '../../components/PrintPreviewModal'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import type { RxTransaction } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -44,6 +46,7 @@ function fmtDateTime(iso: string): string {
 
 export function DispensingReport() {
   usePageTitle('Dispensing Report')
+  const { data: currentUser } = useCurrentUser()
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false)
@@ -84,14 +87,25 @@ export function DispensingReport() {
     )
   }, [records.length, from, to, nonVoided.length, voided.length, totalRevenue, totalNhf, totalQty])
 
-  // CSV export — full dispensing report
-  function exportCsv() {
+  // ── Helper to create masked patient identifier from name ────────────────────
+  function maskPatientName(patientName: string | null): string {
+    if (!patientName) return '—'
+    // Create a simple masked identifier using patient initials and hash
+    const parts = patientName.trim().split(' ')
+    const initials = parts.map(p => p[0]).join('').toUpperCase()
+    // Hash the full name to create a consistent pseudo-ID
+    const hash = Array.from(patientName).reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)
+    return `PAT-${initials}-${Math.abs(hash % 10000).toString().padStart(4, '0')}`
+  }
+
+  // CSV export — full dispensing report (with PHI masking and audit logging)
+  async function exportCsv() {
     const rows = [
-      ['Ref', 'Drug', 'Patient', 'Prescriber', 'Qty', 'Copay', 'NHF Subsidy', 'Date', 'Status'],
+      ['Ref', 'Drug', 'Patient ID', 'Prescriber', 'Qty', 'Copay', 'NHF Subsidy', 'Date', 'Status'],
       ...records.map(r => [
         r.ref_number,
         r.drug_name,
-        r.patient_name,
+        maskPatientName(r.patient_name), // Mask patient names
         r.dispensed_by ?? '—',
         String(r.quantity_dispensed),
         r.patient_copay.toFixed(2),
@@ -100,6 +114,29 @@ export function DispensingReport() {
         r.voided ? 'VOIDED' : 'DISPENSED',
       ]),
     ]
+
+    // ── Audit logging for dispensing report export (JDPA 2020) ──
+    await supabase
+      .from('audit_log')
+      .insert({
+        actor_id: currentUser?.id,
+        actor_name: currentUser?.name,
+        action: AUDIT_ACTIONS.DISPENSING_REPORT_EXPORT || 'dispensing_report_export',
+        table_name: 'rx_transactions',
+        details: {
+          export_type: 'CSV',
+          date_from: from,
+          date_to: to,
+          record_count: records.length,
+        },
+        created_at: new Date().toISOString(),
+      })
+      .then(({ error: auditError }) => {
+        if (auditError) {
+          console.error('[DispensingReport] Failed to log CSV export:', auditError.message)
+        }
+      })
+
     const csv = rows.map(row => row.map(v => `"${v}"`).join(',')).join('\n')
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
     const a = document.createElement('a')
@@ -112,14 +149,14 @@ export function DispensingReport() {
   // C-2: NHF Claims export — filters to rows where nhf_subsidy > 0
   // NHF Card No column is included but requires the insurance fields migration
   // (pending worktree merge) to populate; shows — until available.
-  function exportNhfCsv() {
+  async function exportNhfCsv() {
     const nhfRows = nonVoided.filter(r => r.nhf_subsidy > 0)
     const rows = [
-      ['Date', 'Rx Ref', 'Patient Name', 'NHF Card No', 'Drug Name', 'Qty', 'Copay (JMD)', 'NHF Subsidy (JMD)', 'Prescriber'],
+      ['Date', 'Rx Ref', 'Patient ID', 'NHF Card No', 'Drug Name', 'Qty', 'Copay (JMD)', 'NHF Subsidy (JMD)', 'Prescriber'],
       ...nhfRows.map(r => [
         r.created_at.slice(0, 10),
         r.ref_number,
-        r.patient_name,
+        maskPatientName(r.patient_name), // Mask patient names
         '—',  // nhf_card_no — available after insurance fields migration merges
         r.drug_name,
         String(r.quantity_dispensed),
@@ -128,6 +165,29 @@ export function DispensingReport() {
         r.dispensed_by ?? '—',
       ]),
     ]
+
+    // ── Audit logging for NHF claims export (JDPA 2020) ──
+    await supabase
+      .from('audit_log')
+      .insert({
+        actor_id: currentUser?.id,
+        actor_name: currentUser?.name,
+        action: AUDIT_ACTIONS.NHF_REPORT_EXPORT || 'nhf_report_export',
+        table_name: 'rx_transactions',
+        details: {
+          export_type: 'CSV',
+          date_from: from,
+          date_to: to,
+          record_count: nhfRows.length,
+        },
+        created_at: new Date().toISOString(),
+      })
+      .then(({ error: auditError }) => {
+        if (auditError) {
+          console.error('[DispensingReport] Failed to log NHF CSV export:', auditError.message)
+        }
+      })
+
     const csv = rows.map(row => row.map(v => `"${v}"`).join(',')).join('\n')
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
     const a = document.createElement('a')

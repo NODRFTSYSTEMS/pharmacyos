@@ -24,6 +24,10 @@ export const AUDIT_ACTIONS = {
   RX_CANCEL:                'rx_cancel',
   RX_TRANSACTION_CREATE:    'rx_transaction_create',
 
+  // ── Reports / Exports (JDPA 2020) ──────────────────────────────────────────
+  DISPENSING_REPORT_EXPORT: 'dispensing_report_export',
+  NHF_REPORT_EXPORT:        'nhf_report_export',
+
   // ── Schedule Drug Log ────────────────────────────────────────────────────────
   SCHEDULE_DRUG_ENTRY:      'schedule_drug_entry',
   SCHEDULE_DRUG_UPDATE:     'schedule_drug_update',
@@ -46,6 +50,9 @@ export const AUDIT_ACTIONS = {
   // ── AI Queue ─────────────────────────────────────────────────────────────────
   AI_EXTRACTION_ACCEPT:     'ai_extraction_accept',
   AI_EXTRACTION_REJECT:     'ai_extraction_reject',
+  AI_EXTRACTION_BLOCKED_NO_CONSENT:     'ai_extraction_blocked_no_consent',
+  AI_EXTRACTION_DENIED_INSUFFICIENT_ROLE:     'ai_extraction_denied_insufficient_role',
+  AI_EXTRACTION_DENIED_TECHNICIAN_UNAUTHORIZED: 'ai_extraction_denied_technician_unauthorized',
 
   // ── Timecards ────────────────────────────────────────────────────────────────
   TIMECARD_CLOCK_IN:        'timecard_clock_in',
