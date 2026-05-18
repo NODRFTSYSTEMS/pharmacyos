@@ -180,7 +180,7 @@ export function GlobalSearch({ open, onClose }: { open: boolean; onClose: () => 
             id="global-search-input"
             type="text"
             role="combobox"
-            aria-expanded={results.length > 0}
+            aria-expanded={query.length >= 2}
             aria-haspopup="listbox"
             aria-controls="search-listbox"
             aria-activedescendant={activeId}

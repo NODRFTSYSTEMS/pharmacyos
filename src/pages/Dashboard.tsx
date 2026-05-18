@@ -15,6 +15,7 @@ import { usePermission } from '../hooks/usePermission'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { usePharmacyName } from '../hooks/usePharmacyName'
 import { useThemeMode } from '../hooks/useThemeMode'
+import { usePageTitle } from '../hooks/usePageTitle'
 import type {
   DailyInconsistencyReport,
   DashboardUpdate,
@@ -304,6 +305,7 @@ export function Dashboard() {
   const today    = todayJamaica()
   const navigate = useNavigate()
 
+  usePageTitle('Dashboard')
   const pharmacyName   = usePharmacyName()
   const { data: user } = useCurrentUser()
   const { theme, toggleTheme } = useThemeMode()
@@ -783,11 +785,12 @@ export function Dashboard() {
                 {rxQueue.map(p => (
                   <tr
                     key={p.id}
+                    role="button"
+                    aria-label={`Open prescription ${p.ref_number} — ${p.drug_name} for ${p.patient_name}`}
                     className="hover:bg-blue-50 cursor-pointer"
                     onClick={() => navigate(`/prescriptions/${p.id}`)}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate(`/prescriptions/${p.id}`) }}
                     tabIndex={0}
-                    title="Open prescription"
                   >
                     <td className="px-4 font-mono text-xs text-gray-700">{p.ref_number}</td>
                     <td className="px-4 text-xs text-gray-700">{p.drug_name}</td>

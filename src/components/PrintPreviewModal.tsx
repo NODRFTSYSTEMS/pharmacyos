@@ -13,6 +13,7 @@
 //     onCancel={() => setPrintOpen(false)}
 //   />
 
+import { useEffect, useRef } from 'react'
 import { Printer, X } from '@phosphor-icons/react'
 
 interface PrintPreviewModalProps {
@@ -34,6 +35,42 @@ export function PrintPreviewModal({
   onConfirm,
   onCancel,
 }: PrintPreviewModalProps) {
+  const dialogRef    = useRef<HTMLDivElement>(null)
+  const cancelBtnRef = useRef<HTMLButtonElement>(null)
+
+  // C-01: Focus trap — move focus to Cancel on open, trap Tab within dialog,
+  // handle Escape to cancel, and restore focus to the triggering element on close.
+  useEffect(() => {
+    if (!open) return
+    const prevFocus = document.activeElement as HTMLElement | null
+    const id = setTimeout(() => cancelBtnRef.current?.focus(), 0)
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { onCancel(); return }
+      if (e.key !== 'Tab') return
+      const el = dialogRef.current
+      if (!el) return
+      const focusable = Array.from(
+        el.querySelectorAll<HTMLElement>('button:not([disabled])')
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last  = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus() }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      clearTimeout(id)
+      document.removeEventListener('keydown', handleKeyDown)
+      prevFocus?.focus()
+    }
+  }, [open, onCancel])
+
   if (!open) return null
 
   return (
@@ -52,7 +89,7 @@ export function PrintPreviewModal({
         aria-modal="true"
         aria-labelledby="print-preview-title"
       >
-        <div className="bg-white rounded-xl shadow-xl w-full max-w-sm">
+        <div ref={dialogRef} className="bg-white rounded-xl shadow-xl w-full max-w-sm">
 
           {/* Header */}
           <div className="flex items-start justify-between px-5 pt-5 pb-0 gap-3">
@@ -75,7 +112,7 @@ export function PrintPreviewModal({
               className="shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-0.5 rounded"
               aria-label="Cancel"
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
 
@@ -89,6 +126,7 @@ export function PrintPreviewModal({
           {/* Actions */}
           <div className="flex items-center justify-end gap-2 px-5 pb-5">
             <button
+              ref={cancelBtnRef}
               onClick={onCancel}
               className="btn btn-ghost text-sm"
             >

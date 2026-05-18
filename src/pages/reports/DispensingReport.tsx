@@ -8,6 +8,7 @@ import { toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import { ReportAssistant } from '../../components/ReportAssistant'
 import { PrintPreviewModal } from '../../components/PrintPreviewModal'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import type { RxTransaction } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,6 +43,7 @@ function fmtDateTime(iso: string): string {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function DispensingReport() {
+  usePageTitle('Dispensing Report')
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false)

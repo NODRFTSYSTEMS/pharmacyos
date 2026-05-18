@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { Files, Eye, EyeSlash, Warning } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export default function Login() {
+  usePageTitle('Sign In')
   const queryClient = useQueryClient()
   const { search }  = useLocation()
   const sessionExpired = new URLSearchParams(search).get('reason') === 'session_expired'
@@ -112,7 +114,6 @@ export default function Login() {
                 <Link
                   to="/forgot-password"
                   className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                  tabIndex={-1}
                 >
                   Reset password
                 </Link>
@@ -153,6 +154,7 @@ export default function Login() {
               type="submit"
               disabled={loading || !email || !password}
               className="btn btn-primary btn-lg w-full"
+              aria-label={loading ? 'Signing in, please wait' : undefined}
             >
               {loading
                 ? <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />

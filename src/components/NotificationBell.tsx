@@ -52,13 +52,25 @@ export function NotificationBell() {
   const nav = useNavigate()
   const qc  = useQueryClient()
 
-  // Close on outside click
+  // Close on outside click or Escape key (C-03)
   useEffect(() => {
-    function handle(e: MouseEvent) {
+    function handleMouseDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
-    if (open) document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        buttonRef.current?.focus()
+      }
+    }
+    if (open) {
+      document.addEventListener('mousedown', handleMouseDown)
+      document.addEventListener('keydown', handleKeyDown)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [open])
 
   function handleToggle() {
@@ -120,7 +132,7 @@ export function NotificationBell() {
         onClick={handleToggle}
         className="relative p-2 rounded text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
         aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded={open}
       >
         {unreadCount > 0

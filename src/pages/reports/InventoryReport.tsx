@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import { ReportAssistant } from '../../components/ReportAssistant'
 import { PrintPreviewModal } from '../../components/PrintPreviewModal'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import type { Product } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,6 +79,7 @@ const URGENCY_PILL: Record<ReorderRec['urgency'], { label: string; variant: 'red
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function InventoryReport() {
+  usePageTitle('Inventory Report')
   const [tab, setTab] = useState<FilterTab>('ALL')
   const [search, setSearch] = useState('')
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false)
@@ -279,7 +281,9 @@ export function InventoryReport() {
             <button
               key={t}
               role="tab"
+              id={`inv-tab-${t.toLowerCase()}`}
               aria-selected={tab === t}
+              aria-controls="inv-tabpanel"
               onClick={() => setTab(t)}
               className={`btn btn-ghost text-xs h-8 px-3 ${
                 tab === t ? 'bg-blue-50 border-blue-300 text-blue-700' : ''
@@ -338,7 +342,7 @@ export function InventoryReport() {
 
       {/* Reorder recommendations table */}
       {tab === 'REORDER' && !reorderError && (
-        <div className="card overflow-hidden">
+        <div id="inv-tabpanel" role="tabpanel" aria-labelledby={`inv-tab-${tab.toLowerCase()}`} className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full table-compact text-sm" aria-label="Reorder recommendations">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -419,7 +423,7 @@ export function InventoryReport() {
 
       {/* Products table — all tabs except REORDER */}
       {tab !== 'REORDER' && !isError && (
-        <div className="card overflow-hidden">
+        <div id="inv-tabpanel" role="tabpanel" aria-labelledby={`inv-tab-${tab.toLowerCase()}`} className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full table-compact text-sm" aria-label="Inventory stock levels">
               <thead className="bg-gray-50 border-b border-gray-200">

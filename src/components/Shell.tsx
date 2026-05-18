@@ -162,11 +162,12 @@ function NavGroup({ item }: { item: NavItem }) {
         aria-controls={groupId}
         className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
       >
-        <item.icon size={16} weight="duotone" />
+        <item.icon size={16} weight="duotone" aria-hidden="true" />
         <span className="flex-1 text-left">{item.label}</span>
         <CaretRight
           size={12}
           className={`transition-transform ${open ? 'rotate-90' : ''}`}
+          aria-hidden="true"
         />
       </button>
       <div id={groupId} hidden={!open} className="ml-6 mt-0.5 space-y-0.5">
@@ -224,7 +225,7 @@ export function Sidebar() {
         {filteredNav.map(item =>
           item.href ? (
             <NavLink key={item.href} href={item.href}>
-              <item.icon size={16} weight="duotone" />
+              <item.icon size={16} weight="duotone" aria-hidden="true" />
               {item.label}
             </NavLink>
           ) : (
@@ -253,14 +254,14 @@ export function Sidebar() {
         )}
         {/* I-09: Security / MFA setup — available to all authenticated staff */}
         <NavLink href="/profile/security">
-          <LockSimple size={16} />
+          <LockSimple size={16} aria-hidden="true" />
           Security
         </NavLink>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
         >
-          <SignOut size={16} />
+          <SignOut size={16} aria-hidden="true" />
           Sign Out
         </button>
       </div>
@@ -287,7 +288,16 @@ export function PageHeader({ title, subtitle, cta, breadcrumb, showSession }: Pa
     <div className="flex items-start justify-between gap-4 mb-6">
       <div>
         {breadcrumb && (
-          <p className="text-xs text-gray-400 mb-1">{breadcrumb.join(' › ')}</p>
+          <nav aria-label="Breadcrumb" className="mb-1">
+            <ol className="flex items-center gap-1 text-xs text-gray-400 list-none p-0 m-0">
+              {breadcrumb.map((crumb, i) => (
+                <li key={i} className="flex items-center gap-1">
+                  {i > 0 && <span aria-hidden="true">›</span>}
+                  {crumb}
+                </li>
+              ))}
+            </ol>
+          </nav>
         )}
         <h1 className="page-title">{title}</h1>
         {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
@@ -322,7 +332,7 @@ export function MetricCard({ label, value, sub, trend, icon: Icon, accent = 'blu
         <div>
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{label}</p>
           <p className="num-lg">{value}</p>
-          {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+          {sub && <p className="text-xs text-gray-500 mt-0.5">{sub}</p>}
           {trend !== undefined && (
             <p className={`text-xs mt-1 font-medium ${trend >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
               {trend >= 0 ? '+' : ''}{trend.toFixed(1)}% vs yesterday
@@ -331,7 +341,7 @@ export function MetricCard({ label, value, sub, trend, icon: Icon, accent = 'blu
         </div>
         {Icon && (
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${accentMap[accent]}`}>
-            <Icon size={18} weight="duotone" />
+            <Icon size={18} weight="duotone" aria-hidden="true" />
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Receipt, Plus, Minus, X, ShoppingCart,
@@ -10,6 +10,7 @@ import { ProductImageThumb } from '../../components/MedicationVisualReference'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 import { normalizeMedicationKey, useMedicationVisualReferences } from '../../hooks/useMedicationVisualReferences'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -111,6 +112,40 @@ function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => voi
     hour: '2-digit', minute: '2-digit',
   })
 
+  // C-02: Focus trap — move focus to close button on open, trap Tab, Escape to close
+  const dialogRef  = useRef<HTMLDivElement>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const prevFocus = document.activeElement as HTMLElement | null
+    const id = setTimeout(() => closeBtnRef.current?.focus(), 0)
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab') return
+      const el = dialogRef.current
+      if (!el) return
+      const focusable = Array.from(
+        el.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last  = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus() }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus() }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      clearTimeout(id)
+      document.removeEventListener('keydown', handleKeyDown)
+      prevFocus?.focus()
+    }
+  }, [onClose])
+
   return (
     <>
       {/* Backdrop — hidden on print */}
@@ -119,6 +154,10 @@ function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => voi
         onClick={onClose}
       >
         <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="receipt-modal-title"
           className="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto"
           onClick={e => e.stopPropagation()}
         >
@@ -126,15 +165,16 @@ function ReceiptModal({ data, onClose }: { data: ReceiptData; onClose: () => voi
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
             <div className="flex items-center gap-2 text-emerald-700">
               <CheckCircle size={18} weight="duotone" aria-hidden="true" />
-              <span className="font-semibold text-sm">Sale Complete</span>
+              <span id="receipt-modal-title" className="font-semibold text-sm">Sale Complete</span>
             </div>
             <button
+              ref={closeBtnRef}
               type="button"
               onClick={onClose}
               className="btn btn-ghost p-1.5"
               aria-label="Close receipt"
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
 
@@ -310,6 +350,7 @@ function CartRow({ item, onIncrement, onDecrement, onRemove, onSetQty }: CartRow
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function PosTerminal() {
+  usePageTitle('POS Terminal')
   const qc = useQueryClient()
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -992,10 +1033,14 @@ export default function PosTerminal() {
         <div className="flex-[9] min-w-0">
           <div className="card overflow-hidden">
 
-            {/* Tab bar */}
-            <div className="flex border-b border-gray-200">
+            {/* Tab bar — C-04: role="tablist" + role="tab" + aria-selected */}
+            <div className="flex border-b border-gray-200" role="tablist" aria-label="POS panel">
               <button
                 type="button"
+                role="tab"
+                id="pos-tab-catalog"
+                aria-selected={rightTab === 'catalog'}
+                aria-controls="pos-panel-catalog"
                 onClick={() => setRightTab('catalog')}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
                   rightTab === 'catalog'
@@ -1003,12 +1048,16 @@ export default function PosTerminal() {
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <Tag size={14} />
+                <Tag size={14} aria-hidden="true" />
                 Catalog
-                {searching && <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />}
+                {searching && <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" aria-hidden="true" />}
               </button>
               <button
                 type="button"
+                role="tab"
+                id="pos-tab-add"
+                aria-selected={rightTab === 'add'}
+                aria-controls="pos-panel-add"
                 onClick={() => { setRightTab('add'); setTimeout(() => customNameRef.current?.focus(), 50) }}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
                   rightTab === 'add'
@@ -1016,14 +1065,14 @@ export default function PosTerminal() {
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <Plus size={14} weight="bold" />
+                <Plus size={14} weight="bold" aria-hidden="true" />
                 Add Item
               </button>
             </div>
 
             {/* ── CATALOG TAB ── */}
             {rightTab === 'catalog' && (
-              <div className="p-4">
+              <div id="pos-panel-catalog" role="tabpanel" aria-labelledby="pos-tab-catalog" className="p-4">
                 {/* Search */}
                 <div className="relative mb-3">
                   <MagnifyingGlass size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -1041,8 +1090,9 @@ export default function PosTerminal() {
                       type="button"
                       onClick={() => { setSearch(''); searchRef.current?.focus() }}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      aria-label="Clear search"
                     >
-                      <X size={14} />
+                      <X size={14} aria-hidden="true" />
                     </button>
                   )}
                 </div>
@@ -1130,32 +1180,36 @@ export default function PosTerminal() {
 
             {/* ── ADD ITEM TAB ── */}
             {rightTab === 'add' && (
-              <div className="p-6">
+              <div id="pos-panel-add" role="tabpanel" aria-labelledby="pos-tab-add" className="p-6">
                 <p className="text-sm text-gray-500 mb-5">
                   Enter any item name and price — no database product required.
                 </p>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Item name <span className="text-red-500">*</span>
+                    {/* C-07: label htmlFor wired to input id */}
+                    <label htmlFor="custom-item-name" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Item name <span className="text-red-500" aria-hidden="true">*</span>
                     </label>
                     <input
                       ref={customNameRef}
+                      id="custom-item-name"
                       type="text"
                       placeholder="e.g. Paracetamol 500mg × 24"
                       value={customName}
                       onChange={e => setCustomName(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addCustomItem()}
                       className="input w-full text-sm"
+                      aria-required="true"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Price (JMD) <span className="text-red-500">*</span>
+                    <label htmlFor="custom-item-price" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Price (JMD) <span className="text-red-500" aria-hidden="true">*</span>
                     </label>
                     <input
+                      id="custom-item-price"
                       type="number"
                       min={0}
                       step={0.01}
@@ -1164,6 +1218,7 @@ export default function PosTerminal() {
                       onChange={e => setCustomPrice(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addCustomItem()}
                       className="input w-full font-mono text-sm"
+                      aria-required="true"
                     />
                   </div>
 

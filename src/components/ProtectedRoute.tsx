@@ -158,10 +158,14 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (state === 'loading') {
     return (
       <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
-        <div
-          className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
-          aria-label="Loading…"
-        />
+        {/* C-05: role="status" wraps spinner; spinner itself is aria-hidden; sr-only text announces state */}
+        <div role="status" aria-label="Loading, please wait">
+          <div
+            className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
+            aria-hidden="true"
+          />
+          <span className="sr-only">Loading…</span>
+        </div>
       </div>
     )
   }
@@ -181,12 +185,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         <div
           className="fixed top-0 left-0 right-0 z-[9999] bg-amber-500 text-white text-sm
                      flex items-center justify-between gap-4 px-4 py-2.5 shadow-lg"
-          role="alert"
-          aria-live="assertive"
+          role="status"
+          aria-live="polite"
         >
+          {/* M-04: role="status" + aria-live="polite" avoids screen-reader interruption on every
+              countdown tick. The countdown value is wrapped in aria-live="off" so only the initial
+              banner appearance is announced — not every second. */}
           <span>
             {secondsLeft !== null
-              ? <>Session expires in <strong>{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</strong> — move your mouse or press any key to stay logged in.</>
+              ? <>Session expires in <strong aria-live="off">{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</strong> — move your mouse or press any key to stay logged in.</>
               : <>Your session will expire shortly due to inactivity. Move your mouse or press any key to stay logged in.</>
             }
           </span>

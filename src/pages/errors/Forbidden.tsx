@@ -7,8 +7,10 @@ import { Files, ShieldWarning, EnvelopeSimple } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export function Forbidden() {
+  usePageTitle('Access Denied')
   const navigate      = useNavigate()
   const { pathname }  = useLocation()
   const { data: user } = useCurrentUser()
@@ -39,14 +41,14 @@ export function Forbidden() {
 
         {/* Logo mark */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <Files size={22} weight="duotone" className="text-blue-600" />
+          <Files size={22} weight="duotone" className="text-blue-600" aria-hidden="true" />
           <span className="font-bold text-gray-800 text-base">PharmacyOS</span>
         </div>
 
         <div className="card p-10 text-center">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-              <ShieldWarning size={32} weight="duotone" className="text-red-500" />
+              <ShieldWarning size={32} weight="duotone" className="text-red-500" aria-hidden="true" />
             </div>
           </div>
 
