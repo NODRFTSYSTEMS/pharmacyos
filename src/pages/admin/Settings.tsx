@@ -26,6 +26,13 @@ interface SettingsFormState {
   pharmacy_name: string;
   pharmacy_address: string;
   currency: string;
+  // Owner / Licensee Profile (PCOJ + NHF requirement)
+  owner_name: string;
+  owner_phone: string;
+  owner_email: string;
+  pharmacy_phone: string;
+  pharmacy_license_no: string;
+  pharmacy_logo_url: string;
   // Regulatory
   nhf_provider_no: string;
   oic_reg_no: string;
@@ -36,6 +43,8 @@ interface SettingsFormState {
   default_shift: string;
   loyalty_rate: string;
   loyalty_redemption_value: string;
+  // POS Controls
+  allow_over_sell: string;  // 'true' | 'false' — override stock enforcement for special dispensing
   // Receipt
   receipt_footer: string;
   // Reliability reports
@@ -48,15 +57,28 @@ const SETTING_KEYS: Array<keyof SettingsFormState> = [
   'pharmacy_name',
   'pharmacy_address',
   'currency',
+  // Owner / Licensee Profile
+  'owner_name',
+  'owner_phone',
+  'owner_email',
+  'pharmacy_phone',
+  'pharmacy_license_no',
+  'pharmacy_logo_url',
+  // Regulatory
   'nhf_provider_no',
   'oic_reg_no',
+  // POS Defaults
   'default_float',
   'opening_float',
   'gct_rate',
   'default_shift',
   'loyalty_rate',
   'loyalty_redemption_value',
+  // POS Controls
+  'allow_over_sell',
+  // Receipt
   'receipt_footer',
+  // Reliability reports
   'daily_inconsistency_report_enabled',
   'daily_inconsistency_report_time',
   'daily_inconsistency_report_timezone',
@@ -67,14 +89,26 @@ function mapToForm(map: SettingsMap): SettingsFormState {
     pharmacy_name:    map['pharmacy_name']    ?? '',
     pharmacy_address: map['pharmacy_address'] ?? '',
     currency:         map['currency']         ?? 'JMD',
+    // Owner / Licensee Profile
+    owner_name:          map['owner_name']          ?? '',
+    owner_phone:         map['owner_phone']         ?? '',
+    owner_email:         map['owner_email']         ?? '',
+    pharmacy_phone:      map['pharmacy_phone']      ?? '',
+    pharmacy_license_no: map['pharmacy_license_no'] ?? '',
+    pharmacy_logo_url:   map['pharmacy_logo_url']   ?? '',
+    // Regulatory
     nhf_provider_no:  map['nhf_provider_no']  ?? '',
     oic_reg_no:       map['oic_reg_no']       ?? '',
+    // POS Defaults
     default_float:    map['default_float']    ?? '',
     opening_float:    map['opening_float']    ?? '',
     gct_rate:         map['gct_rate']         ?? '15',
     default_shift:    map['default_shift']    ?? 'MORNING',
     loyalty_rate:              map['loyalty_rate']              ?? '1',
     loyalty_redemption_value:  map['loyalty_redemption_value']  ?? '0.01',
+    // POS Controls
+    allow_over_sell: map['allow_over_sell'] ?? 'false',
+    // Receipt
     receipt_footer:            map['receipt_footer']            ?? '',
     daily_inconsistency_report_enabled:  map['daily_inconsistency_report_enabled']  ?? 'true',
     daily_inconsistency_report_time:     map['daily_inconsistency_report_time']     ?? '18:00',
@@ -450,6 +484,97 @@ export function Settings() {
         </div>
       </section>
 
+      {/* ── Owner / Licensee Profile ─────────────────────────────────────── */}
+      {/* Required for PCOJ prescription headers, NHF claims, and print output */}
+      <section aria-labelledby="section-owner">
+        <h2 id="section-owner" className="section-title mb-4 flex items-center gap-2">
+          <Gear size={18} aria-hidden="true" />
+          Owner / Licensee Profile
+        </h2>
+        <div className="card p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="s-owner-name" className="block text-sm font-medium text-gray-700 mb-1">
+                Licensed Owner Name
+              </label>
+              <input
+                id="s-owner-name"
+                type="text"
+                className="input w-full"
+                placeholder="Full name as on PCOJ licence"
+                value={form.owner_name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('owner_name', e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="s-pharmacy-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Pharmacy Phone
+              </label>
+              <input
+                id="s-pharmacy-phone"
+                type="tel"
+                className="input w-full"
+                placeholder="e.g. 876-XXX-XXXX"
+                value={form.pharmacy_phone}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('pharmacy_phone', e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="s-owner-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Owner Phone
+              </label>
+              <input
+                id="s-owner-phone"
+                type="tel"
+                className="input w-full"
+                placeholder="e.g. 876-XXX-XXXX"
+                value={form.owner_phone}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('owner_phone', e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="s-owner-email" className="block text-sm font-medium text-gray-700 mb-1">
+                Owner Email
+              </label>
+              <input
+                id="s-owner-email"
+                type="email"
+                className="input w-full"
+                placeholder="owner@example.com"
+                value={form.owner_email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('owner_email', e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="s-pcoj-license" className="block text-sm font-medium text-gray-700 mb-1">
+                PCOJ Licence No.
+              </label>
+              <input
+                id="s-pcoj-license"
+                type="text"
+                className="input w-full"
+                placeholder="PCOJ-XXXXX"
+                value={form.pharmacy_license_no}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('pharmacy_license_no', e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="s-logo-url" className="block text-sm font-medium text-gray-700 mb-1">
+                Pharmacy Logo URL
+              </label>
+              <input
+                id="s-logo-url"
+                type="url"
+                className="input w-full"
+                placeholder="https://..."
+                value={form.pharmacy_logo_url}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleField('pharmacy_logo_url', e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Regulatory ───────────────────────────────────────────────────── */}
       <section aria-labelledby="section-regulatory">
         <h2 id="section-regulatory" className="section-title mb-4 flex items-center gap-2">
@@ -597,6 +722,28 @@ export function Settings() {
               </div>
               <p className="mt-1 text-xs text-gray-400">Cash value of 1 point when redeemed</p>
             </div>
+          </div>
+
+          {/* Allow Over-Sell — stock enforcement override for special dispensing */}
+          <div className="border-t border-gray-100 pt-5 mt-1">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                checked={form.allow_over_sell === 'true'}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleField('allow_over_sell', e.target.checked ? 'true' : 'false')
+                }
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Allow Over-Sell</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  When enabled, cashiers can sell more units than are recorded in stock.
+                  Disable to enforce strict inventory — recommended for controlled drug dispensaries (Pharmacy Act).
+                  Disabled by default.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
       </section>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Navigate } from 'react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 
@@ -42,6 +43,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const idleTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
   const warnTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const queryClient  = useQueryClient()
 
   // Check pharmacy hours and user role for after-hours access gating (staff access control)
   const { data: user } = useCurrentUser()
@@ -81,49 +83,57 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     idleTimer.current = setTimeout(signOutIdle, IDLE_TIMEOUT_MS)
   }, [signOutIdle])
 
-  useEffect(() => {
-    // ── Auth state + AAL check (I-09) ───────────────────────────────────────
-    // IMPORTANT: resolveAuthState MUST be wrapped in try/catch.
-    // `void resolveAuthState()` silently swallows thrown errors — if getSession
-    // or getAuthenticatorAssuranceLevel throw (bad env vars, network failure, etc.)
-    // the state stays at 'loading' forever and the user sees a blank spinner.
-    async function resolveAuthState() {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) {
-          console.error('[ProtectedRoute] getSession error:', sessionError.message)
-          setState('unauthed')
-          return
-        }
-        if (!session) {
-          setState('unauthed')
-          return
-        }
-        // If the user has enrolled MFA and the session is at AAL1, gate on MFA
-        const { data: aal, error: aalError } = await getAalWithTimeout()
-        if (aalError) {
-          // MFA check failed — fail open (authed) rather than blocking login
-          console.warn('[ProtectedRoute] MFA AAL check failed:', aalError.message)
-          setState('authed')
-          return
-        }
-        if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
-          setState('mfa-required')
-        } else {
-          setState('authed')
-        }
-      } catch (err) {
-        // Unexpected throw (e.g. env vars missing, Supabase misconfigured)
-        // Fail safe: redirect to login so the user sees something actionable.
-        console.error('[ProtectedRoute] Auth resolution failed unexpectedly:', err)
+  // ── resolveAuthState — hoisted to component scope ─────────────────────────
+  // Hoisted (not defined inside useEffect) so the pageshow bfcache handler
+  // can call it without closure staleness issues.
+  // IMPORTANT: must be wrapped in try/catch — `void resolveAuthState()` silently
+  // swallows thrown errors, leaving state at 'loading' forever.
+  const resolveAuthState = useCallback(async () => {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.error('[ProtectedRoute] getSession error:', sessionError.message)
         setState('unauthed')
+        return
       }
+      if (!session) {
+        setState('unauthed')
+        return
+      }
+      // If the user has enrolled MFA and the session is at AAL1, gate on MFA
+      const { data: aal, error: aalError } = await getAalWithTimeout()
+      if (aalError) {
+        // MFA check failed — fail open (authed) rather than blocking login
+        console.warn('[ProtectedRoute] MFA AAL check failed:', aalError.message)
+        setState('authed')
+        return
+      }
+      if (aal?.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') {
+        setState('mfa-required')
+      } else {
+        setState('authed')
+      }
+    } catch (err) {
+      // Unexpected throw (e.g. env vars missing, Supabase misconfigured)
+      // Fail safe: redirect to login so the user sees something actionable.
+      console.error('[ProtectedRoute] Auth resolution failed unexpectedly:', err)
+      setState('unauthed')
     }
+  }, [])
+
+  useEffect(() => {
+    // ── Initial auth check (I-09) ──────────────────────────────────────────
     void resolveAuthState()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+    // ── Auth state change subscription ────────────────────────────────────
+    // SIGNED_OUT: Clear React Query cache to wipe previous user's data from memory.
+    // This covers token expiry, idle timeout logout, and multi-tab sign-out.
+    // JDPA 2020 obligation: no patient-linked cached data must persist after
+    // a session ends on a shared pharmacy workstation.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       try {
-        if (!session) {
+        if (event === 'SIGNED_OUT' || !session) {
+          queryClient.clear()   // JDPA: wipe all cached user data before redirect
           setState('unauthed')
           return
         }
@@ -140,7 +150,24 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [resolveAuthState, queryClient])
+
+  // ── Back-Forward Cache (bfcache) pageshow handler ─────────────────────────
+  // Modern browsers (Chrome, Safari, Firefox) store entire page snapshots in
+  // bfcache. When a staff member logs out and another user presses the browser
+  // Back button, the browser restores the snapshot without re-running React
+  // lifecycle code. This listener detects bfcache restores (e.persisted === true)
+  // and forces a fresh auth check so stale sessions are never surfaced.
+  useEffect(() => {
+    function handlePageShow(e: PageTransitionEvent) {
+      if (e.persisted) {
+        // Page was restored from bfcache — re-validate session immediately
+        void resolveAuthState()
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [resolveAuthState])
 
   // ── Pharmacy hours gate (staff access control) ──────────────────────────────
   // Check if pharmacy is closed and redirect non-ADMIN/MANAGER users

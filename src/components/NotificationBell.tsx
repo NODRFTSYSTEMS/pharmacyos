@@ -52,7 +52,8 @@ export function NotificationBell() {
   const nav = useNavigate()
   const qc  = useQueryClient()
 
-  // Close on outside click or Escape key (C-03)
+  // Close on outside click, Escape key, scroll, or resize (C-03)
+  // scroll/resize close prevents stale anchor position when page moves after open
   useEffect(() => {
     function handleMouseDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -63,13 +64,21 @@ export function NotificationBell() {
         buttonRef.current?.focus()
       }
     }
+    function handleScrollOrResize() {
+      setOpen(false)
+    }
     if (open) {
       document.addEventListener('mousedown', handleMouseDown)
       document.addEventListener('keydown', handleKeyDown)
+      // capture phase catches inner scrollers (e.g. sidebar overflow-y-auto)
+      window.addEventListener('scroll', handleScrollOrResize, true)
+      window.addEventListener('resize', handleScrollOrResize)
     }
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('scroll', handleScrollOrResize, true)
+      window.removeEventListener('resize', handleScrollOrResize)
     }
   }, [open])
 

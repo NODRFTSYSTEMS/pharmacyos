@@ -7,7 +7,6 @@ import {
   ArrowClockwise,
   Warning,
   CheckCircle,
-  XCircle,
   Clock,
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
@@ -43,6 +42,14 @@ interface StaffLastActivity {
   actor_id: string
   last_seen: string
 }
+
+interface ActiveSession {
+  actor_id: string
+  actor_name: string | null
+  last_seen: string
+}
+
+const ACTIVE_CUTOFF_MS = 30 * 60 * 1_000  // 30 minutes
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -138,6 +145,32 @@ function useLastActivity() {
   })
 }
 
+function useActiveSessions() {
+  return useQuery<ActiveSession[]>({
+    queryKey: ['security-active-sessions'],
+    queryFn: async () => {
+      const cutoff = new Date(Date.now() - ACTIVE_CUTOFF_MS).toISOString()
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('actor_id, actor_name, created_at')
+        .not('actor_id', 'is', null)
+        .gte('created_at', cutoff)
+        .order('created_at', { ascending: false })
+        .limit(200)
+      if (error) throw error
+      // Deduplicate — keep most recent entry per actor
+      const seen = new Set<string>()
+      return (data ?? []).filter(row => {
+        if (!row.actor_id || seen.has(row.actor_id)) return false
+        seen.add(row.actor_id)
+        return true
+      }).map(row => ({ actor_id: row.actor_id as string, actor_name: row.actor_name, last_seen: row.created_at }))
+    },
+    refetchInterval: 60_000,   // refresh every minute
+    staleTime: 30_000,
+  })
+}
+
 function useRecentDenials() {
   return useQuery<AuditEntry[]>({
     queryKey: ['security-access-denials'],
@@ -185,7 +218,7 @@ function StaffSecurityTable() {
   return (
     <section aria-labelledby="staff-security-heading">
       <div className="flex items-center justify-between mb-3">
-        <h2 id="staff-security-heading" className="text-sm font-semibold text-gray-100">
+        <h2 id="staff-security-heading" className="text-sm font-semibold text-gray-800">
           Staff Security Status
         </h2>
         <div className="flex gap-1">
@@ -205,18 +238,18 @@ function StaffSecurityTable() {
         </div>
       </div>
 
-      <div className="bg-gray-800/50 border border-white/8 rounded-lg overflow-hidden">
+      <div className="card overflow-hidden p-0">
         <table className="w-full text-sm" role="table" aria-label="Staff security status">
           <thead>
-            <tr className="border-b border-white/8">
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Name</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Role</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Account</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Last Activity</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">MFA</th>
+            <tr className="border-b border-gray-100">
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Name</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Role</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Account</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Last Activity</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">MFA</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/6">
+          <tbody className="divide-y divide-gray-100">
             {loading && (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-sm text-gray-400">
@@ -230,7 +263,7 @@ function StaffSecurityTable() {
             {!loading && staff.map(s => {
               const lastSeen = activityMap.get(s.id)
               return (
-                <tr key={s.id} className="hover:bg-white/3 transition-colors">
+                <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <StaffAvatar
@@ -242,7 +275,7 @@ function StaffSecurityTable() {
                         size="sm"
                       />
                       <div className="min-w-0">
-                        <div className="font-medium text-gray-100 truncate">{s.full_name}</div>
+                        <div className="font-medium text-gray-800 truncate">{s.full_name}</div>
                         <div className="text-xs text-gray-400 truncate">{s.email}</div>
                       </div>
                     </div>
@@ -251,17 +284,10 @@ function StaffSecurityTable() {
                     <StatusPill variant={rolePill(s.role)} label={s.role} />
                   </td>
                   <td className="px-4 py-3">
-                    {s.is_active ? (
-                      <span className="inline-flex items-center gap-1 text-green-400 text-xs font-medium">
-                        <CheckCircle size={14} weight="fill" />
-                        Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-red-400 text-xs font-medium">
-                        <XCircle size={14} weight="fill" />
-                        Deactivated
-                      </span>
-                    )}
+                    {s.is_active
+                      ? <StatusPill variant="green" label="Active" />
+                      : <StatusPill variant="red"   label="Deactivated" />
+                    }
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-300">
                     {lastSeen ? (
@@ -283,7 +309,7 @@ function StaffSecurityTable() {
         </table>
       </div>
       <p className="mt-2 text-xs text-gray-500">
-        MFA enrollment is self-managed via <span className="text-indigo-400">Profile → Security</span>. Admins can enforce enrollment by deactivating accounts until staff complete setup.
+        MFA enrollment is self-managed via <span className="text-blue-600">Profile → Security</span>. Admins can enforce enrollment by deactivating accounts until staff complete setup.
       </p>
     </section>
   )
@@ -295,21 +321,21 @@ function AccessDenialsPanel() {
 
   return (
     <section aria-labelledby="access-denials-heading">
-      <h2 id="access-denials-heading" className="text-sm font-semibold text-gray-100 mb-3">
+      <h2 id="access-denials-heading" className="text-sm font-semibold text-gray-800 mb-3">
         Access Denials — Last 7 Days
       </h2>
 
-      <div className="bg-gray-800/50 border border-white/8 rounded-lg overflow-hidden">
+      <div className="card overflow-hidden p-0">
         <table className="w-full text-sm" role="table" aria-label="Recent access denials">
           <thead>
-            <tr className="border-b border-white/8">
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Staff Member</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Role</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Attempted Path</th>
-              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-400">Time</th>
+            <tr className="border-b border-gray-100">
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Staff Member</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Role</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Attempted Path</th>
+              <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-gray-500">Time</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/6">
+          <tbody className="divide-y divide-gray-100">
             {denialsQ.isLoading && (
               <tr>
                 <td colSpan={4} className="px-4 py-10 text-center text-sm text-gray-400">
@@ -321,14 +347,14 @@ function AccessDenialsPanel() {
               <EmptyRow colSpan={4} message="No access denial events in the last 7 days." />
             )}
             {!denialsQ.isLoading && denials.map(entry => (
-              <tr key={entry.id} className="hover:bg-white/3 transition-colors">
-                <td className="px-4 py-3 text-gray-200 text-xs font-medium">
+              <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 text-gray-700 text-xs font-medium">
                   {entry.actor_name ?? '—'}
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-400">
+                <td className="px-4 py-3 text-xs text-gray-500">
                   {extractDenialRole(entry.details)}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-amber-400">
+                <td className="px-4 py-3 font-mono text-xs text-amber-600">
                   {extractDenialPath(entry.details)}
                 </td>
                 <td className="px-4 py-3 text-xs text-gray-400" title={fmtDateTime(entry.created_at)}>
@@ -370,7 +396,7 @@ function SecurityRecommendations({ staffData }: { staffData: StaffProfile[] }) {
 
   return (
     <section aria-labelledby="security-recs-heading">
-      <h2 id="security-recs-heading" className="text-sm font-semibold text-gray-100 mb-3">
+      <h2 id="security-recs-heading" className="text-sm font-semibold text-gray-800 mb-3">
         Security Posture
       </h2>
       <div className="space-y-2">
@@ -379,22 +405,69 @@ function SecurityRecommendations({ staffData }: { staffData: StaffProfile[] }) {
             key={i}
             className={`flex items-start gap-3 p-3 rounded-lg border ${
               rec.ok
-                ? 'bg-green-900/20 border-green-700/30'
-                : 'bg-amber-900/20 border-amber-700/30'
+                ? 'bg-green-50 border-green-200'
+                : 'bg-amber-50 border-amber-200'
             }`}
           >
             {rec.ok
-              ? <CheckCircle size={16} weight="fill" className="text-green-400 mt-0.5 shrink-0" />
-              : <Warning size={16} weight="fill" className="text-amber-400 mt-0.5 shrink-0" />
+              ? <CheckCircle size={16} weight="fill" className="text-emerald-600 mt-0.5 shrink-0" />
+              : <Warning size={16} weight="fill" className="text-amber-500 mt-0.5 shrink-0" />
             }
             <div>
-              <p className={`text-sm font-medium ${rec.ok ? 'text-green-200' : 'text-amber-200'}`}>
+              <p className={`text-sm font-medium ${rec.ok ? 'text-green-800' : 'text-amber-800'}`}>
                 {rec.label}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">{rec.detail}</p>
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+function ActiveSessionsPanel() {
+  const { data: sessions = [], isLoading } = useActiveSessions()
+
+  return (
+    <section aria-labelledby="active-sessions-heading">
+      <h2 id="active-sessions-heading" className="text-sm font-semibold text-gray-800 mb-3">
+        Currently Active — Last 30 Minutes
+      </h2>
+      <div className="card p-4">
+        {isLoading && (
+          <p className="text-sm text-gray-500">Loading active sessions…</p>
+        )}
+        {!isLoading && sessions.length === 0 && (
+          <p className="text-sm text-gray-500">No active sessions in the last 30 minutes.</p>
+        )}
+        {!isLoading && sessions.length > 0 && (
+          <div className="space-y-2">
+            {sessions.map(s => {
+              const minutesAgo = Math.floor((Date.now() - new Date(s.last_seen).getTime()) / 60_000)
+              const isOnline   = minutesAgo < 10
+              return (
+                <div key={s.actor_id} className="flex items-center gap-3 text-sm">
+                  {/* Green dot ≤10 min, amber dot 10–30 min */}
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    aria-label={isOnline ? 'Active now' : 'Recently active'}
+                  />
+                  <span className="font-medium text-gray-800">
+                    {s.actor_name ?? 'Unknown staff'}
+                  </span>
+                  <span className="text-gray-500 ml-auto tabular-nums">
+                    {minutesAgo === 0 ? 'just now' : `${minutesAgo}m ago`}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+        <p className="mt-3 text-xs text-gray-500 border-t border-gray-100 pt-3">
+          Activity derived from audit log. Refreshes every 60 seconds.
+          Deactivate accounts via Admin → Users to revoke access immediately.
+        </p>
       </div>
     </section>
   )
@@ -422,7 +495,7 @@ export function SecurityAdmin() {
         />
         <button
           onClick={() => { staffQ.refetch(); denialsQ.refetch() }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs text-gray-400 hover:text-white hover:bg-white/6 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
           aria-label="Refresh security data"
         >
           <ArrowClockwise size={14} />
@@ -452,6 +525,9 @@ export function SecurityAdmin() {
         />
       </div>
 
+      {/* Currently active sessions — 30-min activity window (JDPA access monitoring) */}
+      <ActiveSessionsPanel />
+
       {/* Staff security status table */}
       <StaffSecurityTable />
 
@@ -462,16 +538,16 @@ export function SecurityAdmin() {
       {staff.length > 0 && <SecurityRecommendations staffData={staff} />}
 
       {/* Admin note about MFA */}
-      <div className="flex items-start gap-3 p-4 bg-indigo-900/20 border border-indigo-700/30 rounded-lg">
-        <Clock size={16} className="text-indigo-400 mt-0.5 shrink-0" />
+      <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <Clock size={16} className="text-blue-600 mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-medium text-indigo-200">Session management</p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-sm font-medium text-blue-800">Session management</p>
+          <p className="text-xs text-gray-500 mt-1">
             Active sessions are managed by Supabase Auth and expire based on the JWT lifetime configured in
             your Supabase project settings. Deactivating a staff account via Admin → Users sets
-            <code className="mx-1 px-1 bg-white/8 rounded text-indigo-300">is_active = false</code>
-            in <code className="px-1 bg-white/8 rounded text-indigo-300">staff_profiles</code>, which causes
-            <code className="mx-1 px-1 bg-white/8 rounded text-indigo-300">get_my_role()</code>
+            <code className="mx-1 px-1 bg-gray-100 rounded text-blue-600">is_active = false</code>
+            in <code className="px-1 bg-gray-100 rounded text-blue-600">staff_profiles</code>, which causes
+            <code className="mx-1 px-1 bg-gray-100 rounded text-blue-600">get_my_role()</code>
             to return NULL on their next request — all RLS policies will then deny access.
           </p>
         </div>

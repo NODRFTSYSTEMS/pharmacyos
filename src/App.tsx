@@ -53,6 +53,10 @@ import TimecardManager      from './pages/staff/TimecardManager'
 // HR
 import LeaveRequests        from './pages/hr/LeaveRequests'
 import Certifications       from './pages/hr/Certifications'
+import HRManager            from './pages/hr/HRManager'
+
+// Staff — self-service
+import MyTimecards          from './pages/staff/MyTimecards'
 
 // Reports
 import RevenueReport        from './pages/reports/RevenueReport'
@@ -63,6 +67,7 @@ import TimecardReport       from './pages/reports/TimecardReport'
 // Admin
 import { UsersAdmin }       from './pages/admin/Users'
 import { AuditLog }         from './pages/admin/AuditLog'
+import { SystemAuditReport } from './pages/admin/SystemAuditReport'
 import { Settings }         from './pages/admin/Settings'
 import SecurityAdmin        from './pages/admin/Security'
 
@@ -111,7 +116,7 @@ export default function App() {
                   <RoleGuard permission="pos_closeout"><CloseOut /></RoleGuard>
                 } />
                 <Route path="/pos/eod-report" element={
-                  <RoleGuard permission="eod_approve"><EodReport /></RoleGuard>
+                  <RoleGuard permission="pos_closeout"><EodReport /></RoleGuard>
                 } />
                 <Route path="/pos/products" element={
                   <RoleGuard permission="pos_terminal"><ProductCatalog /></RoleGuard>
@@ -170,11 +175,20 @@ export default function App() {
                   <RoleGuard permission="timecard_manage"><TimecardManager /></RoleGuard>
                 } />
 
+                {/* Staff — self-service (Employment Act: right to view own hours) */}
+                <Route path="/staff/my-timecards" element={
+                  <RoleGuard permission="timecard_view"><MyTimecards /></RoleGuard>
+                } />
+
                 {/* HR */}
                 {/* /hr/leave — session-only; managers see all pending, staff see own */}
                 <Route path="/hr/leave" element={<LeaveRequests />} />
                 <Route path="/hr/certifications" element={
                   <RoleGuard permission="staff_manage"><Certifications /></RoleGuard>
+                } />
+                {/* /hr/manager — ADMIN/MANAGER only: salaries, leave approval, leave calendar */}
+                <Route path="/hr/manager" element={
+                  <RoleGuard permission="staff_manage"><HRManager /></RoleGuard>
                 } />
 
                 {/* Reports */}
@@ -201,8 +215,13 @@ export default function App() {
                 <Route path="/admin/settings" element={
                   <RoleGuard permission="settings_manage"><Settings /></RoleGuard>
                 } />
+                {/* Security: audit_view minimum — AUDITOR can view; ADMIN/MANAGER also qualify */}
                 <Route path="/admin/security" element={
-                  <RoleGuard permission="staff_manage"><SecurityAdmin /></RoleGuard>
+                  <RoleGuard permission="audit_view"><SecurityAdmin /></RoleGuard>
+                } />
+                {/* System Audit Report: self-audit capability — audit_view required */}
+                <Route path="/admin/audit-report" element={
+                  <RoleGuard permission="audit_view"><SystemAuditReport /></RoleGuard>
                 } />
 
                 {/* AI Queue */}

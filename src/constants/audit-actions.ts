@@ -82,6 +82,9 @@ export const AUDIT_ACTIONS = {
   LEAVE_REQUEST_CANCEL:     'leave_request_cancel',
   CERT_CREATE:              'cert_create',
   CERT_UPDATE:              'cert_update',
+  // ── HR — Salaries ────────────────────────────────────────────────────────────
+  SALARY_CREATE:            'salary_create',
+  SALARY_UPDATE:            'salary_update',
 
   // ── Settings ─────────────────────────────────────────────────────────────────
   SETTINGS_UPDATE:          'settings_update',

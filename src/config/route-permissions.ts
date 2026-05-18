@@ -16,7 +16,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/pos':                         'pos_terminal',
   '/pos/transactions':            'pos_terminal',
   '/pos/closeout':                'pos_closeout',
-  '/pos/eod-report':              'eod_approve',
+  '/pos/eod-report':              'pos_closeout',
   '/pos/products':                'pos_terminal',
   '/pos/suppliers':               'inventory_manage',
   '/pos/loyalty':                 'loyalty_manage',
@@ -36,6 +36,10 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   // Note: '/staff/timecard' (clock-in/out) is session-only — all authenticated
   // staff may clock in/out regardless of role. Not listed here by design.
   '/staff/timecards':             'timecard_manage',
+  // timecard_view: own timecard history only (Employment Act — right to verify hours)
+  '/staff/my-timecards':          'timecard_view',
+  // HR Manager: full leave + salary management (ADMIN/MANAGER only)
+  '/hr/manager':                  'staff_manage',
 
   // ── Reports ────────────────────────────────────────────────────────────────
   '/reports/revenue':             'reports_view',
@@ -49,7 +53,10 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   // ── Admin ──────────────────────────────────────────────────────────────────
   '/admin/users':                 'staff_manage',
   '/admin/audit':                 'audit_view',
-  '/admin/security':              'staff_manage',
+  // Security: audit_view is the minimum — AUDITOR can view; ADMIN/MANAGER also have audit_view
+  '/admin/security':              'audit_view',
+  // System Audit Report: aggregated self-audit analysis — same audience as raw audit log
+  '/admin/audit-report':          'audit_view',
   '/admin/settings':              'settings_manage',
 }
 

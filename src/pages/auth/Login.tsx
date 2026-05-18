@@ -66,10 +66,10 @@ export default function Login() {
         {/* Live clock */}
         <div className="text-center mb-6">
           <p className="text-2xl font-semibold text-gray-800 tabular-nums tracking-tight">
-            {now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            {now.toLocaleTimeString('en-JM', { timeZone: 'America/Jamaica', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
-            {now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            {now.toLocaleDateString('en-JM', { timeZone: 'America/Jamaica', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 

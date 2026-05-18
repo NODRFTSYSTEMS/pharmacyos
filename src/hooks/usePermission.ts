@@ -19,9 +19,11 @@ const DEFAULT_PERMS: Record<string, string[]> = {
                'audit_view','settings_manage','loyalty_manage','ai_queue','timecard_manage'],
   MANAGER:    ['pos_terminal','pos_void','pos_closeout','eod_approve','inventory_manage',
                'reports_view','loyalty_manage','audit_view','settings_manage','timecard_manage'],
-  PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue'],
-  CASHIER:    ['pos_terminal','loyalty_manage'],
-  TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue'],
+  // timecard_view: staff can view their OWN timecard history only (Employment Act — right to verify own hours)
+  // timecard_manage: ADMIN/MANAGER only — view all staff, approve, export
+  PHARMACIST: ['rx_dispense','rx_schedule_log','inventory_manage','reports_view','ai_queue','timecard_view'],
+  CASHIER:    ['pos_terminal','loyalty_manage','pos_closeout','timecard_view'],
+  TECHNICIAN: ['pos_terminal','rx_dispense','inventory_manage','ai_queue','timecard_view'],
   // AUDITOR: read-only compliance observer — audit log and reports only.
   // No POS, Rx, patient, or staff management access.
   AUDITOR:    ['audit_view','reports_view'],

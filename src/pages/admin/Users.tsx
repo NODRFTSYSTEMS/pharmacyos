@@ -122,12 +122,40 @@ interface UserDrawerProps {
   onClose: () => void;
 }
 
+interface SalaryRecord {
+  id: string
+  salary_type: string
+  amount: number
+  currency: string
+  effective_from: string
+}
+
 function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<DrawerFormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<DrawerErrors>({});
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
+
+  // Salary quick-view — queries active salary record for this staff member.
+  // RLS restricts to ADMIN/MANAGER only; query returns empty for other roles.
+  const { data: currentSalary } = useQuery<SalaryRecord | null>({
+    queryKey: ['staff-salary-quickview', editTarget?.id],
+    queryFn: async () => {
+      if (!editTarget?.id) return null
+      const { data } = await supabase
+        .from('staff_salaries')
+        .select('id, salary_type, amount, currency, effective_from')
+        .eq('staff_id', editTarget.id)
+        .is('effective_to', null)
+        .order('effective_from', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      return data ?? null
+    },
+    enabled: open && !!editTarget?.id,
+    staleTime: 60_000,
+  });
 
   useEffect(() => {
     if (open) {
@@ -411,6 +439,31 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
             </button>
             <label htmlFor="u-active" className="text-sm font-medium text-gray-700 cursor-pointer">Active</label>
           </div>
+
+          {/* Salary quick-view — edit mode only; visible to ADMIN/MANAGER (RLS-enforced) */}
+          {editTarget && (
+            <div className="rounded border border-gray-200 bg-gray-50 p-4 space-y-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Current Salary</p>
+              {currentSalary ? (
+                <div className="flex items-center justify-between text-sm">
+                  <div>
+                    <span className="font-medium text-gray-800">
+                      {currentSalary.currency} {Number(currentSalary.amount).toLocaleString('en-JM', { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="ml-2 text-xs text-gray-500">{currentSalary.salary_type.toLowerCase()}</span>
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    effective {new Date(currentSalary.effective_from).toLocaleDateString('en-JM')}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400">
+                  No active salary record.{' '}
+                  <a href="/hr/manager" className="text-blue-600 hover:underline">Add in HR Manager</a>
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Password reset — edit mode only */}
           {editTarget && (

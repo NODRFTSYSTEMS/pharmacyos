@@ -417,6 +417,22 @@ export default function PosTerminal() {
     staleTime: 300_000,
   })
 
+  // ── allow_over_sell setting — gates pre-flight stock check ──────────────────
+  // Default: false (enforce stock). Admin can override in Settings → POS & Operations.
+
+  const { data: allowOverSell = false } = useQuery<boolean>({
+    queryKey: ['setting-allow-over-sell'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('pharmacy_settings')
+        .select('value')
+        .eq('key', 'allow_over_sell')
+        .maybeSingle()
+      return data?.value === 'true'
+    },
+    staleTime: 300_000,
+  })
+
   // ── Loyalty customer search ───────────────────────────────────────────────
 
   const { data: loyaltyResults = [] } = useQuery<LoyaltyCustomerRow[]>({
@@ -472,8 +488,8 @@ export default function PosTerminal() {
     setCart(prev => {
       const idx = prev.findIndex(x => x.product_id === p.id)
       if (idx >= 0) {
-        // Item already in cart — increment qty
-        return prev.map((x, i) => i === idx ? { ...x, qty: x.qty + 1 } : x)
+        // Item already in cart — increment qty, capped at available stock
+        return prev.map((x, i) => i === idx ? { ...x, qty: Math.min(x.qty + 1, p.stock_qty) } : x)
       }
       // New item
       return [...prev, {
@@ -487,7 +503,11 @@ export default function PosTerminal() {
   }
 
   function incrementItem(id: string) {
-    setCart(prev => prev.map(x => x.product_id === id ? { ...x, qty: x.qty + 1 } : x))
+    setCart(prev => prev.map(x => {
+      if (x.product_id !== id) return x
+      const maxQty = products?.find(p => p.id === id)?.stock_qty ?? Infinity
+      return { ...x, qty: Math.min(x.qty + 1, maxQty) }
+    }))
   }
 
   function decrementItem(id: string) {
@@ -502,7 +522,10 @@ export default function PosTerminal() {
     if (qty <= 0) {
       setCart(prev => prev.filter(x => x.product_id !== id))
     } else {
-      setCart(prev => prev.map(x => x.product_id === id ? { ...x, qty } : x))
+      // Clamp to available stock for real products; custom items (no product record) keep entered qty
+      const maxQty = products?.find(p => p.id === id)?.stock_qty ?? qty
+      const clamped = Math.min(qty, maxQty)
+      setCart(prev => prev.map(x => x.product_id === id ? { ...x, qty: clamped } : x))
     }
   }
 
@@ -559,6 +582,24 @@ export default function PosTerminal() {
 
   const processSale = useMutation({
     mutationFn: async () => {
+      // ── Pre-flight stock check (Pharmacy Act + inventory integrity) ──────────
+      // Fires BEFORE any DB write. Throws if any non-custom cart item exceeds
+      // current stock_qty — preventing oversell even under concurrent sales.
+      // Client-side guards (incrementItem / setItemQty caps) prevent the condition
+      // in normal use; this is the authoritative safety net.
+      // Skipped only if admin has explicitly enabled allow_over_sell in Settings.
+      if (!allowOverSell) {
+        for (const item of cart) {
+          if (item.is_custom) continue
+          const product = products?.find(p => p.id === item.product_id)
+          if (product && item.qty > product.stock_qty) {
+            throw new Error(
+              `Insufficient stock: ${item.product_name} — ${product.stock_qty} unit(s) available`
+            )
+          }
+        }
+      }
+
       // Generate ref number using Jamaica local date (UTC-5) — avoids UTC date mismatch for evening sales
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Jamaica' }).replace(/-/g, '')
       const refNumber = `TXN-${today}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`

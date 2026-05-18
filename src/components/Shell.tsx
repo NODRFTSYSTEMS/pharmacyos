@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useLocation } from 'react-router'
 import {
-  House, Pill as PillIcon, ShoppingBag, Users, ChartBar, Robot,
+  House, Pill as PillIcon, ShoppingBag, Users, UsersThree, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight, LockSimple,
   Warehouse, Clock,
 } from '@phosphor-icons/react'
@@ -33,9 +33,9 @@ const NAV: NavItem[] = [
   ]},
   { label: 'Retail POS', icon: ShoppingBag, children: [
     { label: 'Terminal',      href: '/pos' },
-    { label: 'Transactions',  href: '/pos/transactions' },
     { label: 'Close Out',     href: '/pos/closeout' },
     { label: 'EOD Report',    href: '/pos/eod-report' },
+    { label: 'Transactions',  href: '/pos/transactions' },
     { label: 'Products',      href: '/pos/products' },
     { label: 'Suppliers',     href: '/pos/suppliers' },
     { label: 'Loyalty',       href: '/pos/loyalty' },
@@ -50,11 +50,12 @@ const NAV: NavItem[] = [
     { label: 'Stock Movements', href: '/inventory/stock-movements' },
     { label: 'Purchase Orders', href: '/inventory/purchase-orders' },
   ]},
-  { label: 'Staff',       icon: Clock, children: [
+  { label: 'Staff',       icon: UsersThree, children: [
     { label: 'My Timecard',      href: '/staff/timecard' },
     { label: 'Manage Timecards', href: '/staff/timecards' },
     { label: 'Leave Requests',   href: '/hr/leave' },
     { label: 'Certifications',   href: '/hr/certifications' },
+    { label: 'HR Manager',       href: '/hr/manager' },
   ]},
   { label: 'Reports',     icon: ChartBar, children: [
     { label: 'Revenue',       href: '/reports/revenue' },
@@ -62,11 +63,12 @@ const NAV: NavItem[] = [
     { label: 'Inventory',     href: '/reports/inventory' },
     { label: 'Timecards',     href: '/reports/timecards' },
   ]},
-  { label: 'Document Review', href: '/ai/queue', icon: Robot },
+  { label: 'AI Queue', href: '/ai/queue', icon: Robot },
   { label: 'Admin',       icon: Gear, children: [
+    { label: 'Security',      href: '/admin/security' },
     { label: 'Users',         href: '/admin/users' },
     { label: 'Audit Log',     href: '/admin/audit' },
-    { label: 'Security',      href: '/admin/security' },
+    { label: 'Audit Report',  href: '/admin/audit-report' },
     { label: 'Settings',      href: '/admin/settings' },
   ]},
 ]
@@ -82,7 +84,7 @@ function useFilteredNav(): NavItem[] {
   const showPatients        = useAnyPermission(NAV_PERMISSIONS['Patients'])
   const showInventory       = useAnyPermission(NAV_PERMISSIONS['Inventory'])
   const showReports         = useAnyPermission(NAV_PERMISSIONS['Reports'])
-  const showDocumentReview  = useAnyPermission(NAV_PERMISSIONS['AI Queue'])
+  const showAiQueue         = useAnyPermission(NAV_PERMISSIONS['AI Queue'])
   const showAdmin           = useAnyPermission(NAV_PERMISSIONS['Admin'])
   const canManageTimecards  = usePermission('timecard_manage')
   const canManageStaff      = usePermission('staff_manage')
@@ -96,9 +98,9 @@ function useFilteredNav(): NavItem[] {
       if (item.label === 'Patients')        return showPatients
       if (item.label === 'Inventory')       return showInventory
       if (item.label === 'Staff')           return true  // My Timecard is session-only; all staff see Staff group
-      if (item.label === 'Reports')         return showReports
-      if (item.label === 'Document Review') return showDocumentReview
-      if (item.label === 'Admin')           return showAdmin
+      if (item.label === 'Reports')   return showReports
+      if (item.label === 'AI Queue')  return showAiQueue
+      if (item.label === 'Admin')     return showAdmin
       return false
     })
     .map(item => {
@@ -109,20 +111,23 @@ function useFilteredNav(): NavItem[] {
           children: item.children.filter(c => {
             if (c.label === 'Manage Timecards') return canManageTimecards
             if (c.label === 'Certifications')   return canManageStaff
+            if (c.label === 'HR Manager')       return canManageStaff
             return true
           }),
         }
       }
-      // Admin child filtering: Users and Security require staff_manage;
-      // Settings requires settings_manage. Audit Log is visible to all
-      // admin-group members (audit_view is sufficient for group visibility).
+      // Admin child filtering:
+      // - Users: requires staff_manage (ADMIN/MANAGER)
+      // - Security: visible to all admin-group members — route-level RoleGuard enforces audit_view
+      // - Audit Log + Audit Report: audit_view suffices (AUDITOR, ADMIN, MANAGER)
+      // - Settings: requires settings_manage (ADMIN only)
       if (item.label === 'Admin' && item.children) {
         return {
           ...item,
           children: item.children.filter(c => {
-            if (c.label === 'Users' || c.label === 'Security') return canManageStaff
-            if (c.label === 'Settings') return canManageSettings
-            return true  // Audit Log — visible to all with any Admin permission
+            if (c.label === 'Users')     return canManageStaff
+            if (c.label === 'Settings')  return canManageSettings
+            return true  // Security, Audit Log, Audit Report: any admin-group member can see
           }),
         }
       }
@@ -506,6 +511,15 @@ export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderPro
     staleTime: 300_000,
     retry: false,
   })
+  const { data: pharmacyPhone } = useQuery({
+    queryKey: ['pharmacy-phone'],
+    queryFn: async () => {
+      const { data } = await supabase.from('pharmacy_settings').select('value').eq('key', 'pharmacy_phone').maybeSingle()
+      return data?.value ?? null
+    },
+    staleTime: 300_000,
+    retry: false,
+  })
   const now = new Date().toLocaleString('en-JM', { timeZone: 'America/Jamaica' })
   const generatedByText = generatedBy
     ?? (currentUser ? `${currentUser.name} - ${currentUser.role}` : undefined)
@@ -516,6 +530,7 @@ export function PrintHeader({ reportTitle, period, generatedBy }: PrintHeaderPro
         <div>
           <p className="font-bold text-base text-gray-900">{pharmacyName}</p>
           {pharmacyAddress && <p className="text-xs text-gray-600">{pharmacyAddress}</p>}
+          {pharmacyPhone && <p className="text-xs text-gray-600">Tel: {pharmacyPhone}</p>}
           {oicRegNo && <p className="text-xs text-gray-500 mt-0.5">OIC Registration: {oicRegNo}</p>}
         </div>
         <div className="text-right">
