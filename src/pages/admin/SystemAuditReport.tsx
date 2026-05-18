@@ -12,7 +12,7 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds, todayJamaica } from '../../lib/date'
-import { PageHeader, MetricCard, Pill as StatusPill } from '../../components/Shell'
+import { PageHeader, MetricCard } from '../../components/Shell'
 import { AUDIT_ACTIONS } from '../../constants/audit-actions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router'
 import {
   House, Pill as PillIcon, ShoppingBag, Users, UsersThree, ChartBar, Robot,
   Gear, Files, List, X, SignOut, CaretRight, LockSimple,
-  Warehouse, Clock,
+  Warehouse,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { useCurrentUser } from '../hooks/useCurrentUser'
