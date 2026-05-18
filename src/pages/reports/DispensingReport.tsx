@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import { ReportAssistant } from '../../components/ReportAssistant'
+import { PrintPreviewModal } from '../../components/PrintPreviewModal'
 import type { RxTransaction } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -43,6 +44,7 @@ function fmtDateTime(iso: string): string {
 export function DispensingReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false)
 
   const { data, isLoading, isError } = useQuery<RxTransaction[]>({
     queryKey: ['report-dispensing', from, to],
@@ -188,9 +190,9 @@ export function DispensingReport() {
             Export NHF Claims
           </button>
           <button
-            onClick={() => window.print()}
+            onClick={() => setPrintPreviewOpen(true)}
             className="btn btn-ghost gap-1.5 text-xs"
-            disabled={isLoading}
+            disabled={isLoading || records.length === 0}
             aria-label="Print dispensing report"
           >
             <Printer size={13} />
@@ -327,6 +329,13 @@ export function DispensingReport() {
           </div>
         </div>
       )}
+      <PrintPreviewModal
+        open={printPreviewOpen}
+        reportTitle="Dispensing Report"
+        description={`${records.length} record${records.length !== 1 ? 's' : ''} · ${from} to ${to} · ${voided.length} voided`}
+        onConfirm={() => { setPrintPreviewOpen(false); window.print() }}
+        onCancel={() => setPrintPreviewOpen(false)}
+      />
     </div>
   )
 }

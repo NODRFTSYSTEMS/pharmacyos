@@ -15,11 +15,10 @@ async function fetchSearchResults(query: string): Promise<SearchResult[]> {
   const pattern = `%${query}%`
 
   const [patientsRes, prescriptionsRes, productsRes, transactionsRes, staffRes, suppliersRes] = await Promise.all([
-    supabase
-      .from('patients')
-      .select('id, first_name, last_name, phone')
-      .or(`first_name.ilike.${pattern},last_name.ilike.${pattern}`)
-      .limit(8),
+    // Migration 037: fuzzy_search_patients() uses pg_trgm similarity — catches typos
+    // that ilike misses (e.g. "Crepo" → "Crespo"). Falls back to ilike internally for
+    // short queries where trigram matching is unreliable.
+    supabase.rpc('fuzzy_search_patients', { query }),
 
     supabase
       .from('prescriptions')

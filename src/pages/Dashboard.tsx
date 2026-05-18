@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
   ShoppingBag, Robot, Clock, ArrowRight, Warehouse,
-  Megaphone, Sun, Moon, ShieldCheck,
+  Megaphone, Sun, Moon, ShieldCheck, Sparkle, ArrowClockwise,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
@@ -315,6 +316,39 @@ export function Dashboard() {
   const canManageInventory  = usePermission('inventory_manage')
   const canManageStaff      = usePermission('staff_manage')
   const canManageTimecards  = usePermission('timecard_manage')
+  const canViewAudit        = usePermission('audit_view')
+
+  // Audit anomaly detection — on-demand, gated to audit_view roles
+  const [auditFrom, setAuditFrom] = useState(() => {
+    const d = new Date(today + 'T00:00:00')
+    d.setDate(d.getDate() - 1)
+    return d.toISOString().slice(0, 10)
+  })
+  const [auditTo, setAuditTo] = useState(today)
+  const [auditLoading, setAuditLoading] = useState(false)
+  const [auditSummary, setAuditSummary] = useState<{ summary: string; event_count: number; generated_at: string } | null>(null)
+  const [auditError, setAuditError] = useState<string | null>(null)
+
+  async function generateAuditSummary() {
+    setAuditLoading(true)
+    setAuditError(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('summarize-audit-log', {
+        body: { from_date: auditFrom, to_date: auditTo },
+      })
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
+      setAuditSummary({
+        summary: data.summary as string,
+        event_count: data.event_count as number,
+        generated_at: new Date().toLocaleTimeString('en-JM', { timeZone: 'America/Jamaica', hour: '2-digit', minute: '2-digit' }),
+      })
+    } catch (err) {
+      setAuditError((err as Error).message ?? 'Failed to generate audit summary.')
+    } finally {
+      setAuditLoading(false)
+    }
+  }
 
   const retailQ        = useTodayRetail(today)
   const rxQ            = useTodayRx(today)
@@ -772,6 +806,105 @@ export function Dashboard() {
           </div>
         </div>
       </section>
+      )}
+
+      {/* ── Audit Anomaly Detection — audit_view roles only ───────────────── */}
+      {canViewAudit && (
+        <section className="mb-8" aria-labelledby="audit-summary-heading">
+          <div className="flex items-center justify-between mb-3">
+            <h2 id="audit-summary-heading" className="section-title flex items-center gap-2">
+              <Sparkle size={16} weight="duotone" className="text-blue-500" aria-hidden="true" />
+              AI Audit Summary
+            </h2>
+            {auditSummary && (
+              <span className="text-xs text-gray-400">Generated at {auditSummary.generated_at}</span>
+            )}
+          </div>
+
+          <div className="card p-4">
+            {/* Date range + generate button */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <label htmlFor="audit-from" className="text-xs text-gray-500 font-medium shrink-0">From</label>
+                <input
+                  id="audit-from"
+                  type="date"
+                  value={auditFrom}
+                  max={auditTo}
+                  onChange={e => { setAuditFrom(e.target.value); setAuditSummary(null) }}
+                  className="input w-36 text-xs"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label htmlFor="audit-to" className="text-xs text-gray-500 font-medium shrink-0">To</label>
+                <input
+                  id="audit-to"
+                  type="date"
+                  value={auditTo}
+                  min={auditFrom}
+                  max={today}
+                  onChange={e => { setAuditTo(e.target.value); setAuditSummary(null) }}
+                  className="input w-36 text-xs"
+                />
+              </div>
+              <button
+                onClick={generateAuditSummary}
+                disabled={auditLoading}
+                className="btn btn-primary text-xs gap-1.5"
+                aria-label="Generate AI audit summary for selected date range"
+              >
+                {auditLoading
+                  ? <ArrowClockwise size={13} className="animate-spin" aria-hidden="true" />
+                  : <Sparkle size={13} aria-hidden="true" />
+                }
+                {auditLoading ? 'Generating…' : 'Generate Summary'}
+              </button>
+              {auditSummary && (
+                <span className="text-xs text-gray-400">
+                  {auditSummary.event_count} event{auditSummary.event_count !== 1 ? 's' : ''} analysed
+                </span>
+              )}
+            </div>
+
+            {/* Error state */}
+            {auditError && (
+              <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+                <Warning size={14} weight="duotone" className="mt-0.5 shrink-0" aria-hidden="true" />
+                {auditError}
+              </div>
+            )}
+
+            {/* Summary output */}
+            {!auditLoading && auditSummary && !auditError && (
+              <div className="rounded-lg border border-blue-100 bg-blue-50/60 px-4 py-3">
+                <ul className="space-y-1.5">
+                  {auditSummary.summary
+                    .split('\n')
+                    .map(line => line.replace(/^[-•]\s*/, '').trim())
+                    .filter(line => line.length > 0)
+                    .map((line, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs text-gray-800">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" aria-hidden="true" />
+                        {line}
+                      </li>
+                    ))
+                  }
+                </ul>
+                <p className="mt-3 text-[10px] text-gray-400">
+                  Generated by Claude · Based on audit log entries for selected period · Verify against source records before acting.
+                </p>
+              </div>
+            )}
+
+            {/* Idle state — no summary yet */}
+            {!auditLoading && !auditSummary && !auditError && (
+              <div className="flex items-center gap-2 text-xs text-gray-400 py-2">
+                <Sparkle size={14} className="text-gray-300" aria-hidden="true" />
+                Select a date range and click Generate Summary to analyse audit activity with AI.
+              </div>
+            )}
+          </div>
+        </section>
       )}
 
       {/* ── Reorder Recommendations — inventory_manage roles only ──────────── */}

@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, PrintHeader } from '../../components/Shell'
 import { ReportAssistant } from '../../components/ReportAssistant'
+import { PrintPreviewModal } from '../../components/PrintPreviewModal'
 import type { RetailTransaction, RxTransaction, PaymentMethod } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -54,6 +55,7 @@ const PAY_LABEL: Record<PaymentMethod, string> = {
 export function RevenueReport() {
   const [from, setFrom] = useState(nDaysAgo(7))
   const [to, setTo] = useState(toIsoDate(new Date()))
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false)
 
   const retailQuery = useQuery<RetailTransaction[]>({
     queryKey: ['report-retail', from, to],
@@ -240,9 +242,9 @@ export function RevenueReport() {
             Export CSV
           </button>
           <button
-            onClick={() => window.print()}
+            onClick={() => setPrintPreviewOpen(true)}
             className="btn btn-ghost gap-1.5 text-xs"
-            disabled={isLoading}
+            disabled={isLoading || dailyRows.length === 0}
             aria-label="Print revenue report"
           >
             <Printer size={13} />
@@ -383,6 +385,13 @@ export function RevenueReport() {
         </div>
       </div>
 
+      <PrintPreviewModal
+        open={printPreviewOpen}
+        reportTitle="Revenue Report"
+        description={`${dailyRows.length} day${dailyRows.length !== 1 ? 's' : ''} · ${from} to ${to} · ${retail.length + rx.length} transactions`}
+        onConfirm={() => { setPrintPreviewOpen(false); window.print() }}
+        onCancel={() => setPrintPreviewOpen(false)}
+      />
     </div>
   )
 }

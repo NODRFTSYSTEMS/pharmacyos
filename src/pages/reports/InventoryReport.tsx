@@ -6,6 +6,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
 import { ReportAssistant } from '../../components/ReportAssistant'
+import { PrintPreviewModal } from '../../components/PrintPreviewModal'
 import type { Product } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -79,6 +80,7 @@ const URGENCY_PILL: Record<ReorderRec['urgency'], { label: string; variant: 'red
 export function InventoryReport() {
   const [tab, setTab] = useState<FilterTab>('ALL')
   const [search, setSearch] = useState('')
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false)
 
   const { data, isLoading, isError } = useQuery<Product[]>({
     queryKey: ['report-inventory'],
@@ -216,9 +218,9 @@ export function InventoryReport() {
               Export CSV
             </button>
             <button
-              onClick={() => window.print()}
+              onClick={() => setPrintPreviewOpen(true)}
               className="btn btn-ghost gap-1.5 text-xs no-print"
-              disabled={isLoading}
+              disabled={isLoading || filtered.length === 0}
               aria-label="Print inventory report"
             >
               <Printer size={13} />
@@ -509,6 +511,13 @@ export function InventoryReport() {
           </div>
         </div>
       )}
+      <PrintPreviewModal
+        open={printPreviewOpen}
+        reportTitle="Inventory Report"
+        description={`${filtered.length} product${filtered.length !== 1 ? 's' : ''} · ${TAB_LABELS[tab]} filter`}
+        onConfirm={() => { setPrintPreviewOpen(false); window.print() }}
+        onCancel={() => setPrintPreviewOpen(false)}
+      />
     </div>
   )
 }
