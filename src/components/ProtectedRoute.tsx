@@ -35,23 +35,45 @@ function getAalWithTimeout(): Promise<AalResult> {
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<'loading' | 'authed' | 'mfa-required' | 'unauthed'>('loading')
-  const [showWarning, setShowWarning] = useState(false)
-  const idleTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const warnTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [showWarning,  setShowWarning]  = useState(false)
+  const [idleExpired,  setIdleExpired]  = useState(false)
+  const [secondsLeft,  setSecondsLeft]  = useState<number | null>(null)
+  const idleTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
+  const warnTimer    = useRef<ReturnType<typeof setTimeout>  | null>(null)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const signOutIdle = useCallback(async () => {
     setShowWarning(false)
+    setSecondsLeft(null)
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    setIdleExpired(true)
     await supabase.auth.signOut()
     setState('unauthed')
   }, [])
 
   const resetTimers = useCallback(() => {
     setShowWarning(false)
-    if (idleTimer.current)  clearTimeout(idleTimer.current)
-    if (warnTimer.current)  clearTimeout(warnTimer.current)
+    setSecondsLeft(null)
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    if (idleTimer.current)    clearTimeout(idleTimer.current)
+    if (warnTimer.current)    clearTimeout(warnTimer.current)
 
-    warnTimer.current  = setTimeout(() => setShowWarning(true), IDLE_TIMEOUT_MS - WARN_BEFORE_MS)
-    idleTimer.current  = setTimeout(signOutIdle, IDLE_TIMEOUT_MS)
+    warnTimer.current = setTimeout(() => {
+      setShowWarning(true)
+      const totalSecs = Math.floor(WARN_BEFORE_MS / 1000)
+      setSecondsLeft(totalSecs)
+      countdownRef.current = setInterval(() => {
+        setSecondsLeft(s => {
+          if (s === null || s <= 1) {
+            if (countdownRef.current) clearInterval(countdownRef.current)
+            return null
+          }
+          return s - 1
+        })
+      }, 1_000)
+    }, IDLE_TIMEOUT_MS - WARN_BEFORE_MS)
+
+    idleTimer.current = setTimeout(signOutIdle, IDLE_TIMEOUT_MS)
   }, [signOutIdle])
 
   useEffect(() => {
@@ -127,8 +149,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     return () => {
       events.forEach(e => window.removeEventListener(e, handler))
-      if (idleTimer.current) clearTimeout(idleTimer.current)
-      if (warnTimer.current) clearTimeout(warnTimer.current)
+      if (idleTimer.current)    clearTimeout(idleTimer.current)
+      if (warnTimer.current)    clearTimeout(warnTimer.current)
+      if (countdownRef.current) clearInterval(countdownRef.current)
     }
   }, [state, resetTimers])
 
@@ -144,7 +167,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (state === 'unauthed') {
-    return <Navigate to="/login" replace />
+    return <Navigate to={idleExpired ? '/login?reason=session_expired' : '/login'} replace />
   }
 
   // I-09: User has a session but MFA is required — redirect to verify page
@@ -162,8 +185,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
           aria-live="assertive"
         >
           <span>
-            Your session will expire in 2 minutes due to inactivity. Move your mouse or
-            press any key to stay logged in.
+            {secondsLeft !== null
+              ? <>Session expires in <strong>{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</strong> — move your mouse or press any key to stay logged in.</>
+              : <>Your session will expire shortly due to inactivity. Move your mouse or press any key to stay logged in.</>
+            }
           </span>
           <button
             onClick={resetTimers}

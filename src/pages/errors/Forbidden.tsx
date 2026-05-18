@@ -3,7 +3,9 @@
 // Access denial is logged to the audit trail via the RoleGuard component.
 
 import { useNavigate, useLocation } from 'react-router'
-import { Files, ShieldWarning } from '@phosphor-icons/react'
+import { Files, ShieldWarning, EnvelopeSimple } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '../../lib/supabase'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 
 export function Forbidden() {
@@ -15,6 +17,20 @@ export function Forbidden() {
     timeZone: 'America/Jamaica',
     hour:     '2-digit',
     minute:   '2-digit',
+  })
+
+  // Pull admin contact email from pharmacy_settings (key = 'admin_email')
+  const { data: adminEmail } = useQuery<string | null>({
+    queryKey: ['pharmacy-setting', 'admin_email'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('pharmacy_settings')
+        .select('value')
+        .eq('key', 'admin_email')
+        .maybeSingle()
+      return data?.value ?? null
+    },
+    staleTime: 5 * 60 * 1000,
   })
 
   return (
@@ -38,9 +54,22 @@ export function Forbidden() {
           <p className="text-sm text-gray-500 mb-1">
             Your role ({role}) does not have permission to view this page.
           </p>
-          <p className="text-sm text-gray-400 mb-6">
-            If you believe this is an error, contact your system administrator.
-          </p>
+          {adminEmail ? (
+            <p className="text-sm text-gray-400 mb-6">
+              If you believe this is an error, contact your administrator:
+              <a
+                href={`mailto:${adminEmail}`}
+                className="ml-1 inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
+              >
+                <EnvelopeSimple size={13} aria-hidden="true" />
+                {adminEmail}
+              </a>
+            </p>
+          ) : (
+            <p className="text-sm text-gray-400 mb-6">
+              If you believe this is an error, contact your system administrator.
+            </p>
+          )}
 
           {/* Audit confirmation badge */}
           <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-3 py-1 text-xs text-amber-700 mb-8">

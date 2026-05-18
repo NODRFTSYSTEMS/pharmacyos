@@ -5,6 +5,7 @@ import {
 } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
+import { ReportAssistant } from '../../components/ReportAssistant'
 import type { Product } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -153,6 +154,18 @@ export function InventoryReport() {
   const totalStockQty   = filtered.reduce((s, p) => s + p.stock_qty, 0)
   const totalStockValue = filtered.reduce((s, p) => s + p.unit_price * p.stock_qty, 0)
 
+  // AI context summary for ReportAssistant
+  const dataSummary = useMemo((): string => {
+    if (products.length === 0) return ''
+    return (
+      `Inventory snapshot: ${products.length} active products. ` +
+      `${inStockCount} in stock, ${lowStockCount} low stock, ${outOfStockCount} out of stock, ` +
+      `${expiringSoonCount} expiring within 30 days. ` +
+      `Total stock value: ${fmtCurrency(totalStockValue)}. ` +
+      `Current filter tab: ${TAB_LABELS[tab]}.`
+    )
+  }, [products.length, inStockCount, lowStockCount, outOfStockCount, expiringSoonCount, totalStockValue, tab])
+
   // CSV export (all products, not just filtered, for completeness)
   function exportCsv() {
     const rows = [
@@ -252,6 +265,9 @@ export function InventoryReport() {
           accent={expiringSoonCount > 0 ? 'red' : 'green'}
         />
       </div>
+
+      {/* AI Report Assistant */}
+      {dataSummary && <ReportAssistant dataSummary={dataSummary} reportType="Inventory" />}
 
       {/* Filters row */}
       <div className="card p-3 mb-4 flex flex-wrap items-center gap-3 no-print">

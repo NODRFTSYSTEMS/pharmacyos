@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   Export, Pill as PillIcon, CurrencyDollar, Warning, Printer,
@@ -6,6 +6,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { toJamaicaBounds } from '../../lib/date'
 import { PageHeader, MetricCard, Pill as StatusPill, PrintHeader } from '../../components/Shell'
+import { ReportAssistant } from '../../components/ReportAssistant'
 import type { RxTransaction } from '../../types/database'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -66,6 +67,18 @@ export function DispensingReport() {
   const totalRevenue = nonVoided.reduce((s, r) => s + r.patient_copay, 0)
   const totalNhf = nonVoided.reduce((s, r) => s + r.nhf_subsidy, 0)
   const totalQty = nonVoided.reduce((s, r) => s + r.quantity_dispensed, 0)
+
+  // AI context summary for ReportAssistant
+  const dataSummary = useMemo((): string => {
+    if (records.length === 0) return ''
+    return (
+      `Dispensing report (${from} to ${to}): ` +
+      `${nonVoided.length} prescriptions dispensed, ${voided.length} voided. ` +
+      `Total patient copay revenue: ${fmtCurrency(totalRevenue)}. ` +
+      `NHF subsidy billed: ${fmtCurrency(totalNhf)}. ` +
+      `Total units dispensed: ${totalQty}.`
+    )
+  }, [records.length, from, to, nonVoided.length, voided.length, totalRevenue, totalNhf, totalQty])
 
   // CSV export — full dispensing report
   function exportCsv() {
@@ -217,6 +230,9 @@ export function DispensingReport() {
           accent={voided.length > 0 ? 'red' : 'blue'}
         />
       </div>
+
+      {/* AI Report Assistant */}
+      {dataSummary && <ReportAssistant dataSummary={dataSummary} reportType="Dispensing" />}
 
       {/* Error state */}
       {isError && (

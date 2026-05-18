@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { Files, Eye, EyeSlash } from '@phosphor-icons/react'
+import { Files, Eye, EyeSlash, Warning } from '@phosphor-icons/react'
 import { supabase } from '../../lib/supabase'
 
 export default function Login() {
   const queryClient = useQueryClient()
+  const { search }  = useLocation()
+  const sessionExpired = new URLSearchParams(search).get('reason') === 'session_expired'
+
   const [email,        setEmail]       = useState('')
   const [password,     setPassword]    = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -67,6 +70,17 @@ export default function Login() {
             {now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
+
+        {/* Session-expired notice — shown when ProtectedRoute redirected with ?reason=session_expired */}
+        {sessionExpired && (
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 mb-4 text-sm text-amber-800"
+          >
+            <Warning size={16} weight="duotone" className="mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />
+            <p>Your session timed out due to inactivity. Please sign in again.</p>
+          </div>
+        )}
 
         <div className="card p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Sign in</h1>
