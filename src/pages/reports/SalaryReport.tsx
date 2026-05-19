@@ -271,7 +271,10 @@ export function SalaryReport() {
 
       {/* Print header */}
       <div className="hidden print:block">
-        <PrintHeader subtitle={`Salary Report · ${fmtDate(range.from)} – ${fmtDate(range.to)}`} />
+        <PrintHeader
+        reportTitle="Salary Report"
+        period={`${fmtDate(range.from)} – ${fmtDate(range.to)}`}
+      />
         <p className="text-xs text-gray-500 mt-1 italic">
           Earnings figures are estimates based on calendar days. Actual payroll may vary
           based on attendance, overtime, and deductions. Confidential — authorised personnel only.

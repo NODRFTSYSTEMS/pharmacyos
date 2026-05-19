@@ -96,10 +96,6 @@ function LeaveDrawer({ open, onClose }: { open: boolean; onClose: () => void }) 
   const mutation = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      const daysRequested = Math.max(
-        1,
-        Math.round((new Date(form.end_date).getTime() - new Date(form.start_date).getTime()) / 86_400_000) + 1,
-      )
       const { data: inserted, error } = await supabase
         .from('staff_leaves')
         .insert({
