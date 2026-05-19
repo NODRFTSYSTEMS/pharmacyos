@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router'
 import {
   CurrencyDollar, Receipt, ClockCounterClockwise, Warning,
   ShoppingBag, Robot, Clock, ArrowRight, Warehouse,
-  Megaphone, Sun, Moon, ShieldCheck, Sparkle, ArrowClockwise,
+  Megaphone, ShieldCheck, Sparkle, ArrowClockwise,
 } from '@phosphor-icons/react'
 import { supabase } from '../lib/supabase'
 import { todayJamaica, toJamaicaBounds, fmtJamaicaTime } from '../lib/date'
@@ -14,7 +14,6 @@ import { StaffAvatar } from '../components/StaffAvatar'
 import { usePermission } from '../hooks/usePermission'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { usePharmacyName } from '../hooks/usePharmacyName'
-import { useThemeMode } from '../hooks/useThemeMode'
 import { usePageTitle } from '../hooks/usePageTitle'
 import type {
   DailyInconsistencyReport,
@@ -308,7 +307,6 @@ export function Dashboard() {
   usePageTitle('Dashboard')
   const pharmacyName   = usePharmacyName()
   const { data: user } = useCurrentUser()
-  const { theme, toggleTheme } = useThemeMode()
 
   // I-21: Role-filtered dashboard sections
   const canViewReports      = usePermission('reports_view')
@@ -415,7 +413,7 @@ export function Dashboard() {
         breadcrumb={['Dashboard']}
       />
 
-      <div className="mb-6 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4">
+      <div className="mb-6">
         <section className="card p-4 flex flex-wrap items-center gap-4" aria-label="Current user and system status">
           <StaffAvatar
             name={user?.name}
@@ -441,24 +439,6 @@ export function Dashboard() {
               RBAC active
             </span>
           </div>
-        </section>
-
-        <section className="card p-4 flex items-center justify-between gap-4" aria-label="Dashboard display mode">
-          <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Dashboard theme</p>
-            <p className="text-sm text-gray-700">
-              {theme === 'dark' ? 'Dark mode' : 'Light mode'}
-            </p>
-          </div>
-          <button
-            type="button"
-            className="btn btn-ghost gap-2"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-          >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            {theme === 'dark' ? 'Light' : 'Dark'}
-          </button>
         </section>
       </div>
 

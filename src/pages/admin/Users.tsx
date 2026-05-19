@@ -577,7 +577,10 @@ function UserDrawer({ open, editTarget, onClose }: UserDrawerProps) {
                   </div>
                   {removeMutation.isError && (
                     <p className="text-xs text-red-600" role="alert">
-                      Failed to remove. Ensure this staff member has no active records.
+                      {(removeMutation.error as Error)?.message?.includes('violates foreign key')
+                        ? 'Cannot remove: this staff member has linked records (timecards, transactions, or leave). Deactivate their account instead.'
+                        : ((removeMutation.error as Error)?.message ?? 'Failed to remove. Check that this staff member has no linked records.')
+                      }
                     </p>
                   )}
                 </>

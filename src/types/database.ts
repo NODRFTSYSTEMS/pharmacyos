@@ -46,6 +46,9 @@ export interface RetailTransaction {
   void_denied_at: string | null
   void_denied_note: string | null
   created_at: string
+  // OTP fields added in migration 041 — void_otp is intentionally absent (server-only)
+  void_otp_expires_at: string | null
+  void_otp_issued_by_name: string | null
 }
 
 export interface RetailTransactionItem {

@@ -356,9 +356,21 @@ function useTodayTransactions(date: string) {
   const retail = useQuery({
     queryKey: ['retail-txns', date],
     queryFn: async () => {
+      // void_otp is intentionally excluded — it is a server-side secret communicated
+      // out-of-band. Use void_otp_expires_at (non-secret metadata) to detect OTP state.
       const { data, error } = await supabase
         .from('retail_transactions')
-        .select('*')
+        .select(`
+          id, ref_number, cashier_id, transaction_type,
+          subtotal, tax, discount, total, payment_method,
+          cash_tendered, change_given,
+          loyalty_customer_id, loyalty_points_earned, loyalty_points_redeemed,
+          notes, voided, voided_by, voided_at,
+          void_reason, void_requested_by, void_requested_by_name, void_requested_at,
+          void_denied_by, void_denied_by_name, void_denied_at, void_denied_note,
+          void_otp_expires_at, void_otp_issued_by_name,
+          created_at
+        `)
         .gte('created_at', bounds.gte)
         .lte('created_at', bounds.lte)
         .order('created_at', { ascending: false })
@@ -714,8 +726,9 @@ export default function TransactionLog() {
                         {t.voided ? (
                           <StatusPill label="Voided" variant="red" />
                         ) : isPending ? (() => {
-                          const rtExt = rt as (RetailTransaction & { void_otp?: string | null }) | null
-                          return rtExt?.void_otp ? (
+                          // Detect OTP state via void_otp_expires_at — not the OTP value itself
+                          const hasOtpActive = !!(rt?.void_otp_expires_at)
+                          return hasOtpActive ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                               <LockKey size={9} aria-hidden="true" />
                               Code Issued
@@ -734,9 +747,8 @@ export default function TransactionLog() {
                       {/* Actions */}
                       <td className="px-4 py-2.5">
                         {rt && !rt.voided && (() => {
-                          // Check if OTP has been issued (new columns from migration 041)
-                          const rtExt = rt as RetailTransaction & { void_otp?: string | null }
-                          const hasOtp = !!(rtExt.void_otp)
+                          // Use void_otp_expires_at to detect OTP state — void_otp value is server-only
+                          const hasOtp = !!(rt.void_otp_expires_at)
 
                           if (isPending) {
                             // OTP issued — cashier can now enter the code
